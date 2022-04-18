@@ -2,7 +2,10 @@
 #ifndef EONSIMULATOR_EVENTCALLSERVICETERMINATION_H
 #define EONSIMULATOR_EVENTCALLSERVICETERMINATION_H
 
-class EventCallServiceTermination {
+#include <iostream>
+#include "Event.h"
+
+class EventCallServiceTermination : public Event {
 
 };
 

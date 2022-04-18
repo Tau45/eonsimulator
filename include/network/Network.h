@@ -5,18 +5,19 @@
 #include <iostream>
 #include <vector>
 #include <queue>
-#include "../Link.h"
+#include <map>
+#include "../Connection.h"
 
 using namespace std;
 
 class Network {
-    uint64_t connectionId;
+    map<uint64_t, Connection> activeConnections;
 
-    void setupConnection(vector<Link *> &path, int fsuIndex, int numberOfFSUs) const;
+    void setupConnection(Connection *connection);
 
-    static int isNotVisited(vector<Link *> &path, int node);
+    static int linkWasNotVisited(vector<Link *> &path, int node);
 
-    int findAvailableBandwidth(vector<Link *> &path, int numberOfFSUs);
+    int lookForAvailableBandwidthInPath(vector<Link *> &path, uint64_t numberOfFSUs);
 
     void printPath(vector<Link *> &path);
 
@@ -30,7 +31,9 @@ protected:
 public:
     Network();
 
-    void establishConnection(int srcLinkIndex, int dstLinkIndex, int numberOfFSUs);
+    void tryToEstablishConnection(Connection *connection);
+
+    void closeConnection(uint64_t connectionToCloseId);
 };
 
 #endif //EONSIMULATOR_NETWORK_H

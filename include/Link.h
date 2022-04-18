@@ -3,23 +3,23 @@
 #define EONSIMULATOR_LINK_H
 
 #include <iostream>
-#include "FSU.h"
+#include <cassert>
 
 using namespace std;
 
-class NetworkSwitch;
-
 class Link {
+    bool FSUs[2];
 public:
-    int sourceNode;
-    int destinationNode;
-    FSU FSUs[2];
+    uint64_t sourceNode;
+    uint64_t destinationNode;
 
     Link(int sourceNode, int destinationNode);
 
-    void reserveFSUs(uint16_t numberOfFSUs, uint16_t firstFSU, uint64_t connectionId);
+    void reserveFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
 
-//    void freeFSUs(uint64_t connectionId);
+    void freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
+
+    bool FSUIsBusy(uint64_t FSUIndex);
 };
 
 #endif //EONSIMULATOR_LINK_H

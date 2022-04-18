@@ -3,11 +3,9 @@
 #define EONSIMULATOR_EVENTNEWCALLARRIVAL_H
 
 #include <iostream>
-#include "../Link.h"
+#include "Event.h"
 
-using namespace std;
-
-class EventNewCallArrival {
+class EventNewCallArrival : public Event {
     uint16_t srcLinkIndex;
     uint16_t dstLinkIndex;
     uint64_t connectionId;

@@ -1,12 +1,13 @@
 #include "../../include/network/Network.h"
 
-void Network::setupConnection(vector<Link *> &path, int firstFSU, int numberOfFSUs) const {
-    for (auto &link: path) {
-        link->reserveFSUs(numberOfFSUs, firstFSU, connectionId);
+void Network::setupConnection(Connection *connection) {
+    for (auto &link: connection->path) {
+        link->reserveFSUs(connection->firstFSU, connection->numberOfFSUs);
     }
+    activeConnections.emplace(connection->id, *connection);
 }
 
-int Network::isNotVisited(vector<Link *> &path, int node) {
+int Network::linkWasNotVisited(vector<Link *> &path, int node) {
     for (auto &link: path)
         if (link->destinationNode == node)
             return 0;
@@ -18,7 +19,7 @@ bool Network::pathIsExternallyBlocked(vector<Link *> &path, int numberOfFSUs) {
         bool freeNeighboringFSUsWereFound = true;
 
         for (int FSUIndex = firstFSUIndex; FSUIndex < firstFSUIndex + numberOfFSUs; FSUIndex++) {
-            if (!path.at(0)->FSUs[FSUIndex].isFree || !path.at(path.size() - 1)->FSUs[FSUIndex].isFree) {
+            if (path.at(0)->FSUIsBusy(FSUIndex) || path.at(path.size() - 1)->FSUIsBusy(FSUIndex)) {
                 freeNeighboringFSUsWereFound = false;
             }
         }
@@ -28,7 +29,7 @@ bool Network::pathIsExternallyBlocked(vector<Link *> &path, int numberOfFSUs) {
     return true;
 }
 
-int Network::findAvailableBandwidth(vector<Link *> &path, int numberOfFSUs) {
+int Network::lookForAvailableBandwidthInPath(vector<Link *> &path, uint64_t numberOfFSUs) {
     // Check for external block
     if (pathIsExternallyBlocked(path, numberOfFSUs)) {
         return -1;
@@ -40,13 +41,14 @@ int Network::findAvailableBandwidth(vector<Link *> &path, int numberOfFSUs) {
 
         for (int FSUIndex = firstFSUIndex; FSUIndex < firstFSUIndex + numberOfFSUs; FSUIndex++) {
             for (Link *link: path) {
-                if (!link->FSUs[FSUIndex].isFree) {
+                if (link->FSUIsBusy(FSUIndex)) {
                     freeNeighboringFSUsWereFound = false;
                 }
             }
         }
 
-        if (freeNeighboringFSUsWereFound) return firstFSUIndex;
+        if (freeNeighboringFSUsWereFound)
+            return firstFSUIndex;
     }
 
     // No path was found due to internal blocking
@@ -62,11 +64,11 @@ void Network::printPath(vector<Link *> &path) {
     cout << path[path.size() - 1]->destinationNode;
 }
 
-void Network::establishConnection(int srcLinkIndex, int dstLinkIndex, int numberOfFSUs) {
-    Link *sourceLink = inputLinks[srcLinkIndex];
-    int destinationNode = outputLinks[dstLinkIndex]->destinationNode;
+void Network::tryToEstablishConnection(Connection *connection) {
+    Link *sourceLink = inputLinks[connection->srcLink];
+    int destinationNode = outputLinks[connection->dstLink]->destinationNode;
 
-    cout << "\nSetting up connection " << connectionId << " between nodes: " << sourceLink->sourceNode << " and "
+    cout << "\nSetting up connection " << connection->id << " between nodes: " << sourceLink->sourceNode << " and "
          << destinationNode << "...\n";
 
     vector<Link *> currentPath = {sourceLink};
@@ -85,33 +87,40 @@ void Network::establishConnection(int srcLinkIndex, int dstLinkIndex, int number
             printPath(currentPath);
             cout << ":\n";
 
-            int firstFSUIndex = findAvailableBandwidth(currentPath, numberOfFSUs);
+            connection->firstFSU = lookForAvailableBandwidthInPath(currentPath, connection->numberOfFSUs);
 
-            if (firstFSUIndex == -1) {
+            if (connection->firstFSU == -1) {
                 cout << "\t\tConnection failed due to external blocking" << endl;
-            } else if (firstFSUIndex == -2) {
+            } else if (connection->firstFSU == -2) {
                 cout << "\t\tConnection failed due to internal blocking" << endl;
             } else {
-                setupConnection(currentPath, firstFSUIndex, numberOfFSUs);
-                cout << "\t\tConnection has been successfully set up using FSUs: " << firstFSUIndex << "-"
-                     << firstFSUIndex + numberOfFSUs - 1 << endl;
-                connectionId++;
-                return;
+                connection->path = currentPath;
+                setupConnection(connection);
+                cout << "\t\tConnection id:" << connection->id << " has been successfully set up using FSUs: "
+                << connection->firstFSU << "-" << connection->firstFSU + connection->numberOfFSUs - 1 << endl;
+                break;
             }
         }
 
         for (auto &link: links[currentPathLastNode]) {
-            if (isNotVisited(currentPath, link->destinationNode)) {
+            if (linkWasNotVisited(currentPath, link->destinationNode)) {
                 vector<Link *> newPath(currentPath);
                 newPath.push_back(link);
                 consideredPaths.push(newPath);
             }
         }
     }
-
-    connectionId++;
 }
 
-Network::Network() {
-    connectionId = 0;
+Network::Network() = default;
+
+void Network::closeConnection(uint64_t connectionToCloseId) {
+    Connection connection = activeConnections.at(connectionToCloseId);
+    activeConnections.erase(connectionToCloseId);
+
+    for (auto &link: connection.path) {
+        link->freeFSUs(connection.firstFSU, connection.numberOfFSUs);
+    }
+
+    cout << "\nConnection id:" << connectionToCloseId << " has been closed\n";
 }

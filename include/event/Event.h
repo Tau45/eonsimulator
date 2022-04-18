@@ -9,8 +9,6 @@ class Event {
 public:
     uint64_t occurrenceTime;
 
-    virtual void init() = 0;
-
     virtual void execute(Network &network) = 0;
 };
 
