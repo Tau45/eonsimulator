@@ -31,7 +31,7 @@ protected:
 public:
     Network();
 
-    void tryToEstablishConnection(Connection *connection);
+    int tryToEstablishConnection(Connection *connection);
 
     void closeConnection(uint64_t connectionToCloseId);
 };

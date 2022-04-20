@@ -64,7 +64,7 @@ void Network::printPath(vector<Link *> &path) {
     cout << path[path.size() - 1]->destinationNode;
 }
 
-void Network::tryToEstablishConnection(Connection *connection) {
+int Network::tryToEstablishConnection(Connection *connection) {
     Link *sourceLink = inputLinks[connection->srcLink];
     int destinationNode = outputLinks[connection->dstLink]->destinationNode;
 
@@ -87,13 +87,16 @@ void Network::tryToEstablishConnection(Connection *connection) {
             printPath(currentPath);
             cout << ":\n";
 
-            connection->firstFSU = lookForAvailableBandwidthInPath(currentPath, connection->numberOfFSUs);
+            int result = lookForAvailableBandwidthInPath(currentPath, connection->numberOfFSUs);
 
-            if (connection->firstFSU == -1) {
+            if (result == -1) {
                 cout << "\t\tConnection failed due to external blocking" << endl;
-            } else if (connection->firstFSU == -2) {
+//                numberofexternalblocks++
+            } else if (result == -2) {
                 cout << "\t\tConnection failed due to internal blocking" << endl;
+//                numberofinternalblocks++
             } else {
+                connection->firstFSU = result;
                 connection->path = currentPath;
                 setupConnection(connection);
                 cout << "\t\tConnection id:" << connection->id << " has been successfully set up using FSUs: "
@@ -110,6 +113,7 @@ void Network::tryToEstablishConnection(Connection *connection) {
             }
         }
     }
+    //return numberofexternalblocks, numberofinternalblocks, true/false if set
 }
 
 Network::Network() = default;
