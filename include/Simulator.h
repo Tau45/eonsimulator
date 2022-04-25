@@ -6,8 +6,10 @@
 #include <vector>
 #include <queue>
 #include "network/Network.h"
-#include "../include/network/Benes4x4.h"
+#include "network/Benes4x4.h"
 #include "event/Event.h"
+#include "event/EventNewCallArrival.h"
+#include "event/EventCallServiceTermination.h"
 #include "tools/EventComparator.h"
 
 using namespace std;
@@ -15,18 +17,18 @@ using namespace std;
 class Simulator {
     uint64_t clock;
     Network *network;
-    uint64_t connectionId;
     priority_queue<Event *, vector<Event *>, EventComparator> eventQueue;
 
     uint64_t callsToGenerate;
     uint64_t callsGenerated;
-
-    uint64_t internalBlockingCount;
-    uint64_t externalBlockingCount;
 public:
     Simulator();
 
     void run();
+
+    uint64_t getInternalBlocksCount();
+
+    uint64_t getExternalBlocksCount();
 };
 
 #endif //EONSIMULATOR_SIMULATOR_H

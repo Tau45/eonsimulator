@@ -1,6 +1,6 @@
 #include "../include/Link.h"
 
-Link::Link(int sourceNode, int destinationNode) {
+Link::Link(uint64_t sourceNode, uint64_t destinationNode) {
     this->sourceNode = sourceNode;
     this->destinationNode = destinationNode;
     for (bool &FSU: FSUs) {

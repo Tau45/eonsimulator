@@ -13,7 +13,7 @@ public:
     uint64_t sourceNode;
     uint64_t destinationNode;
 
-    Link(int sourceNode, int destinationNode);
+    Link(uint64_t sourceNode, uint64_t destinationNode);
 
     void reserveFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
 

@@ -36,7 +36,6 @@ void Logger::log(uint64_t clock, string prefix, string message) {
 }
 
 string Logger::getTimestamp(uint64_t clock) {
-//    modulo?
     uint64_t d = clock / 86400000;
     clock -= d * 86400000;
     uint64_t h = clock / 3600000;
