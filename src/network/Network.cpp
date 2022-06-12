@@ -35,11 +35,12 @@ int Network::linkWasNotVisited(vector<Link *> &path, int node) {
 }
 
 bool Network::pathIsExternallyBlocked(vector<Link *> &path, uint64_t numberOfFSUs) {
+    //todo: replace 2 with number of FSUs
     for (int firstFSUIndex = 0; firstFSUIndex < 2 - numberOfFSUs + 1; firstFSUIndex++) {
         bool freeNeighboringFSUsWereFound = true;
 
-        for (int FSUIndex = firstFSUIndex; FSUIndex < firstFSUIndex + numberOfFSUs; FSUIndex++) {
-            if (path.at(0)->FSUIsBusy(FSUIndex) || path.at(path.size() - 1)->FSUIsBusy(FSUIndex)) {
+        for (int i = firstFSUIndex; i < firstFSUIndex + numberOfFSUs; i++) {
+            if (path.at(0)->FSUIsBusy(i) || path.at(path.size() - 1)->FSUIsBusy(i)) {
                 freeNeighboringFSUsWereFound = false;
             }
         }
@@ -51,11 +52,7 @@ bool Network::pathIsExternallyBlocked(vector<Link *> &path, uint64_t numberOfFSU
     return true;
 }
 
-int64_t Network::checkPathAvailability(vector<Link *> &path, uint64_t numberOfFSUs) {
-    if (pathIsExternallyBlocked(path, numberOfFSUs)) {
-        return RESULT_EXTERNAL_BLOCK;
-    }
-
+bool Network::connectionCanBeSetUp(vector<Link *> &path, uint64_t numberOfFSUs, uint64_t &resultFirstFSU) {
     // Check for free path
     //todo: replace 2 with number of FSUs
     for (int firstFSUIndex = 0; firstFSUIndex < 2 - numberOfFSUs + 1; firstFSUIndex++) {
@@ -72,11 +69,12 @@ int64_t Network::checkPathAvailability(vector<Link *> &path, uint64_t numberOfFS
         }
 
         if (freeNeighboringFSUsWereFound) {
-            return firstFSUIndex;
+            resultFirstFSU = firstFSUIndex;
+            return true;
         }
     }
 
-    return RESULT_INTERNAL_BLOCK;
+    return false;
 }
 
 void Network::printPath(vector<Link *> &path) {
@@ -101,6 +99,10 @@ bool Network::establishConnection(Connection *connection, uint64_t clock) {
     queue<vector<Link *>> consideredPaths;
     consideredPaths.push(currentPath);
 
+    uint16_t counterOfAttempts = 0;
+    //todo: set maxCounterOfAttempts
+    uint16_t maxCounterOfAttempts = 5;
+
     while (!consideredPaths.empty()) {
         currentPath = consideredPaths.front();
         consideredPaths.pop();
@@ -108,26 +110,32 @@ bool Network::establishConnection(Connection *connection, uint64_t clock) {
         int64_t currentPathLastNode = currentPath[currentPath.size() - 1]->destinationNode;
 
         if (currentPathLastNode == destinationNode) {
+            if (pathIsExternallyBlocked(currentPath, connection->numberOfFSUs)) {
+                cout << "\tConnection failed due to external blocking" << endl;
+                externalBlocksCount++;
+                return false;
+            }
+
+            if (++counterOfAttempts == maxCounterOfAttempts) {
+                cout << "\t\tThe number of attempts has been exceeded" << endl;
+                cout << "\t\tConnection failed due to internal blocking" << endl;
+                internalBlocksCount++;
+                return false;
+            }
+
             cout << "\tConsidering currentPath: ";
             printPath(currentPath);
             cout << ":\n";
 
-            int64_t result = checkPathAvailability(currentPath, connection->numberOfFSUs);
-
-            if (result == RESULT_EXTERNAL_BLOCK) {
-                cout << "\t\tConnection failed due to external blocking" << endl;
-                externalBlocksCount++;
-            } else if (result == RESULT_INTERNAL_BLOCK) {
-                cout << "\t\tConnection failed due to internal blocking" << endl;
-                internalBlocksCount++;
-            } else {
-                connection->firstFSU = result;
+            uint64_t resultFirstFSU = 0;
+            if (connectionCanBeSetUp(currentPath, connection->numberOfFSUs, resultFirstFSU)) {
+                connection->firstFSU = resultFirstFSU;
                 connection->path = currentPath;
                 reserveResources(connection);
-                Logger::getInstance().log(clock, "", "Connection has been successfully set up using FSUs: " +
-                                                     to_string(connection->firstFSU) + "-" +
-                                                     to_string(connection->firstFSU + connection->numberOfFSUs - 1));
+                Logger::getInstance().log(clock, "", "Connection has been successfully set up using FSUs: " + to_string(connection->firstFSU) + "-" + to_string(connection->firstFSU + connection->numberOfFSUs - 1));
                 return true;
+            } else {
+                cout << "\t\tConnection could not be set up" << endl;
             }
         }
 
@@ -139,7 +147,9 @@ bool Network::establishConnection(Connection *connection, uint64_t clock) {
             }
         }
     }
-    delete connection;
+
+    cout << "\t\tConnection failed due to internal blocking" << endl;
+    internalBlocksCount++;
     return false;
 }
 

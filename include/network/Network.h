@@ -26,7 +26,7 @@ class Network {
 
     static int linkWasNotVisited(vector<Link *> &path, int node);
 
-    int64_t checkPathAvailability(vector<Link *> &path, uint64_t numberOfFSUs);
+    bool connectionCanBeSetUp(vector<Link *> &path, uint64_t numberOfFSUs, uint64_t &resultFirstFSU);
 
     void printPath(vector<Link *> &path);
 

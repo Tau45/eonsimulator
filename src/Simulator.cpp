@@ -5,13 +5,16 @@ Simulator::Simulator() {
     callsToGenerate = 10;
     callsGenerated = 0;
 
-    eventQueue.push(new EventNewCallArrival(0, 2, 0, 2, 5));
-    eventQueue.push(new EventNewCallArrival(0, 3, 0, 1, 10));
-    eventQueue.push(new EventNewCallArrival(0, 3, 1, 1, 10));
-    eventQueue.push(new EventNewCallArrival(5, 2, 0, 1, 10));
-    eventQueue.push(new EventNewCallArrival(5, 2, 0, 2, 10));
-    eventQueue.push(new EventNewCallArrival(5, 2, 0, 1, 10));
-    eventQueue.push(new EventNewCallArrival(5, 2, 0, 1, 10));
+eventQueue.push(new EventNewCallArrival(0, 2, 0, 2, 5));
+eventQueue.push(new EventNewCallArrival(0, 3, 0, 1, 10));
+eventQueue.push(new EventNewCallArrival(0, 3, 1, 1, 10));
+eventQueue.push(new EventNewCallArrival(5, 2, 0, 1, 10));
+eventQueue.push(new EventNewCallArrival(5, 2, 0, 2, 10));
+eventQueue.push(new EventNewCallArrival(5, 2, 0, 1, 10));
+eventQueue.push(new EventNewCallArrival(5, 2, 0, 1, 10));
+
+//    eventQueue.push(new EventNewCallArrival(0, 0, 0, 2, 5));
+//    eventQueue.push(new EventNewCallArrival(0, 0, 0, 2, 5));
 
     clock = eventQueue.top()->occurrenceTime;
 }

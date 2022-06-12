@@ -10,6 +10,8 @@ EventNewCallArrival::EventNewCallArrival(uint64_t occurrenceTime, uint64_t srcLi
 Event *EventNewCallArrival::execute(Network &network, uint64_t clock) {
     if (network.establishConnection(connection, clock)) {
         return new EventCallServiceTermination(occurrenceTime + connection->serviceTime, connection);
+    } else {
+        delete connection;
     }
     return nullptr;
 }
