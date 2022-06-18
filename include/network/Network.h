@@ -19,9 +19,6 @@ class Network {
 
     list<Connection *> activeConnections;
 
-    int64_t RESULT_EXTERNAL_BLOCK = -1;
-    int64_t RESULT_INTERNAL_BLOCK = -2;
-
     void reserveResources(Connection *connection);
 
     static int linkWasNotVisited(vector<Link *> &path, int node);

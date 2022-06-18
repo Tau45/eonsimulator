@@ -6,7 +6,7 @@
 #include <vector>
 #include <queue>
 #include "network/Network.h"
-#include "network/Benes4x4.h"
+#include "network/structures/Benes4x4.h"
 #include "event/Event.h"
 #include "event/EventNewCallArrival.h"
 #include "event/EventCallServiceTermination.h"
