@@ -1,8 +1,11 @@
 #include "../../include/network/Network.h"
 
 Network::Network() {
-    internalBlocksCount = 0;
-    externalBlocksCount = 0;
+    for (int i = 0; i < 4; i++) {
+        blocksCount[i] = 0;
+        internalBlocksCountErlangTraffic[i] = 0;
+        externalBlocksCountErlangTraffic[i] = 0;
+    }
 }
 
 Network::~Network() {
@@ -24,7 +27,7 @@ void Network::reserveResources(Connection *connection) {
     activeConnections.push_back(connection);
 }
 
-int Network::linkWasNotVisited(vector<Link *> &path, int node) {
+int Network::linkWasNotVisited(vector<Link *> &path, uint64_t node) {
     for (auto &link: path) {
         if (link->destinationNode == node) {
             return 0;
@@ -34,46 +37,27 @@ int Network::linkWasNotVisited(vector<Link *> &path, int node) {
     return 1;
 }
 
-bool Network::pathIsExternallyBlocked(vector<Link *> &path, uint64_t numberOfFSUs) {
-    //todo: replace 2 with number of FSUs
-    for (int firstFSUIndex = 0; firstFSUIndex < 2 - numberOfFSUs + 1; firstFSUIndex++) {
+bool Network::connectionCanBeSetUp(vector<Link *> &path, uint64_t requiredNumberOfFSUs, uint64_t &resultFirstFSU) {
+    uint64_t numberOfFSUs = path[0]->getNumberOfFSUs();
+
+    for (int i = 0; i <= numberOfFSUs - requiredNumberOfFSUs; i++) {
         bool freeNeighboringFSUsWereFound = true;
 
-        for (int i = firstFSUIndex; i < firstFSUIndex + numberOfFSUs; i++) {
-            if (path.at(0)->FSUIsBusy(i) || path.at(path.size() - 1)->FSUIsBusy(i)) {
-                freeNeighboringFSUsWereFound = false;
-            }
-        }
-
-        if (freeNeighboringFSUsWereFound) {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool Network::connectionCanBeSetUp(vector<Link *> &path, uint64_t numberOfFSUs, uint64_t &resultFirstFSU) {
-    // Check for free path
-    //todo: replace 2 with number of FSUs
-    for (int firstFSUIndex = 0; firstFSUIndex < 2 - numberOfFSUs + 1; firstFSUIndex++) {
-        bool freeNeighboringFSUsWereFound = true;
-
-        for (int i = firstFSUIndex; i < firstFSUIndex + numberOfFSUs; i++) {
+        for (int j = i; j < i + requiredNumberOfFSUs; j++) {
             for (Link *link: path) {
-                if (link->FSUIsBusy(i)) {
+                if (link->FSUIsOccupied(j)) {
                     freeNeighboringFSUsWereFound = false;
-                    firstFSUIndex = i;
+                    i = j;
                     break;
                 }
             }
         }
 
         if (freeNeighboringFSUsWereFound) {
-            resultFirstFSU = firstFSUIndex;
+            resultFirstFSU = i;
             return true;
         }
     }
-
     return false;
 }
 
@@ -87,55 +71,49 @@ void Network::printPath(vector<Link *> &path) {
     cout << path[path.size() - 1]->destinationNode;
 }
 
-bool Network::establishConnection(Connection *connection, uint64_t clock) {
+bool Network::establishConnection(Connection *connection, uint64_t clock, uint64_t trafficClass) {
     Link *sourceLink = inputLinks[connection->srcLink];
-    uint64_t destinationNode = outputLinks[connection->dstLink]->destinationNode;
+    Link *destinationLink = inputLinks[connection->dstLink];
 
-    cout << "\nSetting up connection between nodes: " << sourceLink->sourceNode << " and "
-         << destinationNode << "...\n";
+    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->numberOfFSUs)) {
+//        Logger::getInstance().log(clock, "", "Connection failed, free FSUs not found in source link");
+        blocksCount[trafficClass]++;
+        return false;
+    }
 
-    vector<Link *> currentPath = {sourceLink};
+    if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection->numberOfFSUs)) {
+//        Logger::getInstance().log(clock, "", "Connection failed due to external blocking");
+        externalBlocksCountErlangTraffic[trafficClass]++;
+        return false;
+    }
+
+    uint64_t destinationNode = destinationLink->destinationNode;
+
+//    cout << "Setting up connection between nodes: " << sourceLink->sourceNode << " and " << destinationNode << "...\n";
 
     queue<vector<Link *>> consideredPaths;
-    consideredPaths.push(currentPath);
-
-    uint16_t counterOfAttempts = 0;
-    //todo: set maxCounterOfAttempts
-    uint16_t maxCounterOfAttempts = 5;
+    consideredPaths.push({sourceLink});
 
     while (!consideredPaths.empty()) {
-        currentPath = consideredPaths.front();
+        vector<Link *> currentPath = consideredPaths.front();
         consideredPaths.pop();
 
-        int64_t currentPathLastNode = currentPath[currentPath.size() - 1]->destinationNode;
+        uint64_t currentPathLastNode = currentPath[currentPath.size() - 1]->destinationNode;
 
         if (currentPathLastNode == destinationNode) {
-            if (pathIsExternallyBlocked(currentPath, connection->numberOfFSUs)) {
-                cout << "\tConnection failed due to external blocking" << endl;
-                externalBlocksCount++;
-                return false;
-            }
-
-            if (++counterOfAttempts == maxCounterOfAttempts) {
-                cout << "\t\tThe number of attempts has been exceeded" << endl;
-                cout << "\t\tConnection failed due to internal blocking" << endl;
-                internalBlocksCount++;
-                return false;
-            }
-
-            cout << "\tConsidering currentPath: ";
-            printPath(currentPath);
-            cout << ":\n";
+//            cout << "\tConsidering currentPath: ";
+//            printPath(currentPath);
+//            cout << ":\n";
 
             uint64_t resultFirstFSU = 0;
             if (connectionCanBeSetUp(currentPath, connection->numberOfFSUs, resultFirstFSU)) {
                 connection->firstFSU = resultFirstFSU;
                 connection->path = currentPath;
                 reserveResources(connection);
-                Logger::getInstance().log(clock, "", "Connection has been successfully set up using FSUs: " + to_string(connection->firstFSU) + "-" + to_string(connection->firstFSU + connection->numberOfFSUs - 1));
+//                Logger::getInstance().log(clock, "", "Connection has been successfully set up using FSUs: " + to_string(connection->firstFSU) + "-" + to_string(connection->firstFSU + connection->numberOfFSUs - 1));
                 return true;
             } else {
-                cout << "\t\tConnection could not be set up" << endl;
+//                cout << "\t\tConnection could not be set up" << endl;
             }
         }
 
@@ -148,8 +126,8 @@ bool Network::establishConnection(Connection *connection, uint64_t clock) {
         }
     }
 
-    cout << "\t\tConnection failed due to internal blocking" << endl;
-    internalBlocksCount++;
+//    cout << "\t\tConnection failed due to internal blocking" << endl;
+    internalBlocksCountErlangTraffic[trafficClass]++;
     return false;
 }
 
@@ -161,7 +139,7 @@ void Network::closeConnection(Connection *connection, uint64_t clock) {
     activeConnections.remove(connection);
     delete connection;
 
-    Logger::getInstance().log(clock, "", "Connection has been closed");
+//    Logger::getInstance().log(clock, "", "Connection has been closed");
 }
 
 void Network::setNumberOfNodes(uint64_t numberOfNodes) {
@@ -182,4 +160,31 @@ void Network::createOutputLink(uint64_t sourceNode, uint64_t destinationNode) {
     Link *link = new Link(sourceNode, destinationNode);
     outputLinks.push_back(link);
     links[sourceNode].push_back(link);
+}
+
+uint64_t Network::getNumberOfInputLinks() {
+    return inputLinks.size();
+}
+
+uint64_t Network::getNumberOfOutputLinks() {
+    return outputLinks.size();
+}
+
+bool Network::linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs) {
+    for (int i = 0; i <= link->getNumberOfFSUs() - requiredNumberOfFSUs; i++) {
+        bool freeNeighboringFSUsWereFound = true;
+
+        for (int j = i; j < i + requiredNumberOfFSUs; j++) {
+            if (link->FSUIsOccupied(j)) {
+                freeNeighboringFSUsWereFound = false;
+                i = j;
+                break;
+            }
+        }
+
+        if (freeNeighboringFSUsWereFound) {
+            return true;
+        }
+    }
+    return false;
 }

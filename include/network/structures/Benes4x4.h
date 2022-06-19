@@ -13,17 +13,19 @@ public:
         createInputLink(2, 5);
         createInputLink(3, 5);
 
-        createOutputLink(7, 9);
-        createOutputLink(7, 10);
+        createOutputLink(8, 10);
         createOutputLink(8, 11);
-        createOutputLink(8, 12);
+        createOutputLink(9, 12);
+        createOutputLink(9, 13);
 
         createLink(4, 6);
         createLink(4, 7);
         createLink(5, 6);
-        createLink(5, 8);
-        createLink(6, 7);
+        createLink(5, 7);
         createLink(6, 8);
+        createLink(6, 9);
+        createLink(7, 8);
+        createLink(7, 9);
     }
 };
 

@@ -22,6 +22,10 @@ void Link::freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
     }
 }
 
-bool Link::FSUIsBusy(uint64_t FSUIndex) {
+bool Link::FSUIsOccupied(uint64_t FSUIndex) {
     return FSUs[FSUIndex];
+}
+
+uint64_t Link::getNumberOfFSUs() {
+    return *(&FSUs + 1) - FSUs;
 }

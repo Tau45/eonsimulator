@@ -8,7 +8,7 @@
 using namespace std;
 
 class Link {
-    bool FSUs[2];
+    bool FSUs[10];
 public:
     uint64_t sourceNode;
     uint64_t destinationNode;
@@ -19,7 +19,9 @@ public:
 
     void freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
 
-    bool FSUIsBusy(uint64_t FSUIndex);
+    bool FSUIsOccupied(uint64_t FSUIndex);
+
+    uint64_t getNumberOfFSUs();
 };
 
 #endif //EONSIMULATOR_LINK_H
