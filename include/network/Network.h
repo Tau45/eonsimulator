@@ -45,7 +45,7 @@ public:
 
     ~Network();
 
-    bool establishConnection(Connection *connection, uint64_t clock, uint64_t trafficClass);
+    bool establishConnection(Connection *connection, uint64_t clock, uint64_t trafficClass, uint64_t &callsGenerated);
 
     void closeConnection(Connection *connection, uint64_t clock);
 

@@ -71,7 +71,7 @@ void Network::printPath(vector<Link *> &path) {
     cout << path[path.size() - 1]->destinationNode;
 }
 
-bool Network::establishConnection(Connection *connection, uint64_t clock, uint64_t trafficClass) {
+bool Network::establishConnection(Connection *connection, uint64_t clock, uint64_t trafficClass, uint64_t &callsGenerated) {
     Link *sourceLink = inputLinks[connection->srcLink];
     Link *destinationLink = inputLinks[connection->dstLink];
 
@@ -80,6 +80,8 @@ bool Network::establishConnection(Connection *connection, uint64_t clock, uint64
         blocksCount[trafficClass]++;
         return false;
     }
+
+    callsGenerated++;
 
     if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection->numberOfFSUs)) {
 //        Logger::getInstance().log(clock, "", "Connection failed due to external blocking");
