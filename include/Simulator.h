@@ -12,7 +12,7 @@
 #include "event/EventNewCallArrivalErlangClass.h"
 #include "event/EventCallServiceTermination.h"
 #include "tools/EventComparator.h"
-#include "Generator.h"
+#include "tools/Generator.h"
 
 using namespace std;
 
@@ -22,14 +22,22 @@ class Simulator {
     priority_queue<Event *, vector<Event *>, EventComparator> eventQueue;
 
     uint64_t callsToGenerate;
-    uint64_t callsGenerated;
 
     uint64_t numberOfInputLinks;
     uint64_t numberOfOutputLinks;
 
     Generator *generator;
+
+    void addErlangTrafficClass(uint64_t requiredNumberOfFSUs);
+
+//    void addEngsetTrafficClass(uint64_t requiredNumberOfFSUs);
+
+//    void addPascalTrafficClass(uint64_t requiredNumberOfFSUs);
+
+    void printResults();
+
 public:
-    Simulator(uint64_t callsTarget, int32_t x, double a);
+    Simulator(uint64_t callsTarget, double a);
 
     ~Simulator();
 

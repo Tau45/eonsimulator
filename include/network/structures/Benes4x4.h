@@ -6,26 +6,24 @@
 class Benes4x4 : public Network {
 public:
     Benes4x4() {
-        setNumberOfNodes(13);
+        createLink(0, 4, true, false);
+        createLink(1, 4, true, false);
+        createLink(2, 5, true, false);
+        createLink(3, 5, true, false);
 
-        createInputLink(0, 4);
-        createInputLink(1, 4);
-        createInputLink(2, 5);
-        createInputLink(3, 5);
+        createLink(8, 10, false, true);
+        createLink(8, 11, false, true);
+        createLink(9, 12, false, true);
+        createLink(9, 13, false, true);
 
-        createOutputLink(8, 10);
-        createOutputLink(8, 11);
-        createOutputLink(9, 12);
-        createOutputLink(9, 13);
-
-        createLink(4, 6);
-        createLink(4, 7);
-        createLink(5, 6);
-        createLink(5, 7);
-        createLink(6, 8);
-        createLink(6, 9);
-        createLink(7, 8);
-        createLink(7, 9);
+        createLink(4, 6, false, false);
+        createLink(4, 7, false, false);
+        createLink(5, 6, false, false);
+        createLink(5, 7, false, false);
+        createLink(6, 8, false, false);
+        createLink(6, 9, false, false);
+        createLink(7, 8, false, false);
+        createLink(7, 9, false, false);
     }
 };
 

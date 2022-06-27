@@ -6,24 +6,22 @@
 class TestCase1 : public Network {
 public:
     TestCase1() {
-        setNumberOfNodes(13);
+        createLink(0, 4, true, false);
+        createLink(1, 4, true, false);
+        createLink(2, 5, true, false);
+        createLink(3, 5, true, false);
 
-        createInputLink(0, 4);
-        createInputLink(1, 4);
-        createInputLink(2, 5);
-        createInputLink(3, 5);
+        createLink(7, 9, false, true);
+        createLink(7, 10, false, true);
+        createLink(8, 11, false, true);
+        createLink(8, 12, false, true);
 
-        createOutputLink(7, 9);
-        createOutputLink(7, 10);
-        createOutputLink(8, 11);
-        createOutputLink(8, 12);
-
-        createLink(4, 6);
-        createLink(4, 7);
-        createLink(5, 6);
-        createLink(5, 8);
-        createLink(6, 7);
-        createLink(6, 8);
+        createLink(4, 6, false, false);
+        createLink(4, 7, false, false);
+        createLink(5, 6, false, false);
+        createLink(5, 8, false, false);
+        createLink(6, 7, false, false);
+        createLink(6, 8, false, false);
     }
 };
 

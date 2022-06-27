@@ -2,25 +2,26 @@
 
 EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(Generator *generator, uint64_t clock,
                                                                uint64_t numberOfInputLinks,
-                                                               uint64_t numberOfOutputLinks, uint64_t trafficClass) {
+                                                               uint64_t numberOfOutputLinks,
+                                                               uint64_t requiredNumberOfFSUs) {
     this->generator = generator;
-    this->occurrenceTime = generator->getOccurrenceTime(clock, trafficClass);
+    this->occurrenceTime = generator->getOccurrenceTime(clock, requiredNumberOfFSUs);
     this->priority = 1;
     this->numberOfInputLinks = numberOfInputLinks;
     this->numberOfOutputLinks = numberOfOutputLinks;
-    this->trafficClass = trafficClass;
+    this->requiredNumberOfFSUs = requiredNumberOfFSUs;
 
     uint64_t srcLink = generator->getRandomLink(numberOfInputLinks);
     uint64_t dstLink = generator->getRandomLink(numberOfOutputLinks);
     uint64_t serviceTime = generator->getServiceTime();
 
-    this->connection = new Connection(srcLink, dstLink, trafficClass, serviceTime);
+    this->connection = new Connection(srcLink, dstLink, requiredNumberOfFSUs, serviceTime);
 }
 
-vector<Event *> EventNewCallArrivalErlangClass::execute(Network &network, uint64_t clock, uint64_t &callsGenerated) {
+vector<Event *> EventNewCallArrivalErlangClass::execute(Network &network, uint64_t clock) {
     vector<Event *> resultingEvents;
 
-    if (network.establishConnection(connection, clock, trafficClass, callsGenerated)) {
+    if (network.establishConnection(connection, network.erlangTrafficClasses[requiredNumberOfFSUs])) {
         resultingEvents.push_back(
                 new EventCallServiceTermination(occurrenceTime + connection->serviceTime, connection));
     } else {
@@ -29,7 +30,7 @@ vector<Event *> EventNewCallArrivalErlangClass::execute(Network &network, uint64
 
     resultingEvents.push_back(
             new EventNewCallArrivalErlangClass(generator, clock, numberOfInputLinks, numberOfOutputLinks,
-                                               trafficClass));
+                                               requiredNumberOfFSUs));
 
     return resultingEvents;
 }

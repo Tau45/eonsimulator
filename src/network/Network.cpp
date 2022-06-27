@@ -1,16 +1,8 @@
 #include "../../include/network/Network.h"
 
-Network::Network() {
-    for (int i = 0; i < 4; i++) {
-        blocksCount[i] = 0;
-        internalBlocksCountErlangTraffic[i] = 0;
-        externalBlocksCountErlangTraffic[i] = 0;
-    }
-}
-
 Network::~Network() {
-    for (const vector<Link *> &node: links) {
-        for (Link *link: node) {
+    for (auto const &node: links) {
+        for (Link *link: node.second) {
             delete link;
         }
     }
@@ -61,31 +53,20 @@ bool Network::connectionCanBeSetUp(vector<Link *> &path, uint64_t requiredNumber
     return false;
 }
 
-void Network::printPath(vector<Link *> &path) {
-    cout << path[0]->sourceNode << " -> ";
+bool Network::establishConnection(Connection *connection, TrafficClassStatistics &statistics) {
+    Link *sourceLink = inputLinks[connection->sourceLinkIndex];
+    Link *destinationLink = inputLinks[connection->destinationLinkIndex];
 
-    for (int i = 0; i < path.size() - 1; i++) {
-        cout << path[i]->destinationNode << " -> ";
-    }
-
-    cout << path[path.size() - 1]->destinationNode;
-}
-
-bool Network::establishConnection(Connection *connection, uint64_t clock, uint64_t trafficClass, uint64_t &callsGenerated) {
-    Link *sourceLink = inputLinks[connection->srcLink];
-    Link *destinationLink = inputLinks[connection->dstLink];
-
-    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->numberOfFSUs)) {
-//        Logger::getInstance().log(clock, "", "Connection failed, free FSUs not found in source link");
-        blocksCount[trafficClass]++;
+    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->numberOfFSUs) && sourceLink != destinationLink) {
+//        cout << "Connection failed, free FSUs not found in source link";
         return false;
     }
 
-    callsGenerated++;
+    statistics.callsGenerated++;
 
     if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection->numberOfFSUs)) {
-//        Logger::getInstance().log(clock, "", "Connection failed due to external blocking");
-        externalBlocksCountErlangTraffic[trafficClass]++;
+//        cout << "Connection failed due to external blocking";
+        statistics.externalBlocksCount++;
         return false;
     }
 
@@ -107,15 +88,11 @@ bool Network::establishConnection(Connection *connection, uint64_t clock, uint64
 //            printPath(currentPath);
 //            cout << ":\n";
 
-            uint64_t resultFirstFSU = 0;
-            if (connectionCanBeSetUp(currentPath, connection->numberOfFSUs, resultFirstFSU)) {
-                connection->firstFSU = resultFirstFSU;
+            if (connectionCanBeSetUp(currentPath, connection->numberOfFSUs, connection->firstFSU)) {
                 connection->path = currentPath;
                 reserveResources(connection);
-//                Logger::getInstance().log(clock, "", "Connection has been successfully set up using FSUs: " + to_string(connection->firstFSU) + "-" + to_string(connection->firstFSU + connection->numberOfFSUs - 1));
+//                cout << "Connection has been successfully set up using FSUs: " << to_string(connection->firstFSU) << "-" << to_string(connection->firstFSU + connection->numberOfFSUs - 1) << endl;
                 return true;
-            } else {
-//                cout << "\t\tConnection could not be set up" << endl;
             }
         }
 
@@ -129,39 +106,32 @@ bool Network::establishConnection(Connection *connection, uint64_t clock, uint64
     }
 
 //    cout << "\t\tConnection failed due to internal blocking" << endl;
-    internalBlocksCountErlangTraffic[trafficClass]++;
+    statistics.internalBlocksCount++;
     return false;
 }
 
 
-void Network::closeConnection(Connection *connection, uint64_t clock) {
+void Network::closeConnection(Connection *connection) {
     for (auto &link: connection->path) {
         link->freeFSUs(connection->firstFSU, connection->numberOfFSUs);
     }
     activeConnections.remove(connection);
     delete connection;
 
-//    Logger::getInstance().log(clock, "", "Connection has been closed");
+//    cout << "Connection has been closed";
 }
 
-void Network::setNumberOfNodes(uint64_t numberOfNodes) {
-    this->links.resize(numberOfNodes);
-}
-
-void Network::createInputLink(uint64_t sourceNode, uint64_t destinationNode) {
-    Link *link = new Link(sourceNode, destinationNode);
-    inputLinks.push_back(link);
+void Network::createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput) {
+    Link *link = new Link(destinationNode);
     links[sourceNode].push_back(link);
-}
 
-void Network::createLink(uint64_t sourceNode, uint64_t destinationNode) {
-    links[sourceNode].push_back(new Link(sourceNode, destinationNode));
-}
+    if (isInput) {
+        inputLinks.push_back(link);
+    }
 
-void Network::createOutputLink(uint64_t sourceNode, uint64_t destinationNode) {
-    Link *link = new Link(sourceNode, destinationNode);
-    outputLinks.push_back(link);
-    links[sourceNode].push_back(link);
+    if (isOutput) {
+        outputLinks.push_back(link);
+    }
 }
 
 uint64_t Network::getNumberOfInputLinks() {
@@ -189,4 +159,28 @@ bool Network::linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumbe
         }
     }
     return false;
+}
+
+uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
+    uint64_t result = UINT64_MAX;
+
+    for (auto const &trafficClass: erlangTrafficClasses) {
+        if (trafficClass.second.callsGenerated < result) {
+            result = trafficClass.second.callsGenerated;
+        }
+    }
+
+    for (auto const &trafficClass: engsetTrafficClasses) {
+        if (trafficClass.second.callsGenerated < result) {
+            result = trafficClass.second.callsGenerated;
+        }
+    }
+
+    for (auto const &trafficClass: pascalTrafficClasses) {
+        if (trafficClass.second.callsGenerated < result) {
+            result = trafficClass.second.callsGenerated;
+        }
+    }
+
+    return result;
 }

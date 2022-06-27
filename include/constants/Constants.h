@@ -1,0 +1,6 @@
+#ifndef EONSIMULATOR_CONSTANTS_H
+#define EONSIMULATOR_CONSTANTS_H
+
+const uint64_t linkCapacity = 10;
+
+#endif //EONSIMULATOR_CONSTANTS_H

@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "../network/Network.h"
-#include "../Generator.h"
+#include "../tools/Generator.h"
 
 class Event {
 public:
@@ -13,7 +13,7 @@ public:
     uint8_t priority;
     Connection *connection;
 
-    virtual vector<Event *> execute(Network &network, uint64_t clock, uint64_t &callsGenerated) = 0;
+    virtual vector<Event *> execute(Network &network, uint64_t clock) = 0;
 };
 
 #endif //EONSIMULATOR_EVENT_H
