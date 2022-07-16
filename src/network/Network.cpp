@@ -58,14 +58,14 @@ bool Network::establishConnection(Connection *connection, TrafficClassStatistics
     Link *destinationLink = inputLinks[connection->destinationLinkIndex];
 
     if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->numberOfFSUs) && sourceLink != destinationLink) {
-//        cout << "Connection failed, free FSUs not found in source link";
+        cout << "Connection failed, free FSUs not found in source link" << endl;
         return false;
     }
 
     statistics.callsGenerated++;
 
     if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection->numberOfFSUs)) {
-//        cout << "Connection failed due to external blocking";
+        cout << "Connection failed due to external blocking" << endl;
         statistics.externalBlocksCount++;
         return false;
     }
@@ -91,7 +91,7 @@ bool Network::establishConnection(Connection *connection, TrafficClassStatistics
             if (connectionCanBeSetUp(currentPath, connection->numberOfFSUs, connection->firstFSU)) {
                 connection->path = currentPath;
                 reserveResources(connection);
-//                cout << "Connection has been successfully set up using FSUs: " << to_string(connection->firstFSU) << "-" << to_string(connection->firstFSU + connection->numberOfFSUs - 1) << endl;
+                cout << "Connection has been successfully set up using FSUs: " << to_string(connection->firstFSU) << "-" << to_string(connection->firstFSU + connection->numberOfFSUs - 1) << endl;
                 return true;
             }
         }
@@ -116,9 +116,8 @@ void Network::closeConnection(Connection *connection) {
         link->freeFSUs(connection->firstFSU, connection->numberOfFSUs);
     }
     activeConnections.remove(connection);
+    cout << "Connection closed: Freeing FSUs: " << to_string(connection->firstFSU) << "-" << to_string(connection->firstFSU + connection->numberOfFSUs - 1) << endl;
     delete connection;
-
-//    cout << "Connection has been closed";
 }
 
 void Network::createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput) {

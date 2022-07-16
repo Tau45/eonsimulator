@@ -25,6 +25,7 @@ vector<Event *> EventNewCallArrivalErlangClass::execute(Network &network, uint64
         resultingEvents.push_back(
                 new EventCallServiceTermination(occurrenceTime + connection->serviceTime, connection));
     } else {
+        cout << "connection rejected (" << requiredNumberOfFSUs << " FSUs)" << endl;
         delete connection;
     }
 

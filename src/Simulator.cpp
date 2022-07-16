@@ -8,7 +8,7 @@ Simulator::Simulator(uint64_t callsTarget, double a) {
 
     callsToGenerate = callsTarget;
 
-    uint64_t V = 10;    // number of FSUs
+    uint64_t V = linkCapacity;    // number of FSUs
     uint64_t M = 3;     // number of traffic classes
     uint64_t mi = 1;    // service time
 
