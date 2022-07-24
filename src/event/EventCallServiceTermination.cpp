@@ -6,7 +6,6 @@ EventCallServiceTermination::EventCallServiceTermination(uint64_t occurrenceTime
     this->connection = connection;
 }
 
-vector<Event *> EventCallServiceTermination::execute(Network &network, uint64_t clock) {
+void EventCallServiceTermination::execute(Network &network, uint64_t clock, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue) {
     network.closeConnection(connection);
-    return vector<Event *>{};
 }

@@ -13,7 +13,15 @@ public:
     uint8_t priority;
     Connection *connection;
 
-    virtual vector<Event *> execute(Network &network, uint64_t clock) = 0;
+    struct EventComparator {
+        bool operator()(const Event *a, const Event *b) {
+            return a->occurrenceTime == b->occurrenceTime
+                   ? a->priority > b->priority
+                   : a->occurrenceTime > b->occurrenceTime;
+        }
+    };
+
+    virtual void execute(Network &network, uint64_t clock, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue) = 0;
 };
 
 #endif //EONSIMULATOR_EVENT_H

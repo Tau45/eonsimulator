@@ -11,7 +11,6 @@
 #include "event/Event.h"
 #include "event/EventNewCallArrivalErlangClass.h"
 #include "event/EventCallServiceTermination.h"
-#include "tools/EventComparator.h"
 #include "tools/Generator.h"
 
 using namespace std;
@@ -19,7 +18,7 @@ using namespace std;
 class Simulator {
     uint64_t clock;
     Network *network;
-    priority_queue<Event *, vector<Event *>, EventComparator> eventQueue;
+    priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
 
     uint64_t callsToGenerate;
 

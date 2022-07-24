@@ -53,21 +53,18 @@ bool Network::connectionCanBeSetUp(vector<Link *> &path, uint64_t requiredNumber
     return false;
 }
 
-bool Network::establishConnection(Connection *connection, TrafficClassStatistics &statistics) {
+Network::ESTABLISH_CONNECTION_RESULT Network::tryToEstablishConnection(Connection *connection) {
     Link *sourceLink = inputLinks[connection->sourceLinkIndex];
     Link *destinationLink = inputLinks[connection->destinationLinkIndex];
 
     if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->numberOfFSUs) && sourceLink != destinationLink) {
-        cout << "Connection failed, free FSUs not found in source link" << endl;
-        return false;
+//        cout << "Connection rejected: free FSUs not found in source link (" << connection->numberOfFSUs << " FSUs)" << endl;
+        return FREE_FSUS_NOT_FOUND_IN_SOURCE_LINK;
     }
 
-    statistics.callsGenerated++;
-
     if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection->numberOfFSUs)) {
-        cout << "Connection failed due to external blocking" << endl;
-        statistics.externalBlocksCount++;
-        return false;
+//        cout << "Connection rejected: external blocking (" << connection->numberOfFSUs << " FSUs)" << endl;
+        return EXTERNAL_BLOCK;
     }
 
     uint64_t destinationNode = destinationLink->destinationNode;
@@ -91,8 +88,8 @@ bool Network::establishConnection(Connection *connection, TrafficClassStatistics
             if (connectionCanBeSetUp(currentPath, connection->numberOfFSUs, connection->firstFSU)) {
                 connection->path = currentPath;
                 reserveResources(connection);
-                cout << "Connection has been successfully set up using FSUs: " << to_string(connection->firstFSU) << "-" << to_string(connection->firstFSU + connection->numberOfFSUs - 1) << endl;
-                return true;
+//                cout << "Connection has been successfully set up using FSUs: " << to_string(connection->firstFSU) << "-" << to_string(connection->firstFSU + connection->numberOfFSUs - 1) << endl;
+                return CONNECTION_ESTABLISHED;
             }
         }
 
@@ -105,9 +102,8 @@ bool Network::establishConnection(Connection *connection, TrafficClassStatistics
         }
     }
 
-//    cout << "\t\tConnection failed due to internal blocking" << endl;
-    statistics.internalBlocksCount++;
-    return false;
+//    cout << "Connection rejected: internal blocking (" << connection->numberOfFSUs << " FSUs)" << endl;
+    return INTERNAL_BLOCK;
 }
 
 
@@ -116,7 +112,7 @@ void Network::closeConnection(Connection *connection) {
         link->freeFSUs(connection->firstFSU, connection->numberOfFSUs);
     }
     activeConnections.remove(connection);
-    cout << "Connection closed: Freeing FSUs: " << to_string(connection->firstFSU) << "-" << to_string(connection->firstFSU + connection->numberOfFSUs - 1) << endl;
+//    cout << "Connection closed: Freeing FSUs: " << to_string(connection->firstFSU) << "-" << to_string(connection->firstFSU + connection->numberOfFSUs - 1) << endl;
     delete connection;
 }
 

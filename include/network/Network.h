@@ -38,7 +38,14 @@ public:
 
     ~Network();
 
-    bool establishConnection(Connection *connection, TrafficClassStatistics &statistics);
+    enum ESTABLISH_CONNECTION_RESULT {
+        FREE_FSUS_NOT_FOUND_IN_SOURCE_LINK,
+        INTERNAL_BLOCK,
+        EXTERNAL_BLOCK,
+        CONNECTION_ESTABLISHED,
+    };
+
+    ESTABLISH_CONNECTION_RESULT tryToEstablishConnection(Connection *connection);
 
     void closeConnection(Connection *connection);
 

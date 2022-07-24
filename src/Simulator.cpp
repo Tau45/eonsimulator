@@ -30,12 +30,10 @@ void Simulator::run() {
     while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < callsToGenerate) {
         clock = eventQueue.top()->occurrenceTime;
 
-        vector<Event *> resultingEvents = eventQueue.top()->execute(*network, clock);
+        Event *event = eventQueue.top();
         eventQueue.pop();
 
-        for (Event *event: resultingEvents) {
-            eventQueue.push(event);
-        }
+        event->execute(*network, clock, eventQueue);
     }
 
     Logger::getInstance().log(clock, "", "The simulation has finished");
@@ -52,8 +50,7 @@ Simulator::~Simulator() {
 
 void Simulator::addErlangTrafficClass(uint64_t requiredNumberOfFSUs) {
     network->erlangTrafficClasses[requiredNumberOfFSUs].callsGenerated = 0;
-    eventQueue.push(new EventNewCallArrivalErlangClass(generator, clock, numberOfInputLinks, numberOfOutputLinks,
-                                                       requiredNumberOfFSUs));
+    eventQueue.push(new EventNewCallArrivalErlangClass(generator, clock, numberOfInputLinks, numberOfOutputLinks, requiredNumberOfFSUs));
 }
 
 void Simulator::printResults() {
