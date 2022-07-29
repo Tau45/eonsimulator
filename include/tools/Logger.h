@@ -5,6 +5,8 @@
 #include <iostream>
 #include <sstream>
 #include <iomanip>
+#include <map>
+#include "../constants/Constants.h"
 
 using namespace std;
 
@@ -22,63 +24,31 @@ public:
 
     void operator=(Logger const &) = delete;
 
-    void log(uint64_t clock, string prefix, string message) {
-        cout << getTimestamp(clock);
+    enum LOG_MESSAGE_TYPE {
+        CONNECTION_REJECTED,
+        INTERNAL_BLOCK,
+        EXTERNAL_BLOCK,
+        CONNECTION_ESTABLISHED,
+        CONNECTION_CLOSED,
+        CONNECTION_SETUP,
+        SIMULATION_START,
+        SIMULATION_END
+    };
 
-        /*if (prefix == "[USER_ARRIVAL]   ") {
-            SetConsoleTextAttribute((CONSOLE_WINDOW), 0x0E);
-        }
-        else if (prefix == "[BLOCK_RELEASE]  ") {
-            SetConsoleTextAttribute((CONSOLE_WINDOW), 0x09);
-        }
-        else if (prefix == "[USER_FINISHED]  ") {
-            SetConsoleTextAttribute((CONSOLE_WINDOW), 0x0A);
-        }
-        else if (prefix == "[USER_QUEUED]    ") {
-            SetConsoleTextAttribute((CONSOLE_WINDOW), 0x0D);
-        }
-        else if (prefix == "[BLOCK_ASSIGN]   ") {
-            SetConsoleTextAttribute((CONSOLE_WINDOW), 0x03);
-        }
-        else if (prefix == "[DATA_TRANSFER]  ") {
-            SetConsoleTextAttribute((CONSOLE_WINDOW), 0x0B);
-        }
-        else if (prefix == "[BITRATE_CHANGE] ") {
-            SetConsoleTextAttribute((CONSOLE_WINDOW), 0x0C);
-        }
-        else if (prefix == "[SIMULATION_END] ") {
-            SetConsoleTextAttribute((CONSOLE_WINDOW), 0x07);
-        }*/
+    map<LOG_MESSAGE_TYPE, string> logMessageTypeMap = {
+            {CONNECTION_REJECTED,    "[CONNECTION_REJECTED   ] "},
+            {INTERNAL_BLOCK,         "[INTERNAL_BLOCK        ] "},
+            {EXTERNAL_BLOCK,         "[EXTERNAL_BLOCK        ] "},
+            {CONNECTION_ESTABLISHED, "[CONNECTION_ESTABLISHED] "},
+            {CONNECTION_CLOSED,      "[CONNECTION_CLOSED     ] "},
+            {CONNECTION_SETUP,       "[CONNECTION_SETUP      ] "},
+            {SIMULATION_START,       "[SIMULATION_START      ] "},
+            {SIMULATION_END,         "[SIMULATION_END        ] "}
+    };
 
-        cout << prefix;
+    void log(double clock, LOG_MESSAGE_TYPE prefix, const string &message);
 
-//    SetConsoleTextAttribute((CONSOLE_WINDOW), 0x07);
-
-        cout << message << endl;
-    }
-
-    string getTimestamp(uint64_t clock) {
-        uint64_t d = clock / 86400000;
-        clock -= d * 86400000;
-        uint64_t h = clock / 3600000;
-        clock -= h * 3600000;
-        uint64_t m = clock / 60000;
-        clock -= m * 60000;
-        uint64_t s = clock / 1000;
-        clock -= s * 1000;
-        uint64_t ms = clock;
-
-        stringstream ss;
-        ss << "["
-           << setfill(' ')
-           << setw(3) << d << "d "
-           << setfill('0')
-           << setw(2) << h << ":"
-           << setw(2) << m << ":"
-           << setw(2) << s << ":"
-           << setw(3) << ms << "] ";
-        return ss.str();
-    }
+    string getTimestamp(double clock);
 };
 
 #endif //EONSIMULATOR_LOGGER_H

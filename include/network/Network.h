@@ -20,11 +20,9 @@ class Network {
 
     list<Connection *> activeConnections;
 
-    void reserveResources(Connection *connection);
+    bool linkWasNotVisited(vector<Link *> &path, uint64_t node);
 
-    static int linkWasNotVisited(vector<Link *> &path, uint64_t node);
-
-    bool connectionCanBeSetUp(vector<Link *> &path, uint64_t numberOfFSUs, uint64_t &resultFirstFSU);
+    bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, uint64_t requiredNumberOfFSUs, uint64_t &resultFirstFSU);
 
     bool linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs);
 
@@ -39,15 +37,17 @@ public:
     ~Network();
 
     enum ESTABLISH_CONNECTION_RESULT {
-        FREE_FSUS_NOT_FOUND_IN_SOURCE_LINK,
+        CONNECTION_REJECTED,
         INTERNAL_BLOCK,
         EXTERNAL_BLOCK,
         CONNECTION_ESTABLISHED,
     };
 
-    ESTABLISH_CONNECTION_RESULT tryToEstablishConnection(Connection *connection);
+    ESTABLISH_CONNECTION_RESULT tryToEstablishConnection(double clock, Connection *connection);
 
-    void closeConnection(Connection *connection);
+    void reserveResources(Connection *connection);
+
+    void closeConnection(double clock, Connection *connection);
 
     uint64_t getNumberOfInputLinks();
 

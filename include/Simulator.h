@@ -16,14 +16,11 @@
 using namespace std;
 
 class Simulator {
-    uint64_t clock;
+    double clock;
     Network *network;
     priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
 
     uint64_t callsToGenerate;
-
-    uint64_t numberOfInputLinks;
-    uint64_t numberOfOutputLinks;
 
     Generator *generator;
 

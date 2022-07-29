@@ -1,6 +1,7 @@
 #include "../include/Link.h"
 
-Link::Link(uint64_t destinationNode) {
+Link::Link(uint64_t sourceNode, uint64_t destinationNode) {
+    this->sourceNode = sourceNode;
     this->destinationNode = destinationNode;
     for (bool &FSU: FSUs) {
         FSU = false;
@@ -23,8 +24,4 @@ void Link::freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
 
 bool Link::FSUIsOccupied(uint64_t FSUIndex) {
     return FSUs[FSUIndex];
-}
-
-uint64_t Link::getNumberOfFSUs() {
-    return *(&FSUs + 1) - FSUs;
 }
