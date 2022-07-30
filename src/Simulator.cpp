@@ -5,11 +5,11 @@ Simulator::Simulator(uint64_t callsTarget, double a) {
     network = new SingleLink();
     callsToGenerate = callsTarget;
 
-    uint64_t M = 3; // number of traffic classes
+    uint64_t numberOfTrafficClasses = 3;
     uint64_t numberOfInputLinks = network->getNumberOfInputLinks();
     uint64_t numberOfOutputLinks = network->getNumberOfOutputLinks();
 
-    generator = new Generator(a, linkCapacity, M, numberOfInputLinks, numberOfOutputLinks);
+    generator = new Generator(a, linkCapacity, numberOfTrafficClasses, numberOfInputLinks, numberOfOutputLinks);
 
     addErlangTrafficClass(1);
     addErlangTrafficClass(2);

@@ -7,8 +7,8 @@
 class Generator {
 public:
     double a;   // input parameter
-    uint64_t V; // number of FSUs
-    uint64_t M; // number of traffic classes
+    uint64_t linkCapacity; // number of FSUs
+    uint64_t numberOfTrafficClasses; // number of traffic classes
     uint64_t numberOfInputLinks;
     uint64_t numberOfOutputLinks;
 
@@ -16,13 +16,13 @@ public:
     int32_t x2;
     int32_t x3;
 
-    Generator(double a, uint64_t V, uint64_t M, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
+    Generator(double a, uint64_t linkCapacity, uint64_t numberOfTrafficClasses, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
 
-    double rown_v1();
+    double rown_v1(int &x);
 
-    double rown_v2();
+    double rown_v2(int &x);
 
-    int rown_v3();
+    double rown_v3(int &x);
 
     double getLambda(uint32_t requiredNumberOfFSUs, double serviceTime);
 
