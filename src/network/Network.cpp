@@ -13,7 +13,7 @@ Network::~Network() {
 }
 
 void Network::reserveResources(Connection *connection) {
-    assert(connection->path != null);
+    assert(!connection->path.empty());
     for (auto &link: connection->path) {
         link->reserveFSUs(connection->firstFSU, connection->requiredNumberOfFSUs);
     }
