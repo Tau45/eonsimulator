@@ -1,10 +1,11 @@
 #include "../../include/tools/Logger.h"
 
 void Logger::log(double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
-    if (!logsEnabled) return;
-    cout << getTimestamp(clock);
-    cout << logMessageTypeMap.at(prefix);
-    cout << message << endl;
+    if (logsEnabled || prefix == SIMULATION_START || prefix == SIMULATION_END) {
+        cout << getTimestamp(clock);
+        cout << logMessageTypeMap.at(prefix);
+        cout << message << endl;
+    }
 }
 
 string Logger::getTimestamp(double clock) {

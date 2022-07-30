@@ -52,7 +52,7 @@ void Simulator::printResults() {
     cout << "Erlang traffic:" << endl;
 
     for (auto const &trafficClass: network->erlangTrafficClasses) {
-        cout << "Traffic class requiring " << trafficClass.first << " FSUs:"
+        cout << trafficClass.first << " FSUs class:"
              << " calls generated: " << trafficClass.second.callsGenerated
              << ", internal blocks: " << trafficClass.second.internalBlocksCount
              << " (" << (double) trafficClass.second.internalBlocksCount / trafficClass.second.callsGenerated << ")"
