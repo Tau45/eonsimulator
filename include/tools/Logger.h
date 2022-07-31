@@ -32,7 +32,8 @@ public:
         CONNECTION_CLOSED,
         CONNECTION_SETUP,
         SIMULATION_START,
-        SIMULATION_END
+        SIMULATION_END,
+        CREATING_STRUCTURE
     };
 
     map<LOG_MESSAGE_TYPE, string> logMessageTypeMap = {
@@ -43,7 +44,8 @@ public:
             {CONNECTION_CLOSED,      "[CONNECTION_CLOSED     ] "},
             {CONNECTION_SETUP,       "[CONNECTION_SETUP      ] "},
             {SIMULATION_START,       "[SIMULATION_START      ] "},
-            {SIMULATION_END,         "[SIMULATION_END        ] "}
+            {SIMULATION_END,         "[SIMULATION_END        ] "},
+            {CREATING_STRUCTURE,     "[CREATING_STRUCTURE    ] "}
     };
 
     void log(double clock, LOG_MESSAGE_TYPE prefix, const string &message);

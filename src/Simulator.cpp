@@ -1,9 +1,15 @@
 #include "../include/Simulator.h"
 
-Simulator::Simulator(uint64_t callsTarget, double a) {
+Simulator::Simulator(string structureFileName, double a, uint64_t callsToGenerate) {
     clock = 0;
-    network = new SingleLink();
-    callsToGenerate = callsTarget;
+    network = new Network();
+
+    network->createStructure(structureFileName);
+
+    // napisz weryfikacje czy kazde wyjscie jest dostepne z kazdego wejscia
+    // wyjmij tworzenie networka do maina
+
+    this->callsToGenerate = callsToGenerate;
 
     uint64_t numberOfTrafficClasses = 3;
     uint64_t numberOfInputLinks = network->getNumberOfInputLinks();
@@ -24,11 +30,11 @@ Simulator::~Simulator() {
 }
 
 void Simulator::run() {
-    cout << "##############################################################################" << endl << endl;
-    cout << "Starting simulation with parameters:" << endl;
-    cout << "Calls to generate: " << callsToGenerate << endl;
-    cout << "a: " << generator->a << endl << endl;
-
+    Logger::getInstance().log(clock, Logger::CREATING_STRUCTURE, "");
+    Logger::getInstance().log(clock, Logger::SIMULATION_START, "Starting simulation with parameters:");
+    Logger::getInstance().log(clock, Logger::SIMULATION_START, "Calls to generate: " + to_string(callsToGenerate));
+    Logger::getInstance().log(clock, Logger::SIMULATION_START, "a: " + to_string(generator->a));
+    Logger::getInstance().log(clock, Logger::SIMULATION_START, "");
     Logger::getInstance().log(clock, Logger::SIMULATION_START, "The simulation has started...");
 
     while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < callsToGenerate) {

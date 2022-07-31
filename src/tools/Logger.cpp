@@ -1,7 +1,7 @@
 #include "../../include/tools/Logger.h"
 
 void Logger::log(double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
-    if (logsEnabled || prefix == SIMULATION_START || prefix == SIMULATION_END) {
+    if (logsEnabled || prefix == SIMULATION_START || prefix == SIMULATION_END || prefix == CREATING_STRUCTURE) {
         cout << getTimestamp(clock);
         cout << logMessageTypeMap.at(prefix);
         cout << message << endl;

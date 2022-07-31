@@ -6,9 +6,6 @@
 #include <vector>
 #include <queue>
 #include "network/Network.h"
-#include "network/structures/Benes4x4.h"
-#include "network/structures/SingleLink.h"
-#include "network/structures/ThreeSections4x4.h"
 #include "event/Event.h"
 #include "event/EventNewCallArrivalErlangClass.h"
 #include "event/EventCallServiceTermination.h"
@@ -34,7 +31,7 @@ class Simulator {
     void printResults();
 
 public:
-    Simulator(uint64_t callsTarget, double a);
+    Simulator(string structureFileName, double a, uint64_t callsToGenerate);
 
     ~Simulator();
 

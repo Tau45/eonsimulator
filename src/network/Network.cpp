@@ -56,9 +56,9 @@ Network::ESTABLISH_CONNECTION_RESULT Network::tryToEstablishConnection(double cl
     Link *sourceLink = inputLinks[connection->sourceLinkIndex];
     Link *destinationLink = outputLinks[connection->destinationLinkIndex];
 
-    Logger::getInstance().log(clock, Logger::CONNECTION_SETUP, "Setting up connection between nodes: " + to_string(sourceLink->sourceNode) + " and " + to_string(destinationLink->destinationNode) + "...");
+    Logger::getInstance().log(clock, Logger::CONNECTION_SETUP, "Setting up connection between input: " + to_string(sourceLink->sourceNode) + " and output " + to_string(destinationLink->destinationNode) + "...");
 
-    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->requiredNumberOfFSUs) && sourceLink != destinationLink) {
+    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->requiredNumberOfFSUs) && inputLinks.size() > 1) {
         Logger::getInstance().log(clock, Logger::CONNECTION_REJECTED, "Connection rejected: free FSUs not found in source link (" + to_string(connection->requiredNumberOfFSUs) + " FSUs)");
         return CONNECTION_REJECTED;
     }
@@ -110,27 +110,6 @@ void Network::closeConnection(double clock, Connection *connection) {
     activeConnections.remove(connection);
     Logger::getInstance().log(clock, Logger::CONNECTION_CLOSED, "Connection closed: Freeing FSUs: " + to_string(connection->firstFSU) + "-" + to_string(connection->firstFSU + connection->requiredNumberOfFSUs - 1));
     delete connection;
-}
-
-void Network::createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput) {
-    Link *link = new Link(sourceNode, destinationNode);
-    links[sourceNode].push_back(link);
-
-    if (isInput) {
-        inputLinks.push_back(link);
-    }
-
-    if (isOutput) {
-        outputLinks.push_back(link);
-    }
-}
-
-uint64_t Network::getNumberOfInputLinks() {
-    return inputLinks.size();
-}
-
-uint64_t Network::getNumberOfOutputLinks() {
-    return outputLinks.size();
 }
 
 bool Network::linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs) {

@@ -3,31 +3,18 @@
 #define EONSIMULATOR_NETWORK_H
 
 #include <iostream>
-#include <list>
-#include <map>
-#include <vector>
 #include <queue>
-#include "../Connection.h"
+#include "Structure.h"
 #include "../TrafficClassStatistics.h"
-#include "../tools/Logger.h"
 
 using namespace std;
 
-class Network {
-    map<uint64_t, vector<Link *>> links;
-    vector<Link *> inputLinks;
-    vector<Link *> outputLinks;
-
-    list<Connection *> activeConnections;
-
+class Network : public Structure {
     bool linkWasNotVisited(vector<Link *> &path, uint64_t node);
 
     bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, uint64_t requiredNumberOfFSUs, uint64_t &resultFirstFSU);
 
     bool linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs);
-
-protected:
-    void createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput);
 
 public:
     map<uint64_t, TrafficClassStatistics> erlangTrafficClasses;
@@ -48,10 +35,6 @@ public:
     void reserveResources(Connection *connection);
 
     void closeConnection(double clock, Connection *connection);
-
-    uint64_t getNumberOfInputLinks();
-
-    uint64_t getNumberOfOutputLinks();
 
     uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
 };
