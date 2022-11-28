@@ -16,10 +16,14 @@ class Network : public Structure {
 
     bool linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs);
 
+    Logger logger;
+
 public:
     map<uint64_t, TrafficClassStatistics> erlangTrafficClasses;
     map<uint64_t, TrafficClassStatistics> engsetTrafficClasses;
     map<uint64_t, TrafficClassStatistics> pascalTrafficClasses;
+
+    Network(SimulationSettings &settings);
 
     ~Network();
 
@@ -30,13 +34,15 @@ public:
         CONNECTION_ESTABLISHED,
     };
 
-    ESTABLISH_CONNECTION_RESULT tryToEstablishConnection(double clock, Connection *connection);
+    ESTABLISH_CONNECTION_RESULT establishConnection(double clock, Connection *connection);
 
     void reserveResources(Connection *connection);
 
     void closeConnection(double clock, Connection *connection);
 
     uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
+
+    bool everyOutputNodeIsAvailableFromEveryInputNode();
 };
 
 #endif //EONSIMULATOR_NETWORK_H

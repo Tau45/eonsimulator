@@ -19,8 +19,8 @@ Simulator::~Simulator() {
 }
 
 void Simulator::run() {
-    if (!network->structureIsValid()) {
-        cout << "error validating structure\n";
+    if (!network->everyOutputNodeIsAvailableFromEveryInputNode()) {
+        cout << "error validating network structure\n";
     }
 
     logger.log(settings->logsEnabled, clock, Logger::SIMULATION_START, "");

@@ -1,7 +1,12 @@
 #include "../../include/network/Structure.h"
 
-void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput) {
-    Link *link = new Link(sourceNode, destinationNode);
+Structure::Structure(SimulationSettings &settings) {
+    this->settings = &settings;
+    createStructure();
+}
+
+void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput) {
+    Link *link = new Link(sourceNode, destinationNode, linkCapacity);
     links[sourceNode].push_back(link);
 
     if (isInput) {
@@ -13,10 +18,11 @@ void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode, bool i
     }
 }
 
-bool Structure::createStructure(string structureFileName) {
+void Structure::createStructure() {
+    logger.log(settings->logsEnabled, 0, Logger::CREATING_STRUCTURE, "Structure creating started...");
     string line;
     vector<vector<int>> nodes;
-    ifstream file(structureFileName);
+    ifstream file(settings->structureFileName);
 
     while (getline(file, line)) {
         if (line.find_first_of("0123456789") == string::npos) {
@@ -36,6 +42,8 @@ bool Structure::createStructure(string structureFileName) {
         nodes.push_back(tmp);
     }
 
+    file.close();
+
     uint64_t lastNodeIndex = nodes[0][0];
     for (const auto &node: nodes) {
         if (node[0] > lastNodeIndex) {
@@ -52,7 +60,7 @@ bool Structure::createStructure(string structureFileName) {
         }
 
         for (int destinationNode: linkedNodes) {
-            createLink(index, destinationNode, false, false);
+            createLink(index, destinationNode, settings->linkCapacity, false, false);
         }
     }
 
@@ -61,7 +69,7 @@ bool Structure::createStructure(string structureFileName) {
         int numberOfInputs = node[1];
 
         for (int i = 0; i < numberOfInputs; i++) {
-            createLink(++lastNodeIndex, index, true, false);
+            createLink(++lastNodeIndex, index, settings->linkCapacity, true, false);
         }
     }
 
@@ -70,11 +78,16 @@ bool Structure::createStructure(string structureFileName) {
         int numberOfOutputs = node[2];
 
         for (int i = 0; i < numberOfOutputs; i++) {
-            createLink(index, ++lastNodeIndex, false, true);
+            createLink(index, ++lastNodeIndex, settings->linkCapacity, false, true);
         }
     }
 
-    // wyswietlanie
+    printStructureDetails(nodes);
+
+    logger.log(settings->logsEnabled, 0, Logger::CREATING_STRUCTURE, "Structure created");
+}
+
+void Structure::printStructureDetails(vector<vector<int>> &nodes) {
     for (const auto &node: nodes) {
         int index = node[0];
         stringstream message;
@@ -82,18 +95,18 @@ bool Structure::createStructure(string structureFileName) {
 
         uint64_t numberOfInputs = 0;
 
-        for (auto inputLink : inputLinks) {
+        for (auto inputLink: inputLinks) {
             if (inputLink->destinationNode == index) {
                 numberOfInputs++;
             }
         }
 
-        message << "inputs: " << to_string(numberOfInputs);
+        message << to_string(numberOfInputs) << " inputs";
 
         if (numberOfInputs > 0) {
             message << " (";
             bool isTheFirstOne = true;
-            for (auto inputLink : inputLinks) {
+            for (auto inputLink: inputLinks) {
                 if (inputLink->destinationNode == index) {
                     if (!isTheFirstOne) {
                         message << " ";
@@ -109,24 +122,24 @@ bool Structure::createStructure(string structureFileName) {
 
         uint64_t numberOfOutputs = 0;
 
-        for (auto outputLink : outputLinks) {
+        for (auto outputLink: outputLinks) {
             if (outputLink->sourceNode == index) {
                 numberOfOutputs++;
             }
         }
 
-        message << "outputs: " + to_string(numberOfOutputs);
+        message << to_string(numberOfOutputs) << " outputs";
 
         if (numberOfOutputs > 0) {
             message << " (";
             bool isTheFirstOne = true;
-            for (int i = 0; i < outputLinks.size(); i++) {
-                if (outputLinks[i]->sourceNode == index) {
+            for (auto &outputLink: outputLinks) {
+                if (outputLink->sourceNode == index) {
                     if (!isTheFirstOne) {
                         message << " ";
                     }
                     isTheFirstOne = false;
-                    message << outputLinks[i]->destinationNode;
+                    message << outputLink->destinationNode;
                 }
             }
             message << ")";
@@ -134,7 +147,7 @@ bool Structure::createStructure(string structureFileName) {
 
         message << ", ";
 
-        message << "links to nodes: " + to_string(links[index].size());
+        message << to_string(links[index].size()) << " links to nodes";
 
         if (!links[index].empty()) {
             message << " (";
@@ -147,8 +160,7 @@ bool Structure::createStructure(string structureFileName) {
             message << ")";
         }
 
-
-        Logger::getInstance().log(0, Logger::CREATING_STRUCTURE, message.str());
+        logger.log(settings->logsEnabled, 0, Logger::CREATING_STRUCTURE, message.str());
     }
 }
 

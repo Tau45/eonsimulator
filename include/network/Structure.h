@@ -8,22 +8,30 @@
 #include <fstream>
 #include "../Connection.h"
 #include "../tools/Logger.h"
+#include "../tools/SimulationSettings.h"
 
 class Structure {
-    void createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput);
+    void createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput);
+
+    void createStructure();
+
+    void printStructureDetails(vector<vector<int>> &nodes);
+
+    Logger logger;
 public:
+    SimulationSettings *settings;
+
     map<uint64_t, vector<Link *>> links;
     vector<Link *> inputLinks;
     vector<Link *> outputLinks;
 
     list<Connection *> activeConnections;
 
-    bool createStructure(string structureFileName);
+    Structure(SimulationSettings &settings);
 
     uint64_t getNumberOfInputLinks();
 
     uint64_t getNumberOfOutputLinks();
 };
-
 
 #endif //EONSIMULATOR_STRUCTURE_H

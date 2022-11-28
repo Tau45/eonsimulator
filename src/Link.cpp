@@ -1,9 +1,10 @@
 #include "../include/Link.h"
 
-Link::Link(uint64_t sourceNode, uint64_t destinationNode) {
+Link::Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity) {
     this->sourceNode = sourceNode;
     this->destinationNode = destinationNode;
-    for (bool &FSU: FSUs) {
+    FSUs.reserve(linkCapacity);
+    for (auto &&FSU: FSUs) {
         FSU = false;
     }
 }

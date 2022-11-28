@@ -16,7 +16,7 @@ void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Ev
 
     eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime, generator, requiredNumberOfFSUs));
 
-    switch (network.tryToEstablishConnection(occurrenceTime, connection)) {
+    switch (network.establishConnection(occurrenceTime, connection)) {
         case Network::CONNECTION_ESTABLISHED:
             network.reserveResources(connection);
             eventQueue.push(new EventCallServiceTermination(occurrenceTime + connection->serviceTime, connection));

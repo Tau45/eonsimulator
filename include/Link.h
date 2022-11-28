@@ -4,17 +4,17 @@
 
 #include <iostream>
 #include <cassert>
-#include "constants/Constants.h"
+#include <vector>
 
 using namespace std;
 
 class Link {
-    bool FSUs[linkCapacity];
+    vector<bool> FSUs;
 public:
     uint64_t sourceNode;
     uint64_t destinationNode;
 
-    Link(uint64_t sourceNode, uint64_t destinationNode);
+    Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity);
 
     void reserveFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
 
