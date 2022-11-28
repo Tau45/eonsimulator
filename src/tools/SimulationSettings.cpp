@@ -115,11 +115,11 @@ void SimulationSettings::setTrafficClasses(const string &value, const string &tr
         }
 
         if (trafficSource == "-erlang") {
-            erlangTrafficClasses.push_back(trafficClass);
+            erlangTrafficClasses.insert(trafficClass);
         } else if (trafficSource == "-engset") {
-            engsetTrafficClasses.push_back(trafficClass);
+            engsetTrafficClasses.insert(trafficClass);
         } else if (trafficSource == "-pascal") {
-            pascalTrafficClasses.push_back(trafficClass);
+            pascalTrafficClasses.insert(trafficClass);
         }
 
         anyTrafficClassIsPresent = true;

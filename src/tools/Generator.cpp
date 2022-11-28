@@ -1,12 +1,12 @@
 #include "../../include/tools/Generator.h"
 
-Generator::Generator(double a, uint64_t linkCapacity, uint64_t M, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
+Generator::Generator(SimulationSettings &settings, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
     this->x1 = 869724338;
     this->x2 = 925386436;
     this->x3 = 742339657;
-    this->a = a;
-    this->linkCapacity = linkCapacity;
-    this->numberOfTrafficClasses = M;
+    this->a = settings.a;
+    this->linkCapacity = settings.linkCapacity;
+    this->numberOfTrafficClasses = settings.erlangTrafficClasses.size() + settings.engsetTrafficClasses.size() + settings.pascalTrafficClasses.size();
     this->numberOfInputLinks = numberOfInputLinks;
     this->numberOfOutputLinks = numberOfOutputLinks;
 }

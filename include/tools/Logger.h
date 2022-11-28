@@ -10,6 +10,7 @@
 using namespace std;
 
 class Logger {
+public:
     enum LOG_MESSAGE_TYPE {
         CONNECTION_REJECTED,
         INTERNAL_BLOCK,
@@ -24,6 +25,9 @@ class Logger {
         PARSE_INPUT_PARAMETERS
     };
 
+    void log(bool logsEnabled, double clock, LOG_MESSAGE_TYPE prefix, const string &message);
+
+private:
     map<LOG_MESSAGE_TYPE, string> logMessageTypeMap = {
             {CONNECTION_REJECTED,    "[CONNECTION_REJECTED   ] "},
             {INTERNAL_BLOCK,         "[INTERNAL_BLOCK        ] "},
@@ -39,9 +43,6 @@ class Logger {
     };
 
     string getTimestamp(double clock);
-
-public:
-    void log(bool logsEnabled, double clock, LOG_MESSAGE_TYPE prefix, const string &message);
 };
 
 #endif //EONSIMULATOR_LOGGER_H

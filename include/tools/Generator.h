@@ -3,12 +3,13 @@
 
 #include <iostream>
 #include <math.h>
+#include "SimulationSettings.h"
 
 class Generator {
 public:
-    double a;   // input parameter
-    uint64_t linkCapacity; // number of FSUs
-    uint64_t numberOfTrafficClasses; // number of traffic classes
+    double a;
+    uint64_t linkCapacity;
+    uint64_t numberOfTrafficClasses;
     uint64_t numberOfInputLinks;
     uint64_t numberOfOutputLinks;
 
@@ -16,7 +17,7 @@ public:
     int32_t x2;
     int32_t x3;
 
-    Generator(double a, uint64_t linkCapacity, uint64_t numberOfTrafficClasses, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
+    Generator(SimulationSettings &settings, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
 
     double rown_v1(int &x);
 

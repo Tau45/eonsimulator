@@ -1,5 +1,13 @@
 #include "../../include/tools/Logger.h"
 
+void Logger::log(bool logsEnabled, double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
+    if (logsEnabled || prefix == SIMULATION_START || prefix == SIMULATION_END || prefix == CREATING_STRUCTURE || prefix == STRUCTURE_VALIDATION) {
+        cout << getTimestamp(clock);
+        cout << logMessageTypeMap.at(prefix);
+        cout << message << endl;
+    }
+}
+
 string Logger::getTimestamp(double clock) {
     uint64_t d = clock / 86400;
     clock -= d * 86400;
@@ -22,12 +30,4 @@ string Logger::getTimestamp(double clock) {
        //           << setw(6) << ms << "] ";
        << setw(3) << ms << "] ";
     return ss.str();
-}
-
-void Logger::log(bool logsEnabled, double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
-    if (logsEnabled || prefix == SIMULATION_START || prefix == SIMULATION_END || prefix == CREATING_STRUCTURE || prefix == STRUCTURE_VALIDATION) {
-        cout << getTimestamp(clock);
-        cout << logMessageTypeMap.at(prefix);
-        cout << message << endl;
-    }
 }

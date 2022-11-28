@@ -2,7 +2,7 @@
 #define EONSIMULATOR_SIMULATIONSETTINGS_H
 
 #include <iostream>
-#include <vector>
+#include <set>
 #include <regex>
 #include "Logger.h"
 
@@ -32,9 +32,9 @@ public:
     string structureFileName;
     uint64_t callsToGenerate;
     uint64_t linkCapacity;
-    vector<uint64_t> erlangTrafficClasses;
-    vector<uint64_t> engsetTrafficClasses;
-    vector<uint64_t> pascalTrafficClasses;
+    set<uint64_t> erlangTrafficClasses;
+    set<uint64_t> engsetTrafficClasses;
+    set<uint64_t> pascalTrafficClasses;
     bool logsEnabled;
 
     SimulationSettings(int numberOfParams, char **params);

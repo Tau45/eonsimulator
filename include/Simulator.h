@@ -10,6 +10,7 @@
 #include "event/EventNewCallArrivalErlangClass.h"
 #include "event/EventCallServiceTermination.h"
 #include "tools/Generator.h"
+#include "tools/SimulationSettings.h"
 
 using namespace std;
 
@@ -17,21 +18,20 @@ class Simulator {
     double clock;
     Network *network;
     priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
-
-    uint64_t callsToGenerate;
-
     Generator *generator;
-
-    void addErlangTrafficClass(uint64_t requiredNumberOfFSUs);
-
-//    void addEngsetTrafficClass(uint64_t requiredNumberOfFSUs);
-
-//    void addPascalTrafficClass(uint64_t requiredNumberOfFSUs);
+    SimulationSettings *settings;
 
     void printResults();
 
+    void addErlangTrafficClasses();
+
+    void addEngsetTrafficClasses();
+
+    void addPascalTrafficClasses();
+
+    Logger logger;
 public:
-    Simulator(string structureFileName, double a, uint64_t callsToGenerate);
+    Simulator(SimulationSettings &simulationSettings);
 
     ~Simulator();
 
