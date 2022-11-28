@@ -6,24 +6,10 @@
 #include <sstream>
 #include <iomanip>
 #include <map>
-#include "../constants/Constants.h"
 
 using namespace std;
 
 class Logger {
-private:
-    Logger() = default;
-
-public:
-    static Logger &getInstance() {
-        static Logger instance;
-        return instance;
-    }
-
-    Logger(Logger const &) = delete;
-
-    void operator=(Logger const &) = delete;
-
     enum LOG_MESSAGE_TYPE {
         CONNECTION_REJECTED,
         INTERNAL_BLOCK,
@@ -33,7 +19,9 @@ public:
         CONNECTION_SETUP,
         SIMULATION_START,
         SIMULATION_END,
-        CREATING_STRUCTURE
+        CREATING_STRUCTURE,
+        STRUCTURE_VALIDATION,
+        PARSE_INPUT_PARAMETERS
     };
 
     map<LOG_MESSAGE_TYPE, string> logMessageTypeMap = {
@@ -45,12 +33,15 @@ public:
             {CONNECTION_SETUP,       "[CONNECTION_SETUP      ] "},
             {SIMULATION_START,       "[SIMULATION_START      ] "},
             {SIMULATION_END,         "[SIMULATION_END        ] "},
-            {CREATING_STRUCTURE,     "[CREATING_STRUCTURE    ] "}
+            {CREATING_STRUCTURE,     "[CREATING_STRUCTURE    ] "},
+            {STRUCTURE_VALIDATION,   "[STRUCTURE_VALIDATION  ] "},
+            {PARSE_INPUT_PARAMETERS, "[PARSE_INPUT_PARAMETERS] "}
     };
 
-    void log(double clock, LOG_MESSAGE_TYPE prefix, const string &message);
-
     string getTimestamp(double clock);
+
+public:
+    void log(bool logsEnabled, double clock, LOG_MESSAGE_TYPE prefix, const string &message);
 };
 
 #endif //EONSIMULATOR_LOGGER_H

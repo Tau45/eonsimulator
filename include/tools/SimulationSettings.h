@@ -25,6 +25,8 @@ class SimulationSettings {
 
     void setTrafficClasses(const string &value, const string &trafficSource);
 
+    Logger logger;
+
 public:
     double a;
     string structureFileName;

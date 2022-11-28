@@ -37,12 +37,12 @@ void SimulationSettings::setA(const string &inputValue) {
     try {
         a = stod(inputValue);
     } catch (...) {
-        Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value -a: " + inputValue);
+        logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value -a: " + inputValue);
         return;
     }
 
     if (a <= 0.0) {
-        Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "-a must be greater than 0");
+        logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "-a must be greater than 0");
         return;
     }
 
@@ -56,7 +56,7 @@ void SimulationSettings::setStructureFileName(const string &value) {
     if (fileExtensionIsCorrect) {
         structureFileName = value;
     } else {
-        Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "-structureFileName must point to a .csv file");
+        logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "-structureFileName must point to a .csv file");
         return;
     }
 
@@ -67,12 +67,12 @@ void SimulationSettings::setCallsToGenerate(const string &value) {
     try {
         callsToGenerate = stoi(value);
     } catch (...) {
-        Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value -callsToGenerate: " + value);
+        logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value -callsToGenerate: " + value);
         return;
     }
 
     if (callsToGenerate <= 0) {
-        Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "-callsToGenerate must be greater than 0");
+        logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "-callsToGenerate must be greater than 0");
         return;
     }
 
@@ -83,12 +83,12 @@ void SimulationSettings::setLinkCapacity(const string &value) {
     try {
         linkCapacity = stoi(value);
     } catch (...) {
-        Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value -linkCapacity: " + value);
+        logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value -linkCapacity: " + value);
         return;
     }
 
     if (linkCapacity <= 0) {
-        Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "-linkCapacity must be greater than 0");
+        logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "-linkCapacity must be greater than 0");
         return;
     }
 
@@ -105,12 +105,12 @@ void SimulationSettings::setTrafficClasses(const string &value, const string &tr
         try {
             trafficClass = stoi(token);
         } catch (...) {
-            Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing " + trafficSource + ": " + token);
+            logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing " + trafficSource + ": " + token);
             return;
         }
 
         if (trafficClass <= 0) {
-            Logger::getInstance().log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Traffic class must be greater than 0");
+            logger.log(true, 0, Logger::PARSE_INPUT_PARAMETERS, "Traffic class must be greater than 0");
             return;
         }
 
