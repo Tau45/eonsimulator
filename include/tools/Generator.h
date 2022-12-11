@@ -6,10 +6,6 @@
 #include "SimulationSettings.h"
 
 class Generator {
-public:
-    double a;
-    uint64_t linkCapacity;
-    uint64_t numberOfTrafficClasses;
     uint64_t numberOfInputLinks;
     uint64_t numberOfOutputLinks;
 
@@ -17,7 +13,11 @@ public:
     int32_t x2;
     int32_t x3;
 
-    Generator(SimulationSettings &settings, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
+    Generator(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
+
+    Generator(const Generator &) = delete;
+
+    void operator=(const Generator &) = delete;
 
     double rown_v1(int &x);
 
@@ -27,13 +27,20 @@ public:
 
     double getLambda(uint32_t requiredNumberOfFSUs, double serviceTime);
 
-    double getServiceTime();
+public:
+    static Generator &instance(function<Generator()> *init = nullptr);
 
-    double getOccurrenceTime(uint32_t requiredNumberOfFSUs, double serviceTime);
+    static void initialize(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
+
+    double getRandomServiceTime();
+
+    double getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, double serviceTime);
 
     uint64_t getRandomInputLink();
 
     uint64_t getRandomOutputLink();
+
+    uint64_t getRandomFirstFSU(vector<uint64_t> potentialFirstFSUs);
 };
 
 #endif //EONSIMULATOR_GENERATOR_H

@@ -5,18 +5,31 @@
 #include <vector>
 #include "Link.h"
 
-using namespace std;
-
 class Connection {
-public:
-    uint64_t sourceLinkIndex;
-    uint64_t destinationLinkIndex;
+    uint64_t sourceLink;
+    uint64_t destinationLink;
     vector<Link *> path;
     uint64_t firstFSU;
     uint64_t requiredNumberOfFSUs;
     double serviceTime;
+public:
+    Connection(uint64_t sourceLink, uint64_t destinationLink, uint64_t requiredNumberOfFSUs, double serviceTime);
 
-    Connection(uint64_t srcLink, uint64_t dstLink, uint64_t requiredNumberOfFSUs, double serviceTime);
+    uint64_t getSourceLink();
+
+    uint64_t getDestinationLink();
+
+    vector<Link *> getPath();
+
+    void setPath(vector<Link *> path);
+
+    uint64_t getFirstFSU();
+
+    void setFirstFSU(uint64_t firstFSU);
+
+    uint64_t getRequiredNumberOfFSUs();
+
+    double getServiceTime();
 };
 
 #endif //EONSIMULATOR_CONNECTION_H

@@ -3,8 +3,6 @@
 
 #include <iostream>
 
-using namespace std;
-
 class TrafficClassStatistics {
 public:
     uint64_t callsGenerated;

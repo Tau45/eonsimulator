@@ -5,44 +5,34 @@
 #include <iostream>
 #include <queue>
 #include "Structure.h"
+#include "../Connection.h"
+#include "../tools/Generator.h"
 #include "../TrafficClassStatistics.h"
 
-using namespace std;
-
 class Network : public Structure {
-    bool linkWasNotVisited(vector<Link *> &path, uint64_t node);
-
-    bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, uint64_t requiredNumberOfFSUs, uint64_t &resultFirstFSU);
+    bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection *connection);
 
     bool linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs);
 
-    Logger logger;
-
 public:
-    map<uint64_t, TrafficClassStatistics> erlangTrafficClasses;
-    map<uint64_t, TrafficClassStatistics> engsetTrafficClasses;
-    map<uint64_t, TrafficClassStatistics> pascalTrafficClasses;
-
-    Network(SimulationSettings &settings);
-
-    ~Network();
-
     enum ESTABLISH_CONNECTION_RESULT {
         CONNECTION_REJECTED,
         INTERNAL_BLOCK,
         EXTERNAL_BLOCK,
-        CONNECTION_ESTABLISHED,
+        CONNECTION_CAN_BE_ESTABLISHED,
     };
 
-    ESTABLISH_CONNECTION_RESULT establishConnection(double clock, Connection *connection);
+    map<uint64_t, TrafficClassStatistics> erlangTrafficClasses;
+    map<uint64_t, TrafficClassStatistics> engsetTrafficClasses;
+    map<uint64_t, TrafficClassStatistics> pascalTrafficClasses;
 
-    void reserveResources(Connection *connection);
+    Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection *connection);
 
     void closeConnection(double clock, Connection *connection);
 
-    uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
+    void reserveResources(Connection *connection);
 
-    bool everyOutputNodeIsAvailableFromEveryInputNode();
+    uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
 };
 
 #endif //EONSIMULATOR_NETWORK_H

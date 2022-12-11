@@ -3,9 +3,8 @@
 Link::Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity) {
     this->sourceNode = sourceNode;
     this->destinationNode = destinationNode;
-    FSUs.reserve(linkCapacity);
-    for (auto &&FSU: FSUs) {
-        FSU = false;
+    for (int i = 0; i < linkCapacity; i++) {
+        FSUs.push_back(false);
     }
 }
 
@@ -25,4 +24,12 @@ void Link::freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
 
 bool Link::FSUIsOccupied(uint64_t FSUIndex) {
     return FSUs[FSUIndex];
+}
+
+uint64_t Link::getSourceNode() {
+    return sourceNode;
+}
+
+uint64_t Link::getDestinationNode() {
+    return destinationNode;
 }

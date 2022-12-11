@@ -1,14 +1,21 @@
 #include "../../include/tools/Generator.h"
 
-Generator::Generator(SimulationSettings &settings, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
+Generator::Generator(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
     this->x1 = 869724338;
     this->x2 = 925386436;
     this->x3 = 742339657;
-    this->a = settings.a;
-    this->linkCapacity = settings.linkCapacity;
-    this->numberOfTrafficClasses = settings.erlangTrafficClasses.size() + settings.engsetTrafficClasses.size() + settings.pascalTrafficClasses.size();
     this->numberOfInputLinks = numberOfInputLinks;
     this->numberOfOutputLinks = numberOfOutputLinks;
+}
+
+Generator &Generator::instance(function<Generator()> *init) {
+    static Generator s{(*init)()};
+    return s;
+}
+
+void Generator::initialize(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
+    function<Generator()> init = [numberOfInputLinks, numberOfOutputLinks]() { return Generator(numberOfInputLinks, numberOfOutputLinks); };
+    instance(&init);
 }
 
 double Generator::rown_v1(int &x) {
@@ -36,14 +43,18 @@ double Generator::rown_v3(int &x) {
 }
 
 double Generator::getLambda(uint32_t requiredNumberOfFSUs, double serviceTime) {
+    double a = SimulationSettings::instance().getA();
+    uint64_t linkCapacity = SimulationSettings::instance().getLinkCapacity();
+    uint64_t numberOfTrafficClasses = SimulationSettings::instance().getNumberOfTrafficClasses();
+
     return (a * linkCapacity) / (numberOfTrafficClasses * serviceTime * requiredNumberOfFSUs);
 }
 
-double Generator::getServiceTime() {
+double Generator::getRandomServiceTime() {
     return 1;
 }
 
-double Generator::getOccurrenceTime(uint32_t requiredNumberOfFSUs, double serviceTime) {
+double Generator::getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, double serviceTime) {
     return log(rown_v1(x1)) * (-1 / getLambda(requiredNumberOfFSUs, serviceTime));
 }
 
@@ -65,4 +76,14 @@ uint64_t Generator::getRandomOutputLink() {
     }
 
     return randomLink;
+}
+
+uint64_t Generator::getRandomFirstFSU(vector<uint64_t> potentialFirstFSUs) {
+    uint64_t randomFirstFSUIndex = rown_v2(x2) * potentialFirstFSUs.size();
+
+    if (randomFirstFSUIndex == potentialFirstFSUs.size()) {
+        randomFirstFSUIndex = randomFirstFSUIndex - 1;
+    }
+
+    return potentialFirstFSUs[randomFirstFSUIndex];
 }

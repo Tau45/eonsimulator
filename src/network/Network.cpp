@@ -1,42 +1,19 @@
 #include "../../include/network/Network.h"
 
-Network::Network(SimulationSettings &settings) : Structure(settings) {}
-
-Network::~Network() {
-    for (auto const &node: links) {
-        for (Link *link: node.second) {
-            delete link;
-        }
-    }
-
-    for (Connection *connection: activeConnections) {
-        delete connection;
-    }
-}
-
 void Network::reserveResources(Connection *connection) {
-    assert(!connection->path.empty());
-    for (auto &link: connection->path) {
-        link->reserveFSUs(connection->firstFSU, connection->requiredNumberOfFSUs);
+    assert(!connection->getPath().empty());
+    for (auto &link: connection->getPath()) {
+        link->reserveFSUs(connection->getFirstFSU(), connection->getRequiredNumberOfFSUs());
     }
-    activeConnections.push_back(connection);
 }
 
-bool Network::linkWasNotVisited(vector<Link *> &path, uint64_t node) {
-    for (auto &link: path) {
-        if (link->destinationNode == node) {
-            return false;
-        }
-    }
+bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection *connection) {
+    vector<uint64_t> potentialFirstFSUs;
 
-    return true;
-}
-
-bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, uint64_t requiredNumberOfFSUs, uint64_t &resultFirstFSU) {
-    for (int i = 0; i <= settings->linkCapacity - requiredNumberOfFSUs; i++) {
+    for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - connection->getRequiredNumberOfFSUs(); i++) {
         bool freeNeighboringFSUsWereFound = true;
 
-        for (int j = i; j < i + requiredNumberOfFSUs; j++) {
+        for (int j = i; j < i + connection->getRequiredNumberOfFSUs(); j++) {
             for (Link *link: path) {
                 if (link->FSUIsOccupied(j)) {
                     freeNeighboringFSUsWereFound = false;
@@ -47,26 +24,27 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, uint64_t req
         }
 
         if (freeNeighboringFSUsWereFound) {
-            resultFirstFSU = i;
-            return true;
+            potentialFirstFSUs.push_back(i);
         }
+    }
+
+    if (!potentialFirstFSUs.empty()) {
+        connection->setPath(path);
+        connection->setFirstFSU(Generator::instance().getRandomFirstFSU(potentialFirstFSUs));
+        return true;
     }
     return false;
 }
 
-Network::ESTABLISH_CONNECTION_RESULT Network::establishConnection(double clock, Connection *connection) {
-    Link *sourceLink = inputLinks[connection->sourceLinkIndex];
-    Link *destinationLink = outputLinks[connection->destinationLinkIndex];
+Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection *connection) {
+    Link *sourceLink = inputLinks[connection->getSourceLink()];
+    Link *destinationLink = outputLinks[connection->getDestinationLink()];
 
-    logger.log(settings->logsEnabled, clock, Logger::CONNECTION_SETUP, "Setting up connection between input: " + to_string(sourceLink->sourceNode) + " and output " + to_string(destinationLink->destinationNode) + "...");
-
-    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->requiredNumberOfFSUs) && inputLinks.size() > 1) {
-        logger.log(settings->logsEnabled, clock, Logger::CONNECTION_REJECTED, "Connection rejected: free FSUs not found in source link (" + to_string(connection->requiredNumberOfFSUs) + " FSUs)");
+    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->getRequiredNumberOfFSUs()) && inputLinks.size() > 1) {
         return CONNECTION_REJECTED;
     }
 
-    if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection->requiredNumberOfFSUs)) {
-        logger.log(settings->logsEnabled, clock, Logger::EXTERNAL_BLOCK, "Connection rejected: external blocking (" + to_string(connection->requiredNumberOfFSUs) + " FSUs)");
+    if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection->getRequiredNumberOfFSUs())) {
         return EXTERNAL_BLOCK;
     }
 
@@ -77,22 +55,14 @@ Network::ESTABLISH_CONNECTION_RESULT Network::establishConnection(double clock, 
         vector<Link *> currentPath = consideredPaths.front();
         consideredPaths.pop();
 
-        uint64_t currentPathLastNode = currentPath[currentPath.size() - 1]->destinationNode;
+        uint64_t currentPathLastNode = currentPath[currentPath.size() - 1]->getDestinationNode();
 
-        if (currentPathLastNode == destinationLink->destinationNode) {
-//            cout << "\tConsidering currentPath: ";
-//            printPath(currentPath);
-//            cout << ":\n";
-
-            if (pathHasRequiredNumberOfFreeFSUs(currentPath, connection->requiredNumberOfFSUs, connection->firstFSU)) {
-                connection->path = currentPath;
-                logger.log(settings->logsEnabled, clock, Logger::CONNECTION_ESTABLISHED, "Connection has been successfully set up using FSUs: " + to_string(connection->firstFSU) + "-" + to_string(connection->firstFSU + connection->requiredNumberOfFSUs - 1) + " (" + to_string(connection->requiredNumberOfFSUs) + " FSUs)");
-                return CONNECTION_ESTABLISHED;
-            }
+        if (currentPathLastNode == destinationLink->getDestinationNode() && pathHasRequiredNumberOfFreeFSUs(currentPath, connection)) {
+            return CONNECTION_CAN_BE_ESTABLISHED;
         }
 
         for (auto &link: links[currentPathLastNode]) {
-            if (linkWasNotVisited(currentPath, link->destinationNode)) {
+            if (linkWasNotVisited(currentPath, link->getDestinationNode())) {
                 vector<Link *> newPath(currentPath);
                 newPath.push_back(link);
                 consideredPaths.push(newPath);
@@ -100,21 +70,19 @@ Network::ESTABLISH_CONNECTION_RESULT Network::establishConnection(double clock, 
         }
     }
 
-    logger.log(settings->logsEnabled, clock, Logger::INTERNAL_BLOCK, "Connection rejected: internal blocking (" + to_string(connection->requiredNumberOfFSUs) + " FSUs)");
     return INTERNAL_BLOCK;
 }
 
 void Network::closeConnection(double clock, Connection *connection) {
-    for (auto &link: connection->path) {
-        link->freeFSUs(connection->firstFSU, connection->requiredNumberOfFSUs);
+    for (auto &link: connection->getPath()) {
+        link->freeFSUs(connection->getFirstFSU(), connection->getRequiredNumberOfFSUs());
     }
-    activeConnections.remove(connection);
-    logger.log(settings->logsEnabled, clock, Logger::CONNECTION_CLOSED, "Connection closed: Freeing FSUs: " + to_string(connection->firstFSU) + "-" + to_string(connection->firstFSU + connection->requiredNumberOfFSUs - 1));
+    Logger::instance().log(clock, Logger::CONNECTION_CLOSED, "Connection closed: Freeing FSUs: " + to_string(connection->getFirstFSU()) + "-" + to_string(connection->getFirstFSU() + connection->getRequiredNumberOfFSUs() - 1));
     delete connection;
 }
 
 bool Network::linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs) {
-    for (int i = 0; i <= settings->linkCapacity - requiredNumberOfFSUs; i++) {
+    for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - requiredNumberOfFSUs; i++) {
         bool freeNeighboringFSUsWereFound = true;
 
         for (int j = i; j < i + requiredNumberOfFSUs; j++) {
@@ -157,23 +125,4 @@ uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
     }
 
     return result;
-}
-
-bool Network::everyOutputNodeIsAvailableFromEveryInputNode() {
-    logger.log(settings->logsEnabled, 0, Logger::STRUCTURE_VALIDATION, "Structure validation started...");
-
-    for (uint64_t i = 0; i < inputLinks.size(); i++) {
-        for (uint64_t j = 0; j < outputLinks.size(); j++) {
-            Connection *connection = new Connection(i, j, 1, 1);
-            if (establishConnection(0, connection) != CONNECTION_ESTABLISHED) {
-                logger.log(settings->logsEnabled, 0, Logger::STRUCTURE_VALIDATION, "Structure is not valid. Output " + to_string(outputLinks[j]->destinationNode) + " is not reachable from input " + to_string(inputLinks[i]->sourceNode));
-                delete connection;
-                return false;
-            }
-            delete connection;
-        }
-    }
-
-    logger.log(settings->logsEnabled, 0, Logger::STRUCTURE_VALIDATION, "Structure is valid");
-    return true;
 }

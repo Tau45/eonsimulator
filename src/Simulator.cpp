@@ -1,51 +1,33 @@
 #include "../include/Simulator.h"
 
-Simulator::Simulator(SimulationSettings &settings) {
-    this->clock = 0;
-    this->settings = &settings;
-    this->network = new Network(settings);
-    this->generator = new Generator(settings, network->getNumberOfInputLinks(), network->getNumberOfOutputLinks());
+Simulator::Simulator(Network &network) {
+    this->network = &network;
 
     addErlangTrafficClasses();
     addEngsetTrafficClasses();
     addPascalTrafficClasses();
 }
 
-Simulator::~Simulator() {
-    while (!eventQueue.empty()) {
-        delete eventQueue.top()->connection;
-        eventQueue.pop();
-    }
-}
-
 void Simulator::run() {
-    if (!network->everyOutputNodeIsAvailableFromEveryInputNode()) {
-        cout << "error validating network structure\n";
-    }
+    Logger::instance().log(0, Logger::SIMULATION_START, "Starting simulation with parameters:");
+    Logger::instance().log(0, Logger::SIMULATION_START, "Calls to generate: " + to_string(SimulationSettings::instance().getCallsToGenerate()));
+    Logger::instance().log(0, Logger::SIMULATION_START, "a: " + to_string(SimulationSettings::instance().getA()));
+    Logger::instance().log(0, Logger::SIMULATION_START, "The simulation has started...");
 
-    logger.log(settings->logsEnabled, clock, Logger::SIMULATION_START, "");
-    logger.log(settings->logsEnabled, clock, Logger::SIMULATION_START, "Starting simulation with parameters:");
-    logger.log(settings->logsEnabled, clock, Logger::SIMULATION_START, "Calls to generate: " + to_string(settings->callsToGenerate));
-    logger.log(settings->logsEnabled, clock, Logger::SIMULATION_START, "a: " + to_string(generator->a));
-    logger.log(settings->logsEnabled, clock, Logger::SIMULATION_START, "");
-    logger.log(settings->logsEnabled, clock, Logger::SIMULATION_START, "The simulation has started...");
-
-    while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < settings->callsToGenerate) {
-        clock = eventQueue.top()->occurrenceTime;
-
+    while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < SimulationSettings::instance().getCallsToGenerate()) {
         eventQueue.top()->execute(*network, eventQueue);
         eventQueue.pop();
     }
 
-    logger.log(settings->logsEnabled, eventQueue.top()->occurrenceTime, Logger::SIMULATION_END, "The simulation has finished");
+    Logger::instance().log(eventQueue.top()->getOccurrenceTime(), Logger::SIMULATION_END, "The simulation has finished");
 
     printResults();
 }
 
 void Simulator::addErlangTrafficClasses() {
-    for (uint64_t erlangTrafficClass: settings->erlangTrafficClasses) {
+    for (uint64_t erlangTrafficClass: SimulationSettings::instance().getErlangTrafficClasses()) {
         network->erlangTrafficClasses[erlangTrafficClass] = TrafficClassStatistics();
-        eventQueue.push(new EventNewCallArrivalErlangClass(clock, generator, erlangTrafficClass));
+        eventQueue.push(new EventNewCallArrivalErlangClass(0, erlangTrafficClass));
     }
 }
 

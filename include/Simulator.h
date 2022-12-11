@@ -6,20 +6,12 @@
 #include <vector>
 #include <queue>
 #include "network/Network.h"
-#include "event/Event.h"
 #include "event/EventNewCallArrivalErlangClass.h"
-#include "event/EventCallServiceTermination.h"
-#include "tools/Generator.h"
 #include "tools/SimulationSettings.h"
 
-using namespace std;
-
 class Simulator {
-    double clock;
     Network *network;
     priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
-    Generator *generator;
-    SimulationSettings *settings;
 
     void printResults();
 
@@ -29,11 +21,8 @@ class Simulator {
 
     void addPascalTrafficClasses();
 
-    Logger logger;
 public:
-    Simulator(SimulationSettings &simulationSettings);
-
-    ~Simulator();
+    Simulator(Network &network);
 
     void run();
 };

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iomanip>
 #include <map>
+#include <functional>
 
 using namespace std;
 
@@ -25,9 +26,14 @@ public:
         PARSE_INPUT_PARAMETERS
     };
 
-    void log(bool logsEnabled, double clock, LOG_MESSAGE_TYPE prefix, const string &message);
+    static Logger &instance(function<Logger()> *init = nullptr);
+
+    static void initialize(bool logsEnabled);
+
+    void log(double clock, LOG_MESSAGE_TYPE prefix, const string &message);
 
 private:
+    bool logsEnabled;
     map<LOG_MESSAGE_TYPE, string> logMessageTypeMap = {
             {CONNECTION_REJECTED,    "[CONNECTION_REJECTED   ] "},
             {INTERNAL_BLOCK,         "[INTERNAL_BLOCK        ] "},
@@ -41,6 +47,12 @@ private:
             {STRUCTURE_VALIDATION,   "[STRUCTURE_VALIDATION  ] "},
             {PARSE_INPUT_PARAMETERS, "[PARSE_INPUT_PARAMETERS] "}
     };
+
+    Logger(bool logsEnabled);
+
+    Logger(const Logger &) = delete;
+
+    void operator=(const Logger &) = delete;
 
     string getTimestamp(double clock);
 };

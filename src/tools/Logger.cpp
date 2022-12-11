@@ -1,7 +1,26 @@
 #include "../../include/tools/Logger.h"
 
-void Logger::log(bool logsEnabled, double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
-    if (logsEnabled || prefix == SIMULATION_START || prefix == SIMULATION_END || prefix == CREATING_STRUCTURE || prefix == STRUCTURE_VALIDATION) {
+Logger::Logger(bool logsEnabled) {
+    this->logsEnabled = logsEnabled;
+}
+
+Logger &Logger::instance(function<Logger()> *init) {
+    static Logger s{(*init)()};
+    return s;
+}
+
+void Logger::initialize(bool logsEnabled) {
+    function<Logger()> init = [logsEnabled]() { return Logger(logsEnabled); };
+    instance(&init);
+}
+
+void Logger::log(double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
+    if (logsEnabled
+        || prefix == SIMULATION_START
+        || prefix == SIMULATION_END
+        || prefix == CREATING_STRUCTURE
+        || prefix == STRUCTURE_VALIDATION
+        || prefix == PARSE_INPUT_PARAMETERS) {
         cout << getTimestamp(clock);
         cout << logMessageTypeMap.at(prefix);
         cout << message << endl;
