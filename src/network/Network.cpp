@@ -1,19 +1,19 @@
 #include "../../include/network/Network.h"
 
-void Network::reserveResources(Connection *connection) {
-    assert(!connection->getPath().empty());
-    for (auto &link: connection->getPath()) {
-        link->reserveFSUs(connection->getFirstFSU(), connection->getRequiredNumberOfFSUs());
+void Network::reserveResources(Connection connection) {
+    assert(!connection.getPath().empty());
+    for (auto &link: connection.getPath()) {
+        link->reserveFSUs(connection.getFirstFSU(), connection.getRequiredNumberOfFSUs());
     }
 }
 
-bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection *connection) {
+bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection) {
     vector<uint64_t> potentialFirstFSUs;
 
-    for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - connection->getRequiredNumberOfFSUs(); i++) {
+    for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - connection.getRequiredNumberOfFSUs(); i++) {
         bool freeNeighboringFSUsWereFound = true;
 
-        for (int j = i; j < i + connection->getRequiredNumberOfFSUs(); j++) {
+        for (int j = i; j < i + connection.getRequiredNumberOfFSUs(); j++) {
             for (Link *link: path) {
                 if (link->FSUIsOccupied(j)) {
                     freeNeighboringFSUsWereFound = false;
@@ -29,22 +29,22 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection *
     }
 
     if (!potentialFirstFSUs.empty()) {
-        connection->setPath(path);
-        connection->setFirstFSU(Generator::instance().getRandomFirstFSU(potentialFirstFSUs));
+        connection.setPath(path);
+        connection.setFirstFSU(Generator::instance().getRandomFirstFSU(potentialFirstFSUs));
         return true;
     }
     return false;
 }
 
-Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection *connection) {
-    Link *sourceLink = inputLinks[connection->getSourceLink()];
-    Link *destinationLink = outputLinks[connection->getDestinationLink()];
+Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection& connection) {
+    Link *sourceLink = inputLinks[connection.getSourceLink()];
+    Link *destinationLink = outputLinks[connection.getDestinationLink()];
 
-    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection->getRequiredNumberOfFSUs()) && inputLinks.size() > 1) {
+    if (!linkHasRequiredNumberOfFreeFSUs(sourceLink, connection.getRequiredNumberOfFSUs()) && inputLinks.size() > 1) {
         return CONNECTION_REJECTED;
     }
 
-    if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection->getRequiredNumberOfFSUs())) {
+    if (!linkHasRequiredNumberOfFreeFSUs(destinationLink, connection.getRequiredNumberOfFSUs())) {
         return EXTERNAL_BLOCK;
     }
 
@@ -73,12 +73,11 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
     return INTERNAL_BLOCK;
 }
 
-void Network::closeConnection(double clock, Connection *connection) {
-    for (auto &link: connection->getPath()) {
-        link->freeFSUs(connection->getFirstFSU(), connection->getRequiredNumberOfFSUs());
+void Network::closeConnection(double clock, Connection connection) {
+    Logger::instance().log(clock, Logger::CONNECTION_CLOSED, "Connection closed: Freeing FSUs: " + to_string(connection.getFirstFSU()) + "-" + to_string(connection.getFirstFSU() + connection.getRequiredNumberOfFSUs() - 1));
+    for (auto &link: connection.getPath()) {
+        link->freeFSUs(connection.getFirstFSU(), connection.getRequiredNumberOfFSUs());
     }
-    Logger::instance().log(clock, Logger::CONNECTION_CLOSED, "Connection closed: Freeing FSUs: " + to_string(connection->getFirstFSU()) + "-" + to_string(connection->getFirstFSU() + connection->getRequiredNumberOfFSUs() - 1));
-    delete connection;
 }
 
 bool Network::linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs) {
@@ -125,4 +124,12 @@ uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
     }
 
     return result;
+}
+
+void Network::closeAllConnections() {
+    for (const auto &node : links) {
+        for (auto link : node.second) {
+            link->freeAllFSUs();
+        }
+    }
 }

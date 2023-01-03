@@ -23,7 +23,8 @@ public:
         SIMULATION_END,
         CREATING_STRUCTURE,
         STRUCTURE_VALIDATION,
-        PARSE_INPUT_PARAMETERS
+        ERROR,
+        WARN
     };
 
     static Logger &instance(function<Logger()> *init = nullptr);
@@ -45,7 +46,8 @@ private:
             {SIMULATION_END,         "[SIMULATION_END        ] "},
             {CREATING_STRUCTURE,     "[CREATING_STRUCTURE    ] "},
             {STRUCTURE_VALIDATION,   "[STRUCTURE_VALIDATION  ] "},
-            {PARSE_INPUT_PARAMETERS, "[PARSE_INPUT_PARAMETERS] "}
+            {ERROR,                  "[ERROR                 ] "},
+            {WARN,                   "[WARN                  ] "}
     };
 
     Logger(bool logsEnabled);

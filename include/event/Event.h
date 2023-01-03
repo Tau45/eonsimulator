@@ -8,7 +8,7 @@
 class Event {
 protected:
     double occurrenceTime;
-    Connection *connection;
+    Connection connection;
 public:
     class EventComparator {
     public:

@@ -208,11 +208,19 @@ bool Structure::everyOutputNodeIsAvailableFromEveryInputNode() {
     for (uint64_t i = 0; i < inputLinks.size(); i++) {
         for (uint64_t j = 0; j < outputLinks.size(); j++) {
             if (!checkInputToOutputAvailability(i, j)) {
-                Logger::instance().log(0, Logger::STRUCTURE_VALIDATION, "Structure is not valid. Output " + to_string(outputLinks[j]->getDestinationNode()) + " is not reachable from input " + to_string(inputLinks[i]->getSourceNode()));
+                Logger::instance().log(0, Logger::ERROR, "Structure is not valid. Output " + to_string(outputLinks[j]->getDestinationNode()) + " is not reachable from input " + to_string(inputLinks[i]->getSourceNode()));
                 return false;
             }
         }
     }
     Logger::instance().log(0, Logger::STRUCTURE_VALIDATION, "Structure is valid");
     return true;
+}
+
+Structure::~Structure() {
+    for (const auto& node : links) {
+        for (auto& link: node.second) {
+            delete link;
+        }
+    }
 }

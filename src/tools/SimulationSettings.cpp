@@ -9,11 +9,13 @@ SimulationSettings::SimulationSettings(map<string, string> args) {
     bool erlangTrafficClassesAreValid = setErlangTrafficClasses(args, ERLANG);
     bool engsetTrafficClassesAreValid = setEngsetTrafficClasses(args, ENGSET);
     bool pascalTrafficClassesAreValid = setPascalTrafficClasses(args, PASCAL);
+    bool runsIsValid = setRuns(args, RUNS);
 
     settingsAreValid = aIsValid
                        && structureFileNameIsValid
                        && callsToGenerateIsValid
                        && linkCapacityIsValid
+                       && runsIsValid
                        && (erlangTrafficClassesAreValid || engsetTrafficClassesAreValid || pascalTrafficClassesAreValid)
                        && maxTrafficClassRequireLessFSUsThanLinkCapacity();
 }
@@ -31,19 +33,19 @@ SimulationSettings &SimulationSettings::instance(function<SimulationSettings()> 
 bool SimulationSettings::setA(map<string, string> &args, PARAMETER_PREFIX prefix) {
     string parameter = parameterMap[prefix];
     if (!args.count(parameter)) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Parameter " + parameter + " was not found");
+        Logger::instance().log(0, Logger::ERROR, "Parameter " + parameter + " was not found");
         return false;
     }
     string value = args[parameter];
     try {
         a = stod(value);
     } catch (...) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value " + parameter + ": " + value);
+        Logger::instance().log(0, Logger::ERROR, "Error while parsing value " + parameter + ": " + value);
         return false;
     }
 
     if (a <= 0.0) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, parameter + " must be greater than 0. Current value: " + value);
+        Logger::instance().log(0, Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
         return false;
     }
 
@@ -53,7 +55,7 @@ bool SimulationSettings::setA(map<string, string> &args, PARAMETER_PREFIX prefix
 bool SimulationSettings::setStructureFileName(map<string, string> &args, PARAMETER_PREFIX prefix) {
     string parameter = parameterMap[prefix];
     if (!args.count(parameter)) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Parameter " + parameter + " was not found");
+        Logger::instance().log(0, Logger::ERROR, "Parameter " + parameter + " was not found");
         return false;
     }
     string value = args[parameter];
@@ -61,7 +63,7 @@ bool SimulationSettings::setStructureFileName(map<string, string> &args, PARAMET
     bool fileExtensionIsCorrect = regex_match(value, rx);
 
     if (!fileExtensionIsCorrect) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, parameter + " must point to a .csv file");
+        Logger::instance().log(0, Logger::ERROR, parameter + " must point to a .csv file");
         return false;
     }
 
@@ -72,19 +74,19 @@ bool SimulationSettings::setStructureFileName(map<string, string> &args, PARAMET
 bool SimulationSettings::setCallsToGenerate(map<string, string> &args, PARAMETER_PREFIX prefix) {
     string parameter = parameterMap[prefix];
     if (!args.count(parameter)) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Parameter " + parameter + " was not found");
+        Logger::instance().log(0, Logger::ERROR, "Parameter " + parameter + " was not found");
         return false;
     }
     string value = args[parameter];
     try {
         callsToGenerate = stoi(value);
     } catch (...) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value " + parameter + ". Current value: " + value);
+        Logger::instance().log(0, Logger::ERROR, "Error while parsing value " + parameter + ". Current value: " + value);
         return false;
     }
 
     if (callsToGenerate <= 0) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, parameter + " must be greater than 0. Current value: " + value);
+        Logger::instance().log(0, Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
         return false;
     }
 
@@ -94,19 +96,19 @@ bool SimulationSettings::setCallsToGenerate(map<string, string> &args, PARAMETER
 bool SimulationSettings::setLinkCapacity(map<string, string> &args, PARAMETER_PREFIX prefix) {
     string parameter = parameterMap[prefix];
     if (!args.count(parameter)) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Parameter " + parameter + " was not found");
+        Logger::instance().log(0, Logger::ERROR, "Parameter " + parameter + " was not found");
         return false;
     }
     string value = args[parameter];
     try {
         linkCapacity = stoi(value);
     } catch (...) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing value " + parameter + ". Current value: " + value);
+        Logger::instance().log(0, Logger::ERROR, "Error while parsing value " + parameter + ". Current value: " + value);
         return false;
     }
 
     if (linkCapacity <= 0) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, parameter + " must be greater than 0. Current value: " + value);
+        Logger::instance().log(0, Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
         return false;
     }
 
@@ -116,7 +118,7 @@ bool SimulationSettings::setLinkCapacity(map<string, string> &args, PARAMETER_PR
 bool SimulationSettings::setErlangTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix) {
     string parameter = parameterMap[prefix];
     if (!args.count(parameter)) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Parameter " + parameter + " was not found");
+        Logger::instance().log(0, Logger::WARN, "Parameter " + parameter + " was not found");
         return false;
     }
     string value = args[parameter];
@@ -129,12 +131,12 @@ bool SimulationSettings::setErlangTrafficClasses(map<string, string> &args, PARA
         try {
             trafficClass = stoi(token);
         } catch (...) {
-            Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing " + parameter + " traffic class: " + token);
+            Logger::instance().log(0, Logger::ERROR, "Error while parsing " + parameter + " traffic class: " + token);
             return false;
         }
 
         if (trafficClass <= 0) {
-            Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
+            Logger::instance().log(0, Logger::ERROR, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
             return false;
         }
 
@@ -147,7 +149,7 @@ bool SimulationSettings::setErlangTrafficClasses(map<string, string> &args, PARA
 bool SimulationSettings::setEngsetTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix) {
     string parameter = parameterMap[prefix];
     if (!args.count(parameter)) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Parameter " + parameter + " was not found");
+        Logger::instance().log(0, Logger::WARN, "Parameter " + parameter + " was not found");
         return false;
     }
     string value = args[parameter];
@@ -160,12 +162,12 @@ bool SimulationSettings::setEngsetTrafficClasses(map<string, string> &args, PARA
         try {
             trafficClass = stoi(token);
         } catch (...) {
-            Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing " + parameter + " traffic class: " + token);
+            Logger::instance().log(0, Logger::ERROR, "Error while parsing " + parameter + " traffic class: " + token);
             return false;
         }
 
         if (trafficClass <= 0) {
-            Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
+            Logger::instance().log(0, Logger::ERROR, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
             return false;
         }
 
@@ -178,7 +180,7 @@ bool SimulationSettings::setEngsetTrafficClasses(map<string, string> &args, PARA
 bool SimulationSettings::setPascalTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix) {
     string parameter = parameterMap[prefix];
     if (!args.count(parameter)) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Parameter " + parameter + " was not found");
+        Logger::instance().log(0, Logger::WARN, "Parameter " + parameter + " was not found");
         return false;
     }
     string value = args[parameter];
@@ -191,16 +193,38 @@ bool SimulationSettings::setPascalTrafficClasses(map<string, string> &args, PARA
         try {
             trafficClass = stoi(token);
         } catch (...) {
-            Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error while parsing " + parameter + " traffic class: " + token);
+            Logger::instance().log(0, Logger::ERROR, "Error while parsing " + parameter + " traffic class: " + token);
             return false;
         }
 
         if (trafficClass <= 0) {
-            Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
+            Logger::instance().log(0, Logger::ERROR, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
             return false;
         }
 
         pascalTrafficClasses.insert(trafficClass);
+    }
+
+    return true;
+}
+
+bool SimulationSettings::setRuns(map<string, string> &args, SimulationSettings::PARAMETER_PREFIX prefix) {
+    string parameter = parameterMap[prefix];
+    if (!args.count(parameter)) {
+        Logger::instance().log(0, Logger::ERROR, "Parameter " + parameter + " was not found");
+        return false;
+    }
+    string value = args[parameter];
+    try {
+        runs = stoi(value);
+    } catch (...) {
+        Logger::instance().log(0, Logger::ERROR, "Error while parsing value " + parameter + ". Current value: " + value);
+        return false;
+    }
+
+    if (runs <= 0) {
+        Logger::instance().log(0, Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
+        return false;
     }
 
     return true;
@@ -242,21 +266,25 @@ set<uint64_t> SimulationSettings::getPascalTrafficClasses() {
     return pascalTrafficClasses;
 }
 
+uint64_t SimulationSettings::getRuns() {
+    return runs;
+}
+
 bool SimulationSettings::maxTrafficClassRequireLessFSUsThanLinkCapacity() {
     uint64_t erlangMaxTrafficClass = *max_element(erlangTrafficClasses.begin(), erlangTrafficClasses.end());
     uint64_t engsetMaxTrafficClass = *max_element(engsetTrafficClasses.begin(), engsetTrafficClasses.end());
     uint64_t pascalMaxTrafficClass = *max_element(pascalTrafficClasses.begin(), pascalTrafficClasses.end());
 
     if (erlangMaxTrafficClass > linkCapacity) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error: Erlang traffic class requires " + to_string(erlangMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
+        Logger::instance().log(0, Logger::ERROR, "Error: Erlang traffic class requires " + to_string(erlangMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
         return false;
     }
     if (engsetMaxTrafficClass > linkCapacity) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error: Engset traffic class requires " + to_string(engsetMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
+        Logger::instance().log(0, Logger::ERROR, "Error: Engset traffic class requires " + to_string(engsetMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
         return false;
     }
     if (pascalMaxTrafficClass > linkCapacity) {
-        Logger::instance().log(0, Logger::PARSE_INPUT_PARAMETERS, "Error: Pascal traffic class requires " + to_string(pascalMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
+        Logger::instance().log(0, Logger::ERROR, "Error: Pascal traffic class requires " + to_string(pascalMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
         return false;
     }
     return true;

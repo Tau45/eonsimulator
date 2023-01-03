@@ -5,8 +5,7 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
-
-using namespace std;
+#include "../tools/SimulationSettings.h"
 
 class Link {
     vector<bool> FSUs;
@@ -18,6 +17,8 @@ public:
     void reserveFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
 
     void freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
+
+    void freeAllFSUs();
 
     bool FSUIsOccupied(uint64_t FSUIndex);
 

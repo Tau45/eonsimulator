@@ -6,7 +6,7 @@
 #include <vector>
 #include <queue>
 #include <fstream>
-#include "../Link.h"
+#include "Link.h"
 #include "../tools/Logger.h"
 #include "../tools/SimulationSettings.h"
 
@@ -23,6 +23,8 @@ public:
     map<uint64_t, vector<Link *>> links;
     vector<Link *> inputLinks;
     vector<Link *> outputLinks;
+
+    ~Structure();
 
     void buildNetworkStructure();
 

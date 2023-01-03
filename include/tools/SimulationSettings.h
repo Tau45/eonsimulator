@@ -14,7 +14,8 @@ class SimulationSettings {
         LINK_CAPACITY,
         ERLANG,
         ENGSET,
-        PASCAL
+        PASCAL,
+        RUNS
     };
 
     map<PARAMETER_PREFIX, string> parameterMap = {
@@ -24,7 +25,8 @@ class SimulationSettings {
             {LINK_CAPACITY,     "-linkCapacity"},
             {ERLANG,            "-erlang"},
             {ENGSET,            "-engset"},
-            {PASCAL,            "-pascal"}
+            {PASCAL,            "-pascal"},
+            {RUNS,              "-runs"}
     };
 
     bool settingsAreValid;
@@ -35,6 +37,7 @@ class SimulationSettings {
     set<uint64_t> erlangTrafficClasses;
     set<uint64_t> engsetTrafficClasses;
     set<uint64_t> pascalTrafficClasses;
+    uint64_t runs;
 
     SimulationSettings(map<string, string> args);
 
@@ -55,6 +58,8 @@ class SimulationSettings {
     bool setEngsetTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix);
 
     bool setPascalTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix);
+
+    bool setRuns(map<string, string> &args, PARAMETER_PREFIX prefix);
 
     bool maxTrafficClassRequireLessFSUsThanLinkCapacity();
 
@@ -80,6 +85,8 @@ public:
     set<uint64_t> getEngsetTrafficClasses();
 
     set<uint64_t> getPascalTrafficClasses();
+
+    uint64_t getRuns();
 };
 
 #endif //EONSIMULATOR_SIMULATIONSETTINGS_H

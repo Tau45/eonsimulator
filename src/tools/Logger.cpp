@@ -15,12 +15,7 @@ void Logger::initialize(bool logsEnabled) {
 }
 
 void Logger::log(double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
-    if (logsEnabled
-        || prefix == SIMULATION_START
-        || prefix == SIMULATION_END
-        || prefix == CREATING_STRUCTURE
-        || prefix == STRUCTURE_VALIDATION
-        || prefix == PARSE_INPUT_PARAMETERS) {
+    if (logsEnabled || prefix == ERROR || prefix == WARN) {
         cout << getTimestamp(clock);
         cout << logMessageTypeMap.at(prefix);
         cout << message << endl;

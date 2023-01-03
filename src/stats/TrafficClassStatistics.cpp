@@ -1,4 +1,4 @@
-#include "../include/TrafficClassStatistics.h"
+#include "../../include/stats/TrafficClassStatistics.h"
 
 TrafficClassStatistics::TrafficClassStatistics() {
     callsGenerated = 0;

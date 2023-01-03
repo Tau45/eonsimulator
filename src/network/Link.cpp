@@ -1,4 +1,4 @@
-#include "../include/Link.h"
+#include "../../include/network/Link.h"
 
 Link::Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity) {
     this->sourceNode = sourceNode;
@@ -32,4 +32,10 @@ uint64_t Link::getSourceNode() {
 
 uint64_t Link::getDestinationNode() {
     return destinationNode;
+}
+
+void Link::freeAllFSUs() {
+    for (auto &&FSU: FSUs) {
+        FSU = false;
+    }
 }

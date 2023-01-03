@@ -7,10 +7,10 @@
 #include "Structure.h"
 #include "../Connection.h"
 #include "../tools/Generator.h"
-#include "../TrafficClassStatistics.h"
+#include "../stats/TrafficClassStatistics.h"
 
 class Network : public Structure {
-    bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection *connection);
+    bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection);
 
     bool linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs);
 
@@ -26,11 +26,13 @@ public:
     map<uint64_t, TrafficClassStatistics> engsetTrafficClasses;
     map<uint64_t, TrafficClassStatistics> pascalTrafficClasses;
 
-    Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection *connection);
+    Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection &connection);
 
-    void closeConnection(double clock, Connection *connection);
+    void reserveResources(Connection connection);
 
-    void reserveResources(Connection *connection);
+    void closeConnection(double clock, Connection connection);
+
+    void closeAllConnections();
 
     uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
 };

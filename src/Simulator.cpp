@@ -2,26 +2,47 @@
 
 Simulator::Simulator(Network &network) {
     this->network = &network;
-
-    addErlangTrafficClasses();
-    addEngsetTrafficClasses();
-    addPascalTrafficClasses();
 }
 
 void Simulator::run() {
-    Logger::instance().log(0, Logger::SIMULATION_START, "Starting simulation with parameters:");
-    Logger::instance().log(0, Logger::SIMULATION_START, "Calls to generate: " + to_string(SimulationSettings::instance().getCallsToGenerate()));
-    Logger::instance().log(0, Logger::SIMULATION_START, "a: " + to_string(SimulationSettings::instance().getA()));
+    SimulationSetResults x = runSimulationSet();
+
+    for (auto y : x.erlangTrafficResults) {
+        cout << x.a << " " << y.first << " " << y.second.avgInternalBlocksRatio << " " <<  y.second.internalBlocksRatioStandardDeviation << " " <<  y.second.avgExternalBlocksRatio << " " << y.second.externalBlocksRatioStandardDeviation << endl;
+    }
+    for (auto y : x.engsetTrafficResults) {
+        cout << x.a << " " << y.first << " " << y.second.avgInternalBlocksRatio << " " <<  y.second.internalBlocksRatioStandardDeviation << " " <<  y.second.avgExternalBlocksRatio << " " << y.second.externalBlocksRatioStandardDeviation << endl;
+    }
+    for (auto y : x.pascalTrafficResults) {
+        cout << x.a << " " << y.first << " " << y.second.avgInternalBlocksRatio << " " <<  y.second.internalBlocksRatioStandardDeviation << " " <<  y.second.avgExternalBlocksRatio << " " << y.second.externalBlocksRatioStandardDeviation << endl;
+    }
+}
+
+SimulationSetResults Simulator::runSimulationSet() {
+    vector<SingleSimulationResults> simulationResults;
+
+    for (int run = 0; run < SimulationSettings::instance().getRuns(); run++) {
+        simulationResults.push_back(runSingleSimulation());
+    }
+
+    return SimulationSetResults(SimulationSettings::instance().getA(), simulationResults);
+}
+
+SingleSimulationResults Simulator::runSingleSimulation() {
+    reset();
+
     Logger::instance().log(0, Logger::SIMULATION_START, "The simulation has started...");
 
     while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < SimulationSettings::instance().getCallsToGenerate()) {
-        eventQueue.top()->execute(*network, eventQueue);
+        Event* event = eventQueue.top();
+        event->execute(*network, eventQueue);
         eventQueue.pop();
+        delete event;
     }
 
     Logger::instance().log(eventQueue.top()->getOccurrenceTime(), Logger::SIMULATION_END, "The simulation has finished");
 
-    printResults();
+    return SingleSimulationResults(network->erlangTrafficClasses, network->engsetTrafficClasses, network->pascalTrafficClasses);
 }
 
 void Simulator::addErlangTrafficClasses() {
@@ -39,16 +60,24 @@ void Simulator::addPascalTrafficClasses() {
 
 }
 
-void Simulator::printResults() {
-    cout << "Erlang traffic:" << endl;
+void Simulator::reset() {
+    while (!eventQueue.empty()) {
+        Event* event = eventQueue.top();
+        eventQueue.pop();
+        delete event;
+    }
 
-    for (auto const &trafficClass: network->erlangTrafficClasses) {
-        cout << trafficClass.first << " FSUs class:"
-             << " calls generated: " << trafficClass.second.callsGenerated
-             << ", internal blocks: " << trafficClass.second.internalBlocksCount
-             << " (" << (double) trafficClass.second.internalBlocksCount / trafficClass.second.callsGenerated << ")"
-             << ", external blocks: " << trafficClass.second.externalBlocksCount
-             << " (" << (double) trafficClass.second.externalBlocksCount / trafficClass.second.callsGenerated << ")"
-             << endl;
+    network->closeAllConnections();
+
+    addErlangTrafficClasses();
+    addEngsetTrafficClasses();
+    addPascalTrafficClasses();
+}
+
+Simulator::~Simulator() {
+    while (!eventQueue.empty()) {
+        Event* event = eventQueue.top();
+        eventQueue.pop();
+        delete event;
     }
 }

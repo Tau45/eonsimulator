@@ -38,3 +38,15 @@ uint64_t Connection::getRequiredNumberOfFSUs() {
 double Connection::getServiceTime() {
     return serviceTime;
 }
+
+Connection::Connection() {
+}
+
+Connection::Connection(Connection &connection) {
+    sourceLink = connection.sourceLink;
+    destinationLink = connection.destinationLink;
+    path = connection.path;
+    firstFSU = connection.firstFSU;
+    requiredNumberOfFSUs = connection.requiredNumberOfFSUs;
+    serviceTime = connection.serviceTime;
+}

@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <vector>
-#include "Link.h"
+#include "network/Link.h"
 
 class Connection {
     uint64_t sourceLink;
@@ -14,6 +14,10 @@ class Connection {
     double serviceTime;
 public:
     Connection(uint64_t sourceLink, uint64_t destinationLink, uint64_t requiredNumberOfFSUs, double serviceTime);
+
+    Connection(Connection &connection);
+
+    Connection();
 
     uint64_t getSourceLink();
 
