@@ -7,8 +7,8 @@ void Network::reserveResources(Connection connection) {
     }
 }
 
-bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection) {
-    vector<uint64_t> potentialFirstFSUs;
+bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection, Generator &generator) {
+    vector<uint64_t> availableFirstFSUs;
 
     for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - connection.getRequiredNumberOfFSUs(); i++) {
         bool freeNeighboringFSUsWereFound = true;
@@ -24,19 +24,19 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &
         }
 
         if (freeNeighboringFSUsWereFound) {
-            potentialFirstFSUs.push_back(i);
+            availableFirstFSUs.push_back(i);
         }
     }
 
-    if (!potentialFirstFSUs.empty()) {
+    if (!availableFirstFSUs.empty()) {
         connection.setPath(path);
-        connection.setFirstFSU(Generator::instance().getRandomFirstFSU(potentialFirstFSUs));
+        connection.setFirstFSU(generator.getRandomFirstFSU(availableFirstFSUs));
         return true;
     }
     return false;
 }
 
-Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection& connection) {
+Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection& connection, Generator &generator) {
     Link *sourceLink = inputLinks[connection.getSourceLink()];
     Link *destinationLink = outputLinks[connection.getDestinationLink()];
 
@@ -57,7 +57,7 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 
         uint64_t currentPathLastNode = currentPath[currentPath.size() - 1]->getDestinationNode();
 
-        if (currentPathLastNode == destinationLink->getDestinationNode() && pathHasRequiredNumberOfFreeFSUs(currentPath, connection)) {
+        if (currentPathLastNode == destinationLink->getDestinationNode() && pathHasRequiredNumberOfFreeFSUs(currentPath, connection, generator)) {
             return CONNECTION_CAN_BE_ESTABLISHED;
         }
 

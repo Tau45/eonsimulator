@@ -9,9 +9,9 @@
 class EventNewCallArrivalErlangClass : public Event {
     uint64_t requiredNumberOfFSUs;
 public:
-    EventNewCallArrivalErlangClass(double currentTime, uint64_t requiredNumberOfFSUs);
+    EventNewCallArrivalErlangClass(double currentTime, uint64_t requiredNumberOfFSUs, Generator &generator);
 
-    void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue) override;
+    void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
 };
 
 #endif //EONSIMULATOR_EVENTNEWCALLARRIVALERLANGCLASS_H

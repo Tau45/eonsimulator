@@ -13,12 +13,6 @@ class Generator {
     int32_t x2;
     int32_t x3;
 
-    Generator(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
-
-    Generator(const Generator &) = delete;
-
-    void operator=(const Generator &) = delete;
-
     double rown_v1(int &x);
 
     double rown_v2(int &x);
@@ -28,9 +22,7 @@ class Generator {
     double getLambda(uint32_t requiredNumberOfFSUs, double serviceTime);
 
 public:
-    static Generator &instance(function<Generator()> *init = nullptr);
-
-    static void initialize(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
+    Generator(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks);
 
     double getRandomServiceTime();
 
@@ -40,7 +32,7 @@ public:
 
     uint64_t getRandomOutputLink();
 
-    uint64_t getRandomFirstFSU(vector<uint64_t> potentialFirstFSUs);
+    uint64_t getRandomFirstFSU(vector<uint64_t> availableFirstFSUs);
 };
 
 #endif //EONSIMULATOR_GENERATOR_H

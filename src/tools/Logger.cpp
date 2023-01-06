@@ -16,9 +16,9 @@ void Logger::initialize(bool logsEnabled) {
 
 void Logger::log(double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
     if (logsEnabled || prefix == ERROR || prefix == WARN) {
-        cout << getTimestamp(clock);
-        cout << logMessageTypeMap.at(prefix);
-        cout << message << endl;
+        stringstream ss;
+        ss << getTimestamp(clock) << logMessageTypeMap.at(prefix) << message << endl;
+        cout << ss.str();
     }
 }
 

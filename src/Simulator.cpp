@@ -1,41 +1,22 @@
 #include "../include/Simulator.h"
 
-Simulator::Simulator(Network &network) {
+Simulator::Simulator(Network &network, Generator &generator) {
     this->network = &network;
+    this->generator = &generator;
+
+    addErlangTrafficClasses();
+    addEngsetTrafficClasses();
+    addPascalTrafficClasses();
 }
 
-void Simulator::run() {
-    SimulationSetResults x = runSimulationSet();
-
-    for (auto y : x.erlangTrafficResults) {
-        cout << x.a << " " << y.first << " " << y.second.avgInternalBlocksRatio << " " <<  y.second.internalBlocksRatioStandardDeviation << " " <<  y.second.avgExternalBlocksRatio << " " << y.second.externalBlocksRatioStandardDeviation << endl;
-    }
-    for (auto y : x.engsetTrafficResults) {
-        cout << x.a << " " << y.first << " " << y.second.avgInternalBlocksRatio << " " <<  y.second.internalBlocksRatioStandardDeviation << " " <<  y.second.avgExternalBlocksRatio << " " << y.second.externalBlocksRatioStandardDeviation << endl;
-    }
-    for (auto y : x.pascalTrafficResults) {
-        cout << x.a << " " << y.first << " " << y.second.avgInternalBlocksRatio << " " <<  y.second.internalBlocksRatioStandardDeviation << " " <<  y.second.avgExternalBlocksRatio << " " << y.second.externalBlocksRatioStandardDeviation << endl;
-    }
-}
-
-SimulationSetResults Simulator::runSimulationSet() {
-    vector<SingleSimulationResults> simulationResults;
-
-    for (int run = 0; run < SimulationSettings::instance().getRuns(); run++) {
-        simulationResults.push_back(runSingleSimulation());
-    }
-
-    return SimulationSetResults(SimulationSettings::instance().getA(), simulationResults);
-}
-
-SingleSimulationResults Simulator::runSingleSimulation() {
+SingleSimulationResults Simulator::run() {
     reset();
 
     Logger::instance().log(0, Logger::SIMULATION_START, "The simulation has started...");
 
     while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < SimulationSettings::instance().getCallsToGenerate()) {
         Event* event = eventQueue.top();
-        event->execute(*network, eventQueue);
+        event->execute(*network, eventQueue, *generator);
         eventQueue.pop();
         delete event;
     }
@@ -48,7 +29,7 @@ SingleSimulationResults Simulator::runSingleSimulation() {
 void Simulator::addErlangTrafficClasses() {
     for (uint64_t erlangTrafficClass: SimulationSettings::instance().getErlangTrafficClasses()) {
         network->erlangTrafficClasses[erlangTrafficClass] = TrafficClassStatistics();
-        eventQueue.push(new EventNewCallArrivalErlangClass(0, erlangTrafficClass));
+        eventQueue.push(new EventNewCallArrivalErlangClass(0, erlangTrafficClass, *generator));
     }
 }
 

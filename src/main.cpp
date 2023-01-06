@@ -1,5 +1,28 @@
-#include <string>
+#include <future>
 #include "../include/Simulator.h"
+
+SingleSimulationResults runSingleSimulation() {
+    Network network;
+    network.buildNetworkStructure();
+    Generator generator(network.getNumberOfInputLinks(), network.getNumberOfOutputLinks());
+    Simulator simulator(network, generator);
+    return simulator.run();
+}
+
+SimulationSetResults runSimulationSet() {
+    vector<future<SingleSimulationResults>> simulations;
+    vector<SingleSimulationResults> simulationResults;
+
+    for (int j = 0; j < SimulationSettings::instance().getRuns(); j++) {
+        simulations.push_back(async(&runSingleSimulation));
+    }
+
+    for (int j = 0; j < SimulationSettings::instance().getRuns(); j++) {
+        simulationResults.push_back(simulations[j].get());
+    }
+
+    return SimulationSetResults(SimulationSettings::instance().getA(), simulationResults);
+}
 
 int main(int argc, char *argv[]) {
 
@@ -30,12 +53,39 @@ int main(int argc, char *argv[]) {
         return -2;
     }
 
-    /// Initialize RNG
-    Generator::initialize(network.getNumberOfInputLinks(), network.getNumberOfOutputLinks());
-
     /// Create simulator and run simulation
-    Simulator simulator(network);
-    simulator.run();
+    vector<future<SimulationSetResults>> simulationSets;
+    vector<SimulationSetResults> simulationSetResults;
 
+    for (int i = 0; i < 2; i++) {
+        simulationSets.push_back(async(&runSimulationSet));
+    }
+
+    for (int i = 0; i < 2; i++) {
+        simulationSetResults.push_back(simulationSets[i].get());
+    }
+
+    for (int i = 0; i < 2; i++) {
+        stringstream ss;
+        ss << simulationSetResults[i].a << "\t";
+        ss << "Erlang[";
+        for (auto y: simulationSetResults[i].erlangTrafficResults) {
+            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioStandardDeviation << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioStandardDeviation << "}";
+        }
+        ss << "]\t";
+
+        ss << "Engset[";
+        for (auto y: simulationSetResults[i].engsetTrafficResults) {
+            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioStandardDeviation << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioStandardDeviation << "}";
+        }
+        ss << "]\t";
+
+        ss << "Pascal[";
+        for (auto y: simulationSetResults[i].pascalTrafficResults) {
+            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioStandardDeviation << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioStandardDeviation << "}";
+        }
+        ss << "]\n";
+        cout << ss.str();
+    }
     return 0;
 }

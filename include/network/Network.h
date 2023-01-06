@@ -10,7 +10,7 @@
 #include "../stats/TrafficClassStatistics.h"
 
 class Network : public Structure {
-    bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection);
+    bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection, Generator &generator);
 
     bool linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs);
 
@@ -26,7 +26,7 @@ public:
     map<uint64_t, TrafficClassStatistics> engsetTrafficClasses;
     map<uint64_t, TrafficClassStatistics> pascalTrafficClasses;
 
-    Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection &connection);
+    Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator);
 
     void reserveResources(Connection connection);
 

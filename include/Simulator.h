@@ -14,6 +14,7 @@
 class Simulator {
     Network *network;
     priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
+    Generator *generator;
 
     void addErlangTrafficClasses();
 
@@ -23,16 +24,12 @@ class Simulator {
 
     void reset();
 
-    SingleSimulationResults runSingleSimulation();
-
-    SimulationSetResults runSimulationSet();
-
 public:
-    Simulator(Network &network);
+    Simulator(Network &network, Generator &generator);
 
     ~Simulator();
 
-    void run();
+    SingleSimulationResults run();
 };
 
 #endif //EONSIMULATOR_SIMULATOR_H

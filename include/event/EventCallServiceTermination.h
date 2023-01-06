@@ -9,7 +9,7 @@ class EventCallServiceTermination : public Event {
 public:
     EventCallServiceTermination(double occurrenceTime, const Connection& connection);
 
-    void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue) override;
+    void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
 };
 
 #endif //EONSIMULATOR_EVENTCALLSERVICETERMINATION_H

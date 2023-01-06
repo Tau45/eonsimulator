@@ -1,23 +1,23 @@
 #include "../../include/event/EventNewCallArrivalErlangClass.h"
 
-EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double currentTime, uint64_t requiredNumberOfFSUs) {
-    double serviceTime = Generator::instance().getRandomServiceTime();
-    uint64_t sourceLink = Generator::instance().getRandomInputLink();
-    uint64_t destinationLink = Generator::instance().getRandomOutputLink();
+EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double currentTime, uint64_t requiredNumberOfFSUs, Generator &generator) {
+    double serviceTime = generator.getRandomServiceTime();
+    uint64_t sourceLink = generator.getRandomInputLink();
+    uint64_t destinationLink = generator.getRandomOutputLink();
 
     this->requiredNumberOfFSUs = requiredNumberOfFSUs;
-    this->occurrenceTime = currentTime + Generator::instance().getRandomOccurrenceTime(requiredNumberOfFSUs, serviceTime);
+    this->occurrenceTime = currentTime + generator.getRandomOccurrenceTime(requiredNumberOfFSUs, serviceTime);
     this->connection = Connection(sourceLink, destinationLink, requiredNumberOfFSUs, serviceTime);
 }
 
-void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue) {
+void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) {
     TrafficClassStatistics &trafficClassStatistics = network.erlangTrafficClasses[requiredNumberOfFSUs];
 
-    eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime, requiredNumberOfFSUs));
+    eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime, requiredNumberOfFSUs, generator));
 
     Logger::instance().log(occurrenceTime, Logger::CONNECTION_SETUP, "Setting up connection between input: " + to_string(network.inputLinks[connection.getSourceLink()]->getSourceNode()) + " and output " + to_string(network.outputLinks[connection.getDestinationLink()]->getDestinationNode()) + "...");
 
-    switch (network.checkIfConnectionCanBeEstablished(connection)) {
+    switch (network.checkIfConnectionCanBeEstablished(connection, generator)) {
         case Network::CONNECTION_CAN_BE_ESTABLISHED:
             network.reserveResources(connection);
             eventQueue.push(new EventCallServiceTermination(occurrenceTime + connection.getServiceTime(), Connection(connection)));

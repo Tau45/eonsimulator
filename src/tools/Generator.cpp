@@ -8,16 +8,6 @@ Generator::Generator(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) 
     this->numberOfOutputLinks = numberOfOutputLinks;
 }
 
-Generator &Generator::instance(function<Generator()> *init) {
-    static Generator s{(*init)()};
-    return s;
-}
-
-void Generator::initialize(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
-    function<Generator()> init = [numberOfInputLinks, numberOfOutputLinks]() { return Generator(numberOfInputLinks, numberOfOutputLinks); };
-    instance(&init);
-}
-
 double Generator::rown_v1(int &x) {
     int a = 16807, q = 127773, r = 2836, h;
     h = int(x / q);
@@ -78,12 +68,12 @@ uint64_t Generator::getRandomOutputLink() {
     return randomLink;
 }
 
-uint64_t Generator::getRandomFirstFSU(vector<uint64_t> potentialFirstFSUs) {
-    uint64_t randomFirstFSUIndex = rown_v2(x2) * potentialFirstFSUs.size();
+uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {
+    uint64_t randomFirstFSUIndex = rown_v2(x2) * availableFirstFSUs.size();
 
-    if (randomFirstFSUIndex == potentialFirstFSUs.size()) {
+    if (randomFirstFSUIndex == availableFirstFSUs.size()) {
         randomFirstFSUIndex = randomFirstFSUIndex - 1;
     }
 
-    return potentialFirstFSUs[randomFirstFSUIndex];
+    return availableFirstFSUs[randomFirstFSUIndex];
 }
