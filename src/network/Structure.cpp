@@ -1,7 +1,7 @@
 #include "../../include/network/Structure.h"
 
 void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput) {
-    Link *link = new Link(sourceNode, destinationNode, linkCapacity);
+    Link *link = new Link(sourceNode, destinationNode, linkCapacity, isInput, isOutput);
     links[sourceNode].push_back(link);
 
     if (isInput) {
@@ -139,15 +139,23 @@ void Structure::printStructureDetails(vector<vector<int>> &nodes) {
         }
 
         /// Print information about links to other nodes
-        message << ", " << to_string(links[index].size()) << " links to nodes";
+        uint64_t numberOfInternalLinks = 0;
+		for (int i = 0; i < links[index].size(); i++) {
+			if (!links[index][i]->isOutputLink()) {
+				numberOfInternalLinks++;
+			}
+		}
+        message << ", " << to_string(numberOfInternalLinks) << " links to nodes";
 
-        if (!links[index].empty()) {
+        if (numberOfInternalLinks > 0) {
             message << " (";
             for (int i = 0; i < links[index].size(); i++) {
-                message << links[index][i]->getDestinationNode();
-                if (i < links[index].size() - 1) {
-                    message << " ";
-                }
+				if (!links[index][i]->isOutputLink()) {
+					message << links[index][i]->getDestinationNode();
+					if (i < links[index].size() - 1) {
+						message << " ";
+					}
+				}
             }
             message << ")";
         }
