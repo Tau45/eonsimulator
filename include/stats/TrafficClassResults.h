@@ -5,8 +5,8 @@ class TrafficClassResults {
 public:
     double avgInternalBlocksRatio;
     double avgExternalBlocksRatio;
-    double internalBlocksRatioStandardDeviation;
-    double externalBlocksRatioStandardDeviation;
+    double internalBlocksRatioConfidenceInterval;
+    double externalBlocksRatioConfidenceInterval;
 
     TrafficClassResults() {}
 

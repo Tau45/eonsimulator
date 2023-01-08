@@ -30,7 +30,7 @@ class SimulationSettings {
     };
 
     bool settingsAreValid;
-    double a;
+    set<double> aParameters;
     string structureFileName;
     uint64_t callsToGenerate;
     uint64_t linkCapacity;
@@ -70,7 +70,7 @@ public:
 
     bool areValid();
 
-    double getA();
+    set<double> getAParameters();
 
     string getStructureFileName();
 

@@ -2,7 +2,7 @@
 #include "../../include/tools/SimulationSettings.h"
 
 SimulationSettings::SimulationSettings(map<string, string> args) {
-    bool aIsValid = setA(args, A);
+    bool aParametersAreValid = setA(args, A);
     bool structureFileNameIsValid = setStructureFileName(args, STRUCTURE);
     bool callsToGenerateIsValid = setCallsToGenerate(args, CALLS_TO_GENERATE);
     bool linkCapacityIsValid = setLinkCapacity(args, LINK_CAPACITY);
@@ -11,7 +11,7 @@ SimulationSettings::SimulationSettings(map<string, string> args) {
     bool pascalTrafficClassesAreValid = setPascalTrafficClasses(args, PASCAL);
     bool runsIsValid = setRuns(args, RUNS);
 
-    settingsAreValid = aIsValid
+    settingsAreValid = aParametersAreValid
                        && structureFileNameIsValid
                        && callsToGenerateIsValid
                        && linkCapacityIsValid
@@ -37,16 +37,25 @@ bool SimulationSettings::setA(map<string, string> &args, PARAMETER_PREFIX prefix
         return false;
     }
     string value = args[parameter];
-    try {
-        a = stod(value);
-    } catch (...) {
-        Logger::instance().log(0, Logger::ERROR, "Error while parsing value " + parameter + ": " + value);
-        return false;
-    }
+    stringstream ss(value);
+    string token;
 
-    if (a <= 0.0) {
-        Logger::instance().log(0, Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
-        return false;
+    while (std::getline(ss, token, ',')) {
+        double aParameter;
+
+        try {
+            aParameter = stod(token);
+        } catch (...) {
+            Logger::instance().log(0, Logger::ERROR, "Error while parsing value " + parameter + ": " + value);
+            return false;
+        }
+
+        if (aParameter <= 0.0) {
+            Logger::instance().log(0, Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
+            return false;
+        }
+
+        aParameters.insert(aParameter);
     }
 
     return true;
@@ -234,8 +243,8 @@ bool SimulationSettings::areValid() {
     return settingsAreValid;
 }
 
-double SimulationSettings::getA() {
-    return a;
+set<double> SimulationSettings::getAParameters() {
+    return aParameters;
 }
 
 string SimulationSettings::getStructureFileName() {

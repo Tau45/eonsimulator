@@ -1,9 +1,10 @@
 #include "../../include/tools/Generator.h"
 
-Generator::Generator(uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
-    this->x1 = 869724338;
-    this->x2 = 925386436;
-    this->x3 = 742339657;
+Generator::Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
+    this->a = a;
+    this->x1 = x1;
+    this->x2 = x2;
+    this->x3 = x3;
     this->numberOfInputLinks = numberOfInputLinks;
     this->numberOfOutputLinks = numberOfOutputLinks;
 }
@@ -33,7 +34,6 @@ double Generator::rown_v3(int &x) {
 }
 
 double Generator::getLambda(uint32_t requiredNumberOfFSUs, double serviceTime) {
-    double a = SimulationSettings::instance().getA();
     uint64_t linkCapacity = SimulationSettings::instance().getLinkCapacity();
     uint64_t numberOfTrafficClasses = SimulationSettings::instance().getNumberOfTrafficClasses();
 

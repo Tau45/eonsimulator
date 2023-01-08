@@ -4,6 +4,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <cmath>
 #include "TrafficClassResults.h"
 #include "SingleSimulationResults.h"
 #include "../tools/SimulationSettings.h"
@@ -11,9 +12,9 @@
 using namespace std;
 
 class SimulationSetResults {
-    void setTrafficClassResults(map<uint64_t, TrafficClassResults> &trafficResults,
-                                const vector<map<uint64_t, TrafficClassResultRatios>> &trafficResultRatiosVector,
-                                const set<uint64_t> &trafficClasses);
+    void setTrafficSourceResults(map<uint64_t, TrafficClassResults> &trafficResults,
+                                 const vector<map<uint64_t, TrafficClassResultRatios>> &trafficResultRatiosVector,
+                                 const set<uint64_t> &trafficClasses);
 
 public:
     double a;

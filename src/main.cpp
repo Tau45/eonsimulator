@@ -1,27 +1,34 @@
 #include <future>
 #include "../include/Simulator.h"
+#include "../include/tools/SeedsProvider.h"
 
-SingleSimulationResults runSingleSimulation() {
+SingleSimulationResults runSingleSimulation(double a, vector<int32_t> seedsForSimulation) {
     Network network;
     network.buildNetworkStructure();
-    Generator generator(network.getNumberOfInputLinks(), network.getNumberOfOutputLinks());
+
+    int32_t x1 = seedsForSimulation[0];
+    int32_t x2 = seedsForSimulation[1];
+    int32_t x3 = seedsForSimulation[2];
+
+    Generator generator(a, x1, x2, x3, network.getNumberOfInputLinks(), network.getNumberOfOutputLinks());
     Simulator simulator(network, generator);
     return simulator.run();
 }
 
-SimulationSetResults runSimulationSet() {
+SimulationSetResults runSimulationSet(double a, vector<vector<int32_t>> seedsForSimulationSet) {
     vector<future<SingleSimulationResults>> simulations;
     vector<SingleSimulationResults> simulationResults;
+	auto seedsForSimulation = seedsForSimulationSet.begin();
 
-    for (int j = 0; j < SimulationSettings::instance().getRuns(); j++) {
-        simulations.push_back(async(&runSingleSimulation));
+    for (uint64_t i = 0; i < SimulationSettings::instance().getRuns(); i++) {
+        simulations.push_back(async(&runSingleSimulation, a, *seedsForSimulation++));
     }
 
-    for (int j = 0; j < SimulationSettings::instance().getRuns(); j++) {
-        simulationResults.push_back(simulations[j].get());
+    for (uint64_t i = 0; i < SimulationSettings::instance().getRuns(); i++) {
+        simulationResults.push_back(simulations[i].get());
     }
 
-    return SimulationSetResults(SimulationSettings::instance().getA(), simulationResults);
+    return SimulationSetResults(a, simulationResults);
 }
 
 int main(int argc, char *argv[]) {
@@ -53,36 +60,58 @@ int main(int argc, char *argv[]) {
         return -2;
     }
 
-    /// Create simulator and run simulation
+	/// Get seeds for random number generators
+	SeedsProvider seedsProvider;
+	uint64_t numberOfSimulationSets = SimulationSettings::instance().getAParameters().size();
+	uint64_t numberOfSimulationsPerSet = SimulationSettings::instance().getRuns();
+	uint64_t requiredNumberOfSeeds = numberOfSimulationSets * numberOfSimulationsPerSet * 3;
+
+	if (requiredNumberOfSeeds > seedsProvider.getNumberOfAvailableSeeds()) {
+		Logger::instance().log(0, Logger::ERROR, to_string(requiredNumberOfSeeds) + " seeds are required to perform required number of simulations, and the program can provide " + to_string(seedsProvider.getNumberOfAvailableSeeds()) + " seeds only");
+		return -3;
+	}
+
+	vector<vector<vector<int32_t>>> seeds = seedsProvider.getSeeds(numberOfSimulationSets, numberOfSimulationsPerSet);
+	auto seedsForSimulationSet = seeds.begin();
+
+    /// Create simulators and run simulations
     vector<future<SimulationSetResults>> simulationSets;
     vector<SimulationSetResults> simulationSetResults;
 
-    for (int i = 0; i < 2; i++) {
-        simulationSets.push_back(async(&runSimulationSet));
+	auto start = chrono::high_resolution_clock::now();
+
+    for (double a : SimulationSettings::instance().getAParameters()) {
+        simulationSets.push_back(async(&runSimulationSet, a, *seedsForSimulationSet++));
     }
 
-    for (int i = 0; i < 2; i++) {
-        simulationSetResults.push_back(simulationSets[i].get());
+    for (auto & simulationSet : simulationSets) {
+        simulationSetResults.push_back(simulationSet.get());
     }
 
-    for (int i = 0; i < 2; i++) {
+	auto finish = chrono::high_resolution_clock::now();
+	auto duration = duration_cast<chrono::milliseconds>(finish - start);
+
+	Logger::instance().log(0, Logger::ALL_SIMULATIONS_ENDED, "All simulations were done in " + to_string((double) duration.count() / 1000) + "s");
+
+	/// Print results
+    for (auto & simulationSetResult : simulationSetResults) {
         stringstream ss;
-        ss << simulationSetResults[i].a << "\t";
+        ss << simulationSetResult.a << "\t";
         ss << "Erlang[";
-        for (auto y: simulationSetResults[i].erlangTrafficResults) {
-            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioStandardDeviation << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioStandardDeviation << "}";
+        for (auto y: simulationSetResult.erlangTrafficResults) {
+            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
         }
         ss << "]\t";
 
         ss << "Engset[";
-        for (auto y: simulationSetResults[i].engsetTrafficResults) {
-            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioStandardDeviation << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioStandardDeviation << "}";
+        for (auto y: simulationSetResult.engsetTrafficResults) {
+            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
         }
         ss << "]\t";
 
         ss << "Pascal[";
-        for (auto y: simulationSetResults[i].pascalTrafficResults) {
-            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioStandardDeviation << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioStandardDeviation << "}";
+        for (auto y: simulationSetResult.pascalTrafficResults) {
+            ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
         }
         ss << "]\n";
         cout << ss.str();

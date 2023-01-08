@@ -1,6 +1,8 @@
 #include "../../include/network/Link.h"
 
-Link::Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity) {
+Link::Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput) {
+    this->isInput = isInput;
+    this->isOutput = isOutput;
     this->sourceNode = sourceNode;
     this->destinationNode = destinationNode;
     for (int i = 0; i < linkCapacity; i++) {
@@ -38,4 +40,12 @@ void Link::freeAllFSUs() {
     for (auto &&FSU: FSUs) {
         FSU = false;
     }
+}
+
+bool Link::isInputLink() {
+	return isInput;
+}
+
+bool Link::isOutputLink() {
+	return isOutput;
 }
