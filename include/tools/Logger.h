@@ -28,9 +28,9 @@ public:
         WARN
     };
 
-    static Logger &instance(function<Logger()> *init = nullptr);
+	static Logger &instance(function<Logger()> *init = nullptr);
 
-    static void initialize(bool logsEnabled);
+	static void initialize(bool logsEnabled);
 
     void log(double clock, LOG_MESSAGE_TYPE prefix, const string &message);
 

@@ -7,19 +7,19 @@
 
 class Event {
 protected:
-    double occurrenceTime;
-    Connection connection;
+	double occurrenceTime;
+	Connection connection;
 public:
-    class EventComparator {
-    public:
-        bool operator()(const Event *a, const Event *b) {
-            return a->occurrenceTime > b->occurrenceTime;
-        }
-    };
+	class EventComparator {
+	public:
+		bool operator()(const Event *a, const Event *b) {
+			return a->occurrenceTime > b->occurrenceTime;
+		}
+	};
 
-    virtual void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) = 0;
+	virtual void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) = 0;
 
-    double getOccurrenceTime() { return occurrenceTime; }
+	double getOccurrenceTime() { return occurrenceTime; }
 };
 
 #endif //EONSIMULATOR_EVENT_H

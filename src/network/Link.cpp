@@ -1,45 +1,45 @@
 #include "../../include/network/Link.h"
 
 Link::Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput) {
-    this->isInput = isInput;
-    this->isOutput = isOutput;
-    this->sourceNode = sourceNode;
-    this->destinationNode = destinationNode;
-    for (int i = 0; i < linkCapacity; i++) {
-        FSUs.push_back(false);
-    }
+	this->isInput = isInput;
+	this->isOutput = isOutput;
+	this->sourceNode = sourceNode;
+	this->destinationNode = destinationNode;
+	for (int i = 0; i < linkCapacity; i++) {
+		FSUs.push_back(false);
+	}
 }
 
 void Link::reserveFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
-    for (uint64_t i = firstFSU; i < firstFSU + numberOfFSUs; i++) {
-        assert(!FSUs[i]);
-        FSUs[i] = true;
-    }
+	for (uint64_t i = firstFSU; i < firstFSU + numberOfFSUs; i++) {
+		assert(!FSUs[i]);
+		FSUs[i] = true;
+	}
 }
 
 void Link::freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
-    for (uint64_t i = firstFSU; i < firstFSU + numberOfFSUs; i++) {
-        assert(FSUs[i]);
-        FSUs[i] = false;
-    }
+	for (uint64_t i = firstFSU; i < firstFSU + numberOfFSUs; i++) {
+		assert(FSUs[i]);
+		FSUs[i] = false;
+	}
 }
 
 bool Link::FSUIsOccupied(uint64_t FSUIndex) {
-    return FSUs[FSUIndex];
+	return FSUs[FSUIndex];
 }
 
 uint64_t Link::getSourceNode() {
-    return sourceNode;
+	return sourceNode;
 }
 
 uint64_t Link::getDestinationNode() {
-    return destinationNode;
+	return destinationNode;
 }
 
 void Link::freeAllFSUs() {
-    for (auto &&FSU: FSUs) {
-        FSU = false;
-    }
+	for (auto &&FSU: FSUs) {
+		FSU = false;
+	}
 }
 
 bool Link::isInputLink() {

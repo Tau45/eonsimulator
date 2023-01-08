@@ -5,11 +5,11 @@
 
 class TrafficClassStatistics {
 public:
-    uint64_t callsGenerated;
-    uint64_t internalBlocksCount;
-    uint64_t externalBlocksCount;
+	uint64_t callsGenerated;
+	uint64_t internalBlocksCount;
+	uint64_t externalBlocksCount;
 
-    TrafficClassStatistics();
+	TrafficClassStatistics();
 };
 
 #endif //EONSIMULATOR_TRAFFICCLASSSTATISTICS_H

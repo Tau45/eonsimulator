@@ -3,14 +3,14 @@
 
 class TrafficClassResults {
 public:
-    double avgInternalBlocksRatio;
-    double avgExternalBlocksRatio;
-    double internalBlocksRatioConfidenceInterval;
-    double externalBlocksRatioConfidenceInterval;
+	double avgInternalBlocksRatio;
+	double avgExternalBlocksRatio;
+	double internalBlocksRatioConfidenceInterval;
+	double externalBlocksRatioConfidenceInterval;
 
-    TrafficClassResults() {}
+	TrafficClassResults() {}
 
-    TrafficClassResults(double avgInternalBlocksRatio, double avgExternalBlocksRatio, double internalBlocksRatioStandardDeviation, double externalBlocksRatioStandardDeviation);
+	TrafficClassResults(double avgInternalBlocksRatio, double avgExternalBlocksRatio, double internalBlocksRatioStandardDeviation, double externalBlocksRatioStandardDeviation);
 };
 
 #endif //EONSIMULATOR_TRAFFICCLASSRESULTS_H

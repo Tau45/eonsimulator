@@ -12,24 +12,24 @@
 #include "stats/SimulationSetResults.h"
 
 class Simulator {
-    Network *network;
-    priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
-    Generator *generator;
+	Network *network;
+	priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
+	Generator *generator;
 
-    void addErlangTrafficClasses();
+	void addErlangTrafficClasses();
 
-    void addEngsetTrafficClasses();
+	void addEngsetTrafficClasses();
 
-    void addPascalTrafficClasses();
+	void addPascalTrafficClasses();
 
-    void reset();
+	void reset();
 
 public:
-    Simulator(Network &network, Generator &generator);
+	Simulator(Network &network, Generator &generator);
 
-    ~Simulator();
+	~Simulator();
 
-    SingleSimulationResults run();
+	SingleSimulationResults run();
 };
 
 #endif //EONSIMULATOR_SIMULATOR_H

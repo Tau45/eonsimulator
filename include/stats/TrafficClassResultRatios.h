@@ -3,12 +3,12 @@
 
 class TrafficClassResultRatios {
 public:
-    double internalBlocksRatio;
-    double externalBlocksRatio;
+	double internalBlocksRatio;
+	double externalBlocksRatio;
 
-    TrafficClassResultRatios() {}
+	TrafficClassResultRatios() {}
 
-    TrafficClassResultRatios(double internalBlocksRatio, double externalBlocksRatio);
+	TrafficClassResultRatios(double internalBlocksRatio, double externalBlocksRatio);
 };
 
 #endif //EONSIMULATOR_TRAFFICCLASSRESULTRATIOS_H

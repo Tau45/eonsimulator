@@ -16,9 +16,9 @@ public:
                             const map<uint64_t, TrafficClassStatistics> &engsetTrafficClasses,
                             const map<uint64_t, TrafficClassStatistics> &pascalTrafficClasses);
 
-    map<uint64_t, TrafficClassResultRatios> erlangTrafficResultRatios;
-    map<uint64_t, TrafficClassResultRatios> engsetTrafficResultRatios;
-    map<uint64_t, TrafficClassResultRatios> pascalTrafficResultRatios;
+	map<uint64_t, TrafficClassResultRatios> erlangTrafficResultRatios;
+	map<uint64_t, TrafficClassResultRatios> engsetTrafficResultRatios;
+	map<uint64_t, TrafficClassResultRatios> pascalTrafficResultRatios;
 };
 
 #endif //EONSIMULATOR_SINGLESIMULATIONRESULTS_H

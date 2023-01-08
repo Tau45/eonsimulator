@@ -11,30 +11,30 @@
 #include "../tools/SimulationSettings.h"
 
 class Structure {
-    void createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput);
+	void createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput);
 
-    void printStructureDetails(vector<vector<int>> &nodes);
+	void printStructureDetails(vector<vector<int>> &nodes);
 
-    bool checkInputToOutputAvailability(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex);
+	bool checkInputToOutputAvailability(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex);
 
-    bool everyOutputNodeIsAvailableFromEveryInputNode();
+	bool everyOutputNodeIsAvailableFromEveryInputNode();
 
 public:
-    map<uint64_t, vector<Link *>> links;
-    vector<Link *> inputLinks;
-    vector<Link *> outputLinks;
+	map<uint64_t, vector<Link *>> links;
+	vector<Link *> inputLinks;
+	vector<Link *> outputLinks;
 
-    ~Structure();
+	~Structure();
 
-    void buildNetworkStructure();
+	void buildNetworkStructure();
 
-    bool isValid();
+	bool isValid();
 
-    bool linkWasNotVisited(vector<Link *> &path, uint64_t node);
+	bool linkWasNotVisited(vector<Link *> &path, uint64_t node);
 
-    uint64_t getNumberOfInputLinks();
+	uint64_t getNumberOfInputLinks();
 
-    uint64_t getNumberOfOutputLinks();
+	uint64_t getNumberOfOutputLinks();
 };
 
 #endif //EONSIMULATOR_STRUCTURE_H
