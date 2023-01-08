@@ -12,7 +12,7 @@ Simulator::Simulator(Network &network, Generator &generator) {
 SingleSimulationResults Simulator::run() {
     reset();
 
-    Logger::instance().log(0, Logger::SIMULATION_START, "The simulation has started...");
+    Logger::instance().log(0, generator->getA(), generator->getSimulationIndex(), Logger::SIMULATION_START, "The simulation has started...");
 
     while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < SimulationSettings::instance().getCallsToGenerate()) {
         Event* event = eventQueue.top();
@@ -21,7 +21,7 @@ SingleSimulationResults Simulator::run() {
         delete event;
     }
 
-    Logger::instance().log(eventQueue.top()->getOccurrenceTime(), Logger::SIMULATION_END, "The simulation has finished");
+    Logger::instance().log(eventQueue.top()->getOccurrenceTime(), generator->getA(), generator->getSimulationIndex(), Logger::SIMULATION_END, "The simulation has finished");
 
     return SingleSimulationResults(network->erlangTrafficClasses, network->engsetTrafficClasses, network->pascalTrafficClasses);
 }

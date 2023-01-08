@@ -73,8 +73,8 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 	return INTERNAL_BLOCK;
 }
 
-void Network::closeConnection(double clock, Connection connection) {
-	Logger::instance().log(clock, Logger::CONNECTION_CLOSED, "Connection closed: Freeing FSUs: " + to_string(connection.getFirstFSU()) + "-" + to_string(connection.getFirstFSU() + connection.getRequiredNumberOfFSUs() - 1));
+void Network::closeConnection(double clock, Connection connection, Generator &generator) {
+	Logger::instance().log(clock, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_CLOSED, "Connection closed: Freeing FSUs: " + to_string(connection.getFirstFSU()) + "-" + to_string(connection.getFirstFSU() + connection.getRequiredNumberOfFSUs() - 1));
 	for (auto &link: connection.getPath()) {
 		link->freeFSUs(connection.getFirstFSU(), connection.getRequiredNumberOfFSUs());
 	}

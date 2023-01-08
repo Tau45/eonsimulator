@@ -30,7 +30,7 @@ public:
 
 	void reserveResources(Connection connection);
 
-	void closeConnection(double clock, Connection connection);
+	void closeConnection(double clock, Connection connection, Generator &generator);
 
 	void closeAllConnections();
 

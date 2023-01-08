@@ -14,10 +14,18 @@ void Logger::initialize(bool logsEnabled) {
 	instance(&init);
 }
 
-void Logger::log(double clock, LOG_MESSAGE_TYPE prefix, const string &message) {
-	if (logsEnabled || prefix == ERROR || prefix == WARN || prefix == ALL_SIMULATIONS_ENDED) {
+void Logger::log(LOG_MESSAGE_TYPE prefix, const string &message) {
+	if (logsEnabled || prefix == ERROR || prefix == WARN || prefix == STARTING_SIMULATIONS || prefix == SIMULATIONS_ENDED) {
 		stringstream ss;
-		ss << getTimestamp(clock) << logMessageTypeMap.at(prefix) << message << endl;
+		ss << logMessageTypeMap.at(prefix) << message << endl;
+		cout << ss.str();
+	}
+}
+
+void Logger::log(double clock, double a, uint64_t simulationIndex, LOG_MESSAGE_TYPE prefix, const string &message) {
+	if (logsEnabled) {
+		stringstream ss;
+		ss << getTimestamp(clock) << logA(a) << logSimulationIndex(simulationIndex) << logMessageTypeMap.at(prefix) << message << endl;
 		cout << ss.str();
 	}
 }
@@ -43,5 +51,17 @@ string Logger::getTimestamp(double clock) {
 	   << setw(2) << s << ":"
 	   //           << setw(6) << ms << "] ";
 	   << setw(3) << ms << "] ";
+	return ss.str();
+}
+
+string Logger::logA(double a) {
+	stringstream ss;
+	ss << "[" << a << "] ";
+	return ss.str();
+}
+
+string Logger::logSimulationIndex(uint64_t simulationIndex) {
+	stringstream ss;
+	ss << "[" << simulationIndex << "] ";
 	return ss.str();
 }

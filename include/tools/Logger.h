@@ -21,7 +21,8 @@ public:
         CONNECTION_SETUP,
         SIMULATION_START,
         SIMULATION_END,
-		ALL_SIMULATIONS_ENDED,
+		STARTING_SIMULATIONS,
+		SIMULATIONS_ENDED,
         CREATING_STRUCTURE,
         STRUCTURE_VALIDATION,
         ERROR,
@@ -32,7 +33,9 @@ public:
 
 	static void initialize(bool logsEnabled);
 
-    void log(double clock, LOG_MESSAGE_TYPE prefix, const string &message);
+	void log(LOG_MESSAGE_TYPE prefix, const string &message);
+
+    void log(double clock, double a, uint64_t simulationIndex, LOG_MESSAGE_TYPE prefix, const string &message);
 
 private:
     bool logsEnabled;
@@ -45,7 +48,8 @@ private:
             {CONNECTION_SETUP,       "[CONNECTION_SETUP      ] "},
             {SIMULATION_START,       "[SIMULATION_START      ] "},
             {SIMULATION_END,         "[SIMULATION_END        ] "},
-            {ALL_SIMULATIONS_ENDED,  "[ALL_SIMULATIONS_ENDED ] "},
+            {STARTING_SIMULATIONS,   "[STARTING_SIMULATIONS  ] "},
+            {SIMULATIONS_ENDED,      "[SIMULATIONS_ENDED     ] "},
             {CREATING_STRUCTURE,     "[CREATING_STRUCTURE    ] "},
             {STRUCTURE_VALIDATION,   "[STRUCTURE_VALIDATION  ] "},
             {ERROR,                  "[ERROR                 ] "},
@@ -59,6 +63,10 @@ private:
     void operator=(const Logger &) = delete;
 
     string getTimestamp(double clock);
+
+	string logA(double a);
+
+	string logSimulationIndex(uint64_t simulationIndex);
 };
 
 #endif //EONSIMULATOR_LOGGER_H

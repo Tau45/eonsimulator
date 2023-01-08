@@ -26,7 +26,7 @@ public:
 
 	~Structure();
 
-	void buildNetworkStructure();
+	void buildNetworkStructure(bool printStructureInformation);
 
 	bool isValid();
 

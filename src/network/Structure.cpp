@@ -13,8 +13,10 @@ void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode, uint64
 	}
 }
 
-void Structure::buildNetworkStructure() {
-	Logger::instance().log(0, Logger::CREATING_STRUCTURE, "Structure creating started...");
+void Structure::buildNetworkStructure(bool printStructureInformation) {
+	if (printStructureInformation) {
+		Logger::instance().log(Logger::CREATING_STRUCTURE, "Structure creating started...");
+	}
 	string line;
 	vector<vector<int>> nodes;
 	ifstream file(SimulationSettings::instance().getStructureFileName());
@@ -77,9 +79,10 @@ void Structure::buildNetworkStructure() {
 		}
 	}
 
-	printStructureDetails(nodes);
-
-	Logger::instance().log(0, Logger::CREATING_STRUCTURE, "Structure created");
+	if (printStructureInformation) {
+		printStructureDetails(nodes);
+		Logger::instance().log(Logger::CREATING_STRUCTURE, "Structure created");
+	}
 }
 
 void Structure::printStructureDetails(vector<vector<int>> &nodes) {
@@ -160,7 +163,7 @@ void Structure::printStructureDetails(vector<vector<int>> &nodes) {
 			message << ")";
 		}
 
-		Logger::instance().log(0, Logger::CREATING_STRUCTURE, message.str());
+		Logger::instance().log(Logger::CREATING_STRUCTURE, message.str());
 	}
 }
 
@@ -212,16 +215,16 @@ bool Structure::isValid() {
 }
 
 bool Structure::everyOutputNodeIsAvailableFromEveryInputNode() {
-	Logger::instance().log(0, Logger::STRUCTURE_VALIDATION, "Structure validation started...");
+	Logger::instance().log(Logger::STRUCTURE_VALIDATION, "Structure validation started...");
 	for (uint64_t i = 0; i < inputLinks.size(); i++) {
 		for (uint64_t j = 0; j < outputLinks.size(); j++) {
 			if (!checkInputToOutputAvailability(i, j)) {
-				Logger::instance().log(0, Logger::ERROR, "Structure is not valid. Output " + to_string(outputLinks[j]->getDestinationNode()) + " is not reachable from input " + to_string(inputLinks[i]->getSourceNode()));
+				Logger::instance().log(Logger::ERROR, "Structure is not valid. Output " + to_string(outputLinks[j]->getDestinationNode()) + " is not reachable from input " + to_string(inputLinks[i]->getSourceNode()));
 				return false;
 			}
 		}
 	}
-	Logger::instance().log(0, Logger::STRUCTURE_VALIDATION, "Structure is valid");
+	Logger::instance().log(Logger::STRUCTURE_VALIDATION, "Structure is valid");
 	return true;
 }
 

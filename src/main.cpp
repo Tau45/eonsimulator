@@ -2,15 +2,15 @@
 #include "../include/Simulator.h"
 #include "../include/tools/SeedsProvider.h"
 
-SingleSimulationResults runSingleSimulation(double a, vector<int32_t> seedsForSimulation) {
+SingleSimulationResults runSingleSimulation(double a, vector<int32_t> seedsForSimulation, uint64_t simulationIndex) {
 	Network network;
-	network.buildNetworkStructure();
+	network.buildNetworkStructure(false);
 
 	int32_t x1 = seedsForSimulation[0];
 	int32_t x2 = seedsForSimulation[1];
 	int32_t x3 = seedsForSimulation[2];
 
-	Generator generator(a, x1, x2, x3, network.getNumberOfInputLinks(), network.getNumberOfOutputLinks());
+	Generator generator(a, x1, x2, x3, network.getNumberOfInputLinks(), network.getNumberOfOutputLinks(), simulationIndex);
 	Simulator simulator(network, generator);
 	return simulator.run();
 }
@@ -21,7 +21,7 @@ SimulationSetResults runSimulationSet(double a, vector<vector<int32_t>> seedsFor
 	auto seedsForSimulation = seedsForSimulationSet.begin();
 
 	for (uint64_t i = 0; i < SimulationSettings::instance().getRuns(); i++) {
-		simulations.push_back(async(&runSingleSimulation, a, *seedsForSimulation++));
+		simulations.push_back(async(&runSingleSimulation, a, *seedsForSimulation++, i));
 	}
 
 	for (uint64_t i = 0; i < SimulationSettings::instance().getRuns(); i++) {
@@ -43,7 +43,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	/// Initialize Logger
-	Logger::initialize(args.count("-logs"));
+	bool logsEnabled = args.count("-logs");
+	Logger::initialize(logsEnabled);
 
 	/// Initialize and validate SimulationSettings
 	SimulationSettings::initialize(args);
@@ -54,7 +55,7 @@ int main(int argc, char *argv[]) {
 
 	/// Build and validate network node structure
 	Network network;
-	network.buildNetworkStructure();
+	network.buildNetworkStructure(logsEnabled);
 
 	if (!network.isValid()) {
 		return -2;
@@ -67,7 +68,7 @@ int main(int argc, char *argv[]) {
 	uint64_t requiredNumberOfSeeds = numberOfSimulationSets * numberOfSimulationsPerSet * 3;
 
 	if (requiredNumberOfSeeds > seedsProvider.getNumberOfAvailableSeeds()) {
-		Logger::instance().log(0, Logger::ERROR, to_string(requiredNumberOfSeeds) + " seeds are required to perform required number of simulations, and the program can provide " + to_string(seedsProvider.getNumberOfAvailableSeeds()) + " seeds only");
+		Logger::instance().log(Logger::ERROR, to_string(requiredNumberOfSeeds) + " seeds are required to perform required number of simulations, and the program can provide " + to_string(seedsProvider.getNumberOfAvailableSeeds()) + " seeds only");
 		return -3;
 	}
 
@@ -78,6 +79,7 @@ int main(int argc, char *argv[]) {
 	vector<future<SimulationSetResults>> simulationSets;
 	vector<SimulationSetResults> simulationSetResults;
 
+	Logger::instance().log(Logger::STARTING_SIMULATIONS, "Starting simulations...");
 	auto start = chrono::high_resolution_clock::now();
 
 	for (double a: SimulationSettings::instance().getAParameters()) {
@@ -91,7 +93,7 @@ int main(int argc, char *argv[]) {
 	auto finish = chrono::high_resolution_clock::now();
 	auto duration = duration_cast<chrono::milliseconds>(finish - start);
 
-	Logger::instance().log(0, Logger::ALL_SIMULATIONS_ENDED, "All simulations were done in " + to_string((double) duration.count() / 1000) + "s");
+	Logger::instance().log(Logger::SIMULATIONS_ENDED, "All simulations were done in " + to_string((double) duration.count() / 1000) + "s");
 
 	/// Print results
 	for (auto &simulationSetResult: simulationSetResults) {

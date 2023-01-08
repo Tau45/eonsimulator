@@ -1,7 +1,8 @@
 #include "../../include/tools/Generator.h"
 
-Generator::Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks) {
+Generator::Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks, uint64_t simulationIndex) {
 	this->a = a;
+	this->simulationIndex = simulationIndex;
 	this->x1 = x1;
 	this->x2 = x2;
 	this->x3 = x3;
@@ -76,4 +77,12 @@ uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {
 	}
 
 	return availableFirstFSUs[randomFirstFSUIndex];
+}
+
+double Generator::getA() {
+	return a;
+}
+
+uint64_t Generator::getSimulationIndex() {
+	return simulationIndex;
 }
