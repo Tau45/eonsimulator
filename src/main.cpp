@@ -96,24 +96,76 @@ int main(int argc, char *argv[]) {
 	Logger::instance().log(Logger::SIMULATIONS_ENDED, "All simulations were done in " + to_string((double) duration.count() / 1000) + "s");
 
 	/// Print results
+	/// Results for internal blocks
+	cout <<"\nInternal blocks:\n";
 	for (auto &simulationSetResult: simulationSetResults) {
 		stringstream ss;
 		ss << simulationSetResult.a << "\t";
 		ss << "Erlang[";
 		for (auto y: simulationSetResult.erlangTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
+			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "}";
 		}
 		ss << "]\t";
 
 		ss << "Engset[";
 		for (auto y: simulationSetResult.engsetTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
+			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "}";
 		}
 		ss << "]\t";
 
 		ss << "Pascal[";
 		for (auto y: simulationSetResult.pascalTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
+			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "}";
+		}
+		ss << "]\n";
+		cout << ss.str();
+	}
+
+	/// Results for external blocks
+	cout <<"\nExternal blocks:\n";
+	for (auto &simulationSetResult: simulationSetResults) {
+		stringstream ss;
+		ss << simulationSetResult.a << "\t";
+		ss << "Erlang[";
+		for (auto y: simulationSetResult.erlangTrafficResults) {
+			ss << "{" << y.first << " FSUs\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
+		}
+		ss << "]\t";
+
+		ss << "Engset[";
+		for (auto y: simulationSetResult.engsetTrafficResults) {
+			ss << "{" << y.first << " FSUs\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
+		}
+		ss << "]\t";
+
+		ss << "Pascal[";
+		for (auto y: simulationSetResult.pascalTrafficResults) {
+			ss << "{" << y.first << " FSUs\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
+		}
+		ss << "]\n";
+		cout << ss.str();
+	}
+
+	/// Results for total blocks
+	cout <<"\nTotal blocks:\n";
+	for (auto &simulationSetResult: simulationSetResults) {
+		stringstream ss;
+		ss << simulationSetResult.a << "\t";
+		ss << "Erlang[";
+		for (auto y: simulationSetResult.erlangTrafficResults) {
+			ss << "{" << y.first << " FSUs\t" << y.second.avgTotalBlockRatio << "\t" << y.second.totalBlockConfidenceInterval << "}";
+		}
+		ss << "]\t";
+
+		ss << "Engset[";
+		for (auto y: simulationSetResult.engsetTrafficResults) {
+			ss << "{" << y.first << " FSUs\t" << y.second.avgTotalBlockRatio << "\t" << y.second.totalBlockConfidenceInterval << "}";
+		}
+		ss << "]\t";
+
+		ss << "Pascal[";
+		for (auto y: simulationSetResult.pascalTrafficResults) {
+			ss << "{" << y.first << " FSUs\t" << y.second.avgTotalBlockRatio << "\t" << y.second.totalBlockConfidenceInterval << "}";
 		}
 		ss << "]\n";
 		cout << ss.str();
