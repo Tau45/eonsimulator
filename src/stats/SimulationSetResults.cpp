@@ -41,7 +41,7 @@ void SimulationSetResults::setTrafficSourceResults(map<uint64_t, TrafficClassRes
 	for (uint64_t trafficClass: trafficClasses) {
 		avgInternalBlockRatios[trafficClass] = avgInternalBlockRatios[trafficClass] / SimulationSettings::instance().getRuns();
 		avgExternalBlockRatios[trafficClass] = avgExternalBlockRatios[trafficClass] / SimulationSettings::instance().getRuns();
-		avgTotalBlockRatios[trafficClass] = avgExternalBlockRatios[trafficClass] / SimulationSettings::instance().getRuns();
+		avgTotalBlockRatios[trafficClass] = avgTotalBlockRatios[trafficClass] / SimulationSettings::instance().getRuns();
 	}
 
 	/// Calculate standard deviations
