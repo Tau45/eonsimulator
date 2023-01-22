@@ -13,16 +13,21 @@ class Link {
 	vector<bool> FSUs;
 	uint64_t sourceNode;
 	uint64_t destinationNode;
+
+	bool FSUIsOccupied(uint64_t FSUIndex);
+
+	bool hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs, uint64_t startingFromFSU);
+
 public:
-	Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput);
+	Link(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput);
 
 	void reserveFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
 
 	void freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs);
 
-	void freeAllFSUs();
+	vector<uint64_t> getAvailableFirstFSUs(uint64_t requiredNumberOfFSUs);
 
-	bool FSUIsOccupied(uint64_t FSUIndex);
+	bool hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs);
 
 	uint64_t getSourceNode();
 

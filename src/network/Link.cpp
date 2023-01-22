@@ -1,11 +1,11 @@
 #include "../../include/network/Link.h"
 
-Link::Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput) {
+Link::Link(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput) {
 	this->isInput = isInput;
 	this->isOutput = isOutput;
 	this->sourceNode = sourceNode;
 	this->destinationNode = destinationNode;
-	for (int i = 0; i < linkCapacity; i++) {
+	for (int i = 0; i < SimulationSettings::instance().getLinkCapacity(); i++) {
 		FSUs.push_back(false);
 	}
 }
@@ -24,6 +24,38 @@ void Link::freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
 	}
 }
 
+vector<uint64_t> Link::getAvailableFirstFSUs(uint64_t requiredNumberOfFSUs) {
+	vector<uint64_t> availableFirstFSUs;
+	for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - requiredNumberOfFSUs; i++) {
+		if (hasFreeNeighboringFSUs(requiredNumberOfFSUs, i)) {
+			availableFirstFSUs.push_back(i);
+		}
+	}
+	return availableFirstFSUs;
+}
+
+bool Link::hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs) {
+	for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - requiredNumberOfFSUs; i++) {
+		if (hasFreeNeighboringFSUs(requiredNumberOfFSUs, i)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Link::hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs, uint64_t startingFromFSU) {
+	assert(requiredNumberOfFSUs < SimulationSettings::instance().getLinkCapacity());
+	assert(startingFromFSU < SimulationSettings::instance().getLinkCapacity());
+	assert(startingFromFSU + requiredNumberOfFSUs <= SimulationSettings::instance().getLinkCapacity());
+
+	for (uint64_t i = startingFromFSU; i < startingFromFSU + requiredNumberOfFSUs; i++) {
+		if (FSUIsOccupied(i)) {
+			return false;
+		}
+	}
+	return true;
+}
+
 bool Link::FSUIsOccupied(uint64_t FSUIndex) {
 	return FSUs[FSUIndex];
 }
@@ -34,12 +66,6 @@ uint64_t Link::getSourceNode() {
 
 uint64_t Link::getDestinationNode() {
 	return destinationNode;
-}
-
-void Link::freeAllFSUs() {
-	for (auto &&FSU: FSUs) {
-		FSU = false;
-	}
 }
 
 bool Link::isInputLink() {

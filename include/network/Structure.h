@@ -11,7 +11,7 @@
 #include "../tools/SimulationSettings.h"
 
 class Structure {
-	void createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput);
+	void createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput);
 
 	void printStructureDetails(vector<vector<int>> &nodes);
 

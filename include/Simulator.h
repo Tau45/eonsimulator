@@ -22,8 +22,6 @@ class Simulator {
 
 	void addPascalTrafficClasses();
 
-	void reset();
-
 public:
 	Simulator(Network &network, Generator &generator);
 

@@ -12,7 +12,11 @@
 class Network : public Structure {
 	bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection, Generator &generator);
 
-	bool linkHasRequiredNumberOfFreeFSUs(Link *link, uint64_t requiredNumberOfFSUs);
+	bool setFirstFSUOfInputLink(Link *link, Connection &connection, Generator &generator);
+
+	bool setFirstFSUOfInternalLinks(vector<Link *> &path, Connection &connection, Generator &generator);
+
+	bool setFirstFSUOfOutputLink(Link *link, Connection &connection, Generator &generator);
 
 public:
 	enum ESTABLISH_CONNECTION_RESULT {
@@ -27,12 +31,6 @@ public:
 	map<uint64_t, TrafficClassStatistics> pascalTrafficClasses;
 
 	Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator);
-
-	void reserveResources(Connection connection);
-
-	void closeConnection(double clock, Connection connection, Generator &generator);
-
-	void closeAllConnections();
 
 	uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
 };

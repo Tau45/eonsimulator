@@ -1,34 +1,79 @@
 #include "../include/Connection.h"
 
-Connection::Connection(uint64_t sourceLink, uint64_t destinationLink, uint64_t requiredNumberOfFSUs, double serviceTime) {
+Connection::Connection(Link *sourceLink, Link *destinationLink, uint64_t requiredNumberOfFSUs, double serviceTime) {
 	this->sourceLink = sourceLink;
 	this->destinationLink = destinationLink;
 	this->requiredNumberOfFSUs = requiredNumberOfFSUs;
 	this->serviceTime = serviceTime;
 }
 
-uint64_t Connection::getSourceLink() {
+void Connection::reserveResources() {
+	assert(!path.empty());
+	path.front()->reserveFSUs(firstFSUOfInputLink, requiredNumberOfFSUs);
+
+	if (path.size() > 1) {
+		path.back()->reserveFSUs(firstFSUOfOutputLink, requiredNumberOfFSUs);
+	}
+
+	if (path.size() > 2) {
+		for (int i = 1; i < path.size() - 1; i++) {
+			path[i]->reserveFSUs(firstFSUOfInternalLinks, requiredNumberOfFSUs);
+		}
+	}
+}
+
+void Connection::close() {
+	path.front()->freeFSUs(firstFSUOfInputLink, requiredNumberOfFSUs);
+
+	if (path.size() > 1) {
+		path.back()->freeFSUs(firstFSUOfOutputLink, requiredNumberOfFSUs);
+	}
+
+	if (path.size() > 2) {
+		for (int i = 1; i < path.size() - 1; i++) {
+			path[i]->freeFSUs(firstFSUOfInternalLinks, requiredNumberOfFSUs);
+		}
+	}
+}
+
+Link *Connection::getSourceLink() {
 	return sourceLink;
 }
 
-uint64_t Connection::getDestinationLink() {
+Link *Connection::getDestinationLink() {
 	return destinationLink;
 }
 
-vector<Link *> Connection::getPath() {
-	return path;
+uint64_t Connection::getPathSize() {
+	return path.size();
 }
 
 void Connection::setPath(vector<Link *> newPath) {
 	this->path = newPath;
 }
 
-uint64_t Connection::getFirstFSU() {
-	return firstFSU;
+uint64_t Connection::getFirstFSUOfInputLink() {
+	return firstFSUOfInputLink;
 }
 
-void Connection::setFirstFSU(uint64_t newFirstFSU) {
-	this->firstFSU = newFirstFSU;
+uint64_t Connection::getFirstFSUOfInternalLinks() {
+	return firstFSUOfInternalLinks;
+}
+
+uint64_t Connection::getFirstFSUOfOutputLink() {
+	return firstFSUOfOutputLink;
+}
+
+void Connection::setFirstFSUOfInputLink(uint64_t firstFSUOfInputLink) {
+	this->firstFSUOfInputLink = firstFSUOfInputLink;
+}
+
+void Connection::setFirstFSUOfInternalLinks(uint64_t firstFSUOfInternalLinks) {
+	this->firstFSUOfInternalLinks = firstFSUOfInternalLinks;
+}
+
+void Connection::setFirstFSUOfOutputLink(uint64_t firstFSUOfOutputLink) {
+	this->firstFSUOfOutputLink = firstFSUOfOutputLink;
 }
 
 uint64_t Connection::getRequiredNumberOfFSUs() {
@@ -46,7 +91,9 @@ Connection::Connection(Connection &connection) {
 	sourceLink = connection.sourceLink;
 	destinationLink = connection.destinationLink;
 	path = connection.path;
-	firstFSU = connection.firstFSU;
+	firstFSUOfInputLink = connection.firstFSUOfInputLink;
+	firstFSUOfInternalLinks = connection.firstFSUOfInternalLinks;
+	firstFSUOfOutputLink = connection.firstFSUOfOutputLink;
 	requiredNumberOfFSUs = connection.requiredNumberOfFSUs;
 	serviceTime = connection.serviceTime;
 }

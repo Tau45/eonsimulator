@@ -1,7 +1,7 @@
 #include "../../include/network/Structure.h"
 
-void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t linkCapacity, bool isInput, bool isOutput) {
-	Link *link = new Link(sourceNode, destinationNode, linkCapacity, isInput, isOutput);
+void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput) {
+	Link *link = new Link(sourceNode, destinationNode, isInput, isOutput);
 	links[sourceNode].push_back(link);
 
 	if (isInput) {
@@ -57,7 +57,7 @@ void Structure::buildNetworkStructure(bool printStructureInformation) {
 		}
 
 		for (int destinationNode: linkedNodes) {
-			createLink(index, destinationNode, SimulationSettings::instance().getLinkCapacity(), false, false);
+			createLink(index, destinationNode, false, false);
 		}
 	}
 
@@ -66,7 +66,7 @@ void Structure::buildNetworkStructure(bool printStructureInformation) {
 		int numberOfInputs = node[1];
 
 		for (int i = 0; i < numberOfInputs; i++) {
-			createLink(++lastNodeIndex, index, SimulationSettings::instance().getLinkCapacity(), true, false);
+			createLink(++lastNodeIndex, index, true, false);
 		}
 	}
 
@@ -75,7 +75,7 @@ void Structure::buildNetworkStructure(bool printStructureInformation) {
 		int numberOfOutputs = node[2];
 
 		for (int i = 0; i < numberOfOutputs; i++) {
-			createLink(index, ++lastNodeIndex, SimulationSettings::instance().getLinkCapacity(), false, true);
+			createLink(index, ++lastNodeIndex, false, true);
 		}
 	}
 
@@ -182,7 +182,7 @@ bool Structure::checkInputToOutputAvailability(uint64_t sourceLinkIndex, uint64_
 	while (!consideredPaths.empty()) {
 		vector<Link *> currentPath = consideredPaths.front();
 		consideredPaths.pop();
-		uint64_t currentPathLastNode = currentPath[currentPath.size() - 1]->getDestinationNode();
+		uint64_t currentPathLastNode = currentPath.back()->getDestinationNode();
 
 		if (currentPathLastNode == outputLinks[destinationLinkIndex]->getDestinationNode()) {
 			return true;

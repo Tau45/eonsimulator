@@ -10,8 +10,6 @@ Simulator::Simulator(Network &network, Generator &generator) {
 }
 
 SingleSimulationResults Simulator::run() {
-    reset();
-
     Logger::instance().log(0, generator->getA(), generator->getSimulationIndex(), Logger::SIMULATION_START, "The simulation has started...");
 
     while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < SimulationSettings::instance().getCallsToGenerate()) {
@@ -29,7 +27,7 @@ SingleSimulationResults Simulator::run() {
 void Simulator::addErlangTrafficClasses() {
     for (uint64_t erlangTrafficClass: SimulationSettings::instance().getErlangTrafficClasses()) {
         network->erlangTrafficClasses[erlangTrafficClass] = TrafficClassStatistics();
-        eventQueue.push(new EventNewCallArrivalErlangClass(0, erlangTrafficClass, *generator));
+        eventQueue.push(new EventNewCallArrivalErlangClass(0, erlangTrafficClass, *network, *generator));
     }
 }
 
@@ -39,20 +37,6 @@ void Simulator::addEngsetTrafficClasses() {
 
 void Simulator::addPascalTrafficClasses() {
 
-}
-
-void Simulator::reset() {
-    while (!eventQueue.empty()) {
-        Event* event = eventQueue.top();
-        eventQueue.pop();
-        delete event;
-    }
-
-    network->closeAllConnections();
-
-    addErlangTrafficClasses();
-    addEngsetTrafficClasses();
-    addPascalTrafficClasses();
 }
 
 Simulator::~Simulator() {

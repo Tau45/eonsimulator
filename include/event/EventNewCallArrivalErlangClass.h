@@ -9,7 +9,7 @@
 class EventNewCallArrivalErlangClass : public Event {
 	uint64_t requiredNumberOfFSUs;
 public:
-	EventNewCallArrivalErlangClass(double currentTime, uint64_t requiredNumberOfFSUs, Generator &generator);
+	EventNewCallArrivalErlangClass(double currentTime, uint64_t requiredNumberOfFSUs, Network &network, Generator &generator);
 
 	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
 };
