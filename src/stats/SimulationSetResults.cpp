@@ -59,7 +59,7 @@ void SimulationSetResults::setTrafficSourceResults(map<uint64_t, TrafficClassRes
 		for (const auto &trafficResultRatio: trafficResultRatios) {
 			internalBlockStandardDeviations[trafficResultRatio.first] += pow(trafficResultRatio.second.internalBlocksRatio - avgInternalBlockRatios[trafficResultRatio.first], 2);
 			externalBlockStandardDeviations[trafficResultRatio.first] += pow(trafficResultRatio.second.externalBlocksRatio - avgExternalBlockRatios[trafficResultRatio.first], 2);
-			totalBlockStandardDeviations[trafficResultRatio.first] += pow(trafficResultRatio.second.totalRatio - avgInternalBlockRatios[trafficResultRatio.first], 2);
+			totalBlockStandardDeviations[trafficResultRatio.first] += pow(trafficResultRatio.second.totalRatio - avgTotalBlockRatios[trafficResultRatio.first], 2);
 		}
 	}
 

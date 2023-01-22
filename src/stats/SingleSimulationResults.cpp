@@ -12,7 +12,7 @@ void SingleSimulationResults::setTrafficClassResultRatios(map<uint64_t, TrafficC
 	for (auto const &trafficClass: trafficClasses) {
 		double internalBlocksRatio = (double) trafficClass.second.internalBlocksCount / trafficClass.second.callsGenerated;
 		double externalBlocksRatio = (double) trafficClass.second.externalBlocksCount / trafficClass.second.callsGenerated;
-		double totalRatio = (double) (trafficClass.second.internalBlocksCount + trafficClass.second.externalBlocksCount) / trafficClass.second.callsGenerated;
+		double totalRatio = internalBlocksRatio + externalBlocksRatio;
 		trafficResultRatios[trafficClass.first] = TrafficClassResultRatios(internalBlocksRatio, externalBlocksRatio, totalRatio);
 	}
 }
