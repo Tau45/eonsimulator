@@ -8,8 +8,6 @@
 class Generator {
 	double a;
 	uint64_t simulationIndex;
-	uint64_t numberOfInputLinks;
-	uint64_t numberOfOutputLinks;
 
 	int32_t x1;
 	int32_t x2;
@@ -24,7 +22,7 @@ class Generator {
 	double getLambda(uint32_t requiredNumberOfFSUs, double serviceTime);
 
 public:
-	Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks, uint64_t simulationIndex);
+	Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t simulationIndex);
 
 	double getA();
 

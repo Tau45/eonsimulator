@@ -1,7 +1,7 @@
 #include "../include/Simulator.h"
 
-Simulator::Simulator(Network &network, Generator &generator) {
-    this->network = &network;
+Simulator::Simulator(Generator &generator) {
+    this->network = new Network();
     this->generator = &generator;
 
     addErlangTrafficClasses();

@@ -3,15 +3,12 @@
 #include "../include/tools/SeedsProvider.h"
 
 SingleSimulationResults runSingleSimulation(double a, vector<int32_t> seedsForSimulation, uint64_t simulationIndex) {
-	Network network;
-	network.buildNetworkStructure(false);
-
 	int32_t x1 = seedsForSimulation[0];
 	int32_t x2 = seedsForSimulation[1];
 	int32_t x3 = seedsForSimulation[2];
 
-	Generator generator(a, x1, x2, x3, network.getNumberOfInputLinks(), network.getNumberOfOutputLinks(), simulationIndex);
-	Simulator simulator(network, generator);
+	Generator generator(a, x1, x2, x3, simulationIndex);
+	Simulator simulator(generator);
 	return simulator.run();
 }
 
@@ -50,16 +47,19 @@ int main(int argc, char *argv[]) {
 	SimulationSettings::initialize(args);
 
 	if (!SimulationSettings::instance().areValid()) {
-		return -1;
+		return -10;
 	}
 
 	/// Build and validate network node structure
 	Network network;
-	network.buildNetworkStructure(logsEnabled);
+	network.printStructureDetails();
 
 	if (!network.isValid()) {
-		return -2;
+		return -11;
 	}
+
+	SimulationSettings::instance().setNumberOfInputLinks(network.getNumberOfInputLinks());
+	SimulationSettings::instance().setNumberOfOutputLinks(network.getNumberOfOutputLinks());
 
 	/// Get seeds for random number generators
 	SeedsProvider seedsProvider;
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 
 	if (requiredNumberOfSeeds > seedsProvider.getNumberOfAvailableSeeds()) {
 		Logger::instance().log(Logger::ERROR, to_string(requiredNumberOfSeeds) + " seeds are required to perform required number of simulations, and the program can provide " + to_string(seedsProvider.getNumberOfAvailableSeeds()) + " seeds only");
-		return -3;
+		return -12;
 	}
 
 	vector<vector<vector<int32_t>>> seeds = seedsProvider.getSeeds(numberOfSimulationSets, numberOfSimulationsPerSet);

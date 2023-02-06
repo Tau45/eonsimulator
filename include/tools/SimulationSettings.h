@@ -38,6 +38,8 @@ class SimulationSettings {
     set<uint64_t> engsetTrafficClasses;
     set<uint64_t> pascalTrafficClasses;
     uint64_t runs;
+	uint64_t numberOfInputLinks;
+	uint64_t numberOfOutputLinks;
 
     SimulationSettings(map<string, string> args);
 
@@ -87,6 +89,14 @@ public:
     set<uint64_t> getPascalTrafficClasses();
 
     uint64_t getRuns();
+
+	void setNumberOfInputLinks(uint64_t numberOfInputLinks);
+
+	void setNumberOfOutputLinks(uint64_t numberOfOutputLinks);
+
+	uint64_t getNumberOfInputLinks();
+
+	uint64_t getNumberOfOutputLinks();
 };
 
 #endif //EONSIMULATOR_SIMULATIONSETTINGS_H

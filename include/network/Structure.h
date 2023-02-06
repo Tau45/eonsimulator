@@ -11,9 +11,9 @@
 #include "../tools/SimulationSettings.h"
 
 class Structure {
-	void createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput);
+	vector<string> parseLine(const string &line);
 
-	void printStructureDetails(vector<vector<int>> &nodes);
+	void createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput);
 
 	bool checkInputToOutputAvailability(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex);
 
@@ -24,9 +24,13 @@ public:
 	vector<Link *> inputLinks;
 	vector<Link *> outputLinks;
 
+	Structure();
+
 	~Structure();
 
-	void buildNetworkStructure(bool printStructureInformation);
+	void buildNetworkStructure();
+
+	void printStructureDetails();
 
 	bool isValid();
 

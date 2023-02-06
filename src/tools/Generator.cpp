@@ -1,13 +1,11 @@
 #include "../../include/tools/Generator.h"
 
-Generator::Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t numberOfInputLinks, uint64_t numberOfOutputLinks, uint64_t simulationIndex) {
+Generator::Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t simulationIndex) {
 	this->a = a;
 	this->simulationIndex = simulationIndex;
 	this->x1 = x1;
 	this->x2 = x2;
 	this->x3 = x3;
-	this->numberOfInputLinks = numberOfInputLinks;
-	this->numberOfOutputLinks = numberOfOutputLinks;
 }
 
 double Generator::rown_v1(int &x) {
@@ -50,9 +48,9 @@ double Generator::getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, double 
 }
 
 uint64_t Generator::getRandomInputLink() {
-	uint64_t randomLink = rown_v3(x3) * numberOfInputLinks;
+	uint64_t randomLink = rown_v3(x3) * SimulationSettings::instance().getNumberOfInputLinks();
 
-	if (randomLink == numberOfInputLinks) {
+	if (randomLink == SimulationSettings::instance().getNumberOfInputLinks()) {
 		return randomLink - 1;
 	}
 
@@ -60,9 +58,9 @@ uint64_t Generator::getRandomInputLink() {
 }
 
 uint64_t Generator::getRandomOutputLink() {
-	uint64_t randomLink = rown_v3(x3) * numberOfOutputLinks;
+	uint64_t randomLink = rown_v3(x3) * SimulationSettings::instance().getNumberOfOutputLinks();
 
-	if (randomLink == numberOfOutputLinks) {
+	if (randomLink == SimulationSettings::instance().getNumberOfOutputLinks()) {
 		return randomLink - 1;
 	}
 

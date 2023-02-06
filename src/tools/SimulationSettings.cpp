@@ -279,6 +279,22 @@ uint64_t SimulationSettings::getRuns() {
 	return runs;
 }
 
+void SimulationSettings::setNumberOfInputLinks(uint64_t numberOfInputs) {
+	this->numberOfInputLinks = numberOfInputs;
+}
+
+void SimulationSettings::setNumberOfOutputLinks(uint64_t numberOfOutputs) {
+	this->numberOfOutputLinks = numberOfOutputs;
+}
+
+uint64_t SimulationSettings::getNumberOfInputLinks() {
+	return numberOfInputLinks;
+}
+
+uint64_t SimulationSettings::getNumberOfOutputLinks() {
+	return numberOfOutputLinks;
+}
+
 bool SimulationSettings::maxTrafficClassRequireLessFSUsThanLinkCapacity() {
 	uint64_t erlangMaxTrafficClass = *max_element(erlangTrafficClasses.begin(), erlangTrafficClasses.end());
 	uint64_t engsetMaxTrafficClass = *max_element(engsetTrafficClasses.begin(), engsetTrafficClasses.end());
