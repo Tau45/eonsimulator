@@ -63,16 +63,14 @@ int main(int argc, char *argv[]) {
 
 	/// Get seeds for random number generators
 	SeedsProvider seedsProvider;
-	uint64_t numberOfSimulationSets = SimulationSettings::instance().getAParameters().size();
-	uint64_t numberOfSimulationsPerSet = SimulationSettings::instance().getRuns();
-	uint64_t requiredNumberOfSeeds = numberOfSimulationSets * numberOfSimulationsPerSet * 3;
+	uint64_t requiredNumberOfSeeds = SimulationSettings::instance().getAParameters().size() * SimulationSettings::instance().getRuns() * 3;
 
 	if (requiredNumberOfSeeds > seedsProvider.getNumberOfAvailableSeeds()) {
 		Logger::instance().log(Logger::ERROR, to_string(requiredNumberOfSeeds) + " seeds are required to perform required number of simulations, and the program can provide " + to_string(seedsProvider.getNumberOfAvailableSeeds()) + " seeds only");
 		return -12;
 	}
 
-	vector<vector<vector<int32_t>>> seeds = seedsProvider.getSeeds(numberOfSimulationSets, numberOfSimulationsPerSet);
+	vector<vector<vector<int32_t>>> seeds = seedsProvider.getSeeds();
 	auto seedsForSimulationSet = seeds.begin();
 
 	/// Create simulators and run simulations
@@ -94,6 +92,8 @@ int main(int argc, char *argv[]) {
 	auto duration = duration_cast<chrono::milliseconds>(finish - start);
 
 	Logger::instance().log(Logger::SIMULATIONS_ENDED, "All simulations were done in " + to_string((double) duration.count() / 1000) + "s");
+
+	// TODO: Save results in a file
 
 	/// Print results
 	/// Results for internal blocks

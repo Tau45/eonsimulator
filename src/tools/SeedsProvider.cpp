@@ -26,10 +26,10 @@ vector<vector<int32_t>> SeedsProvider::getSeedsForSimulationSet(uint64_t numberO
 	return seedsForSimulationSet;
 }
 
-vector<vector<vector<int32_t>>> SeedsProvider::getSeeds(uint64_t numberOfSimulationSets, uint64_t numberOfSimulationsPerSet) {
+vector<vector<vector<int32_t>>> SeedsProvider::getSeeds() {
 	vector<vector<vector<int32_t>>> seedVector;
-	for (uint64_t i = 0; i < numberOfSimulationSets; i++) {
-		seedVector.push_back(getSeedsForSimulationSet(numberOfSimulationsPerSet));
+	for (uint64_t i = 0; i < SimulationSettings::instance().getAParameters().size(); i++) {
+		seedVector.push_back(getSeedsForSimulationSet(SimulationSettings::instance().getRuns()));
 	}
 	return seedVector;
 }

@@ -40,6 +40,7 @@ double Generator::getLambda(uint32_t requiredNumberOfFSUs, double serviceTime) {
 }
 
 double Generator::getRandomServiceTime() {
+	// TODO: Get random service time
 	return 1;
 }
 

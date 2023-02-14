@@ -32,11 +32,17 @@ void Simulator::addErlangTrafficClasses() {
 }
 
 void Simulator::addEngsetTrafficClasses() {
-
+	for (uint64_t engsetTrafficClass: SimulationSettings::instance().getEngsetTrafficClasses()) {
+		network->engsetTrafficClasses[engsetTrafficClass] = TrafficClassStatistics();
+		eventQueue.push(new EventNewCallArrivalEngsetClass());
+	}
 }
 
 void Simulator::addPascalTrafficClasses() {
-
+	for (uint64_t pascalTrafficClass: SimulationSettings::instance().getPascalTrafficClasses()) {
+		network->pascalTrafficClasses[pascalTrafficClass] = TrafficClassStatistics();
+		eventQueue.push(new EventNewCallArrivalPascalClass());
+	}
 }
 
 Simulator::~Simulator() {

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <queue>
+#include "../../include/tools/SimulationSettings.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ public:
 
 	uint64_t getNumberOfAvailableSeeds();
 
-	vector<vector<vector<int32_t>>> getSeeds(uint64_t numberOfSimulationSets, uint64_t numberOfSimulationsPerSet);
+	vector<vector<vector<int32_t>>> getSeeds();
 };
 
 #endif //EONSIMULATOR_SEEDSPROVIDER_H
