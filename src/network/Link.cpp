@@ -1,8 +1,8 @@
 #include "../../include/network/Link.h"
 
-Link::Link(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput) {
-	this->isInput = isInput;
-	this->isOutput = isOutput;
+Link::Link(uint64_t sourceNode, uint64_t destinationNode) {
+	this->isInput = false;
+	this->isOutput = false;
 	this->sourceNode = sourceNode;
 	this->destinationNode = destinationNode;
 	for (int i = 0; i < SimulationSettings::instance().getLinkCapacity(); i++) {
@@ -66,6 +66,14 @@ uint64_t Link::getSourceNode() {
 
 uint64_t Link::getDestinationNode() {
 	return destinationNode;
+}
+
+void Link::setAsInput() {
+	this->isInput = true;
+}
+
+void Link::setAsOutput() {
+	this->isOutput = true;
 }
 
 bool Link::isInputLink() {

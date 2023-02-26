@@ -3,6 +3,9 @@
 Connection::Connection(Link *sourceLink, Link *destinationLink, uint64_t requiredNumberOfFSUs, double serviceTime) {
 	this->sourceLink = sourceLink;
 	this->destinationLink = destinationLink;
+	this->firstFSUOfInputLink = UINT64_MAX;
+	this->firstFSUOfInternalLinks = UINT64_MAX;
+	this->firstFSUOfOutputLink = UINT64_MAX;
 	this->requiredNumberOfFSUs = requiredNumberOfFSUs;
 	this->serviceTime = serviceTime;
 }

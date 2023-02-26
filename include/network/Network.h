@@ -12,11 +12,7 @@
 class Network : public Structure {
 	bool pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection, Generator &generator);
 
-	bool setFirstFSUOfInputLink(Link *link, Connection &connection, Generator &generator);
-
-	bool setFirstFSUOfInternalLinks(vector<Link *> &path, Connection &connection, Generator &generator);
-
-	bool setFirstFSUOfOutputLink(Link *link, Connection &connection, Generator &generator);
+	vector<uint64_t> getAvailableFirstFSUsInPath(vector<Link *> &path, Connection &connection);
 
 public:
 	enum ESTABLISH_CONNECTION_RESULT {

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <math.h>
 #include "SimulationSettings.h"
+#include "../../include/network/Link.h"
 
 class Generator {
 	double a;
@@ -37,6 +38,8 @@ public:
 	uint64_t getRandomOutputLink();
 
 	uint64_t getRandomFirstFSU(vector<uint64_t> availableFirstFSUs);
+
+	vector<Link *> shuffleVector(vector<Link *> inputVector);
 };
 
 #endif //EONSIMULATOR_GENERATOR_H

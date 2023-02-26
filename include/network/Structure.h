@@ -11,9 +11,11 @@
 #include "../tools/SimulationSettings.h"
 
 class Structure {
-	vector<string> parseLine(const string &line);
+	vector<uint64_t> parseLine(const string &line);
 
-	void createLink(uint64_t sourceNode, uint64_t destinationNode, bool isInput, bool isOutput);
+	void createLink(uint64_t sourceNode, uint64_t destinationNode);
+
+	void setInputOutputLinks();
 
 	bool checkInputToOutputAvailability(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex);
 

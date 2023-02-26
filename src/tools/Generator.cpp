@@ -72,10 +72,26 @@ uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {
 	uint64_t randomFirstFSUIndex = rown_v2(x2) * availableFirstFSUs.size();
 
 	if (randomFirstFSUIndex == availableFirstFSUs.size()) {
-		randomFirstFSUIndex = randomFirstFSUIndex - 1;
+		randomFirstFSUIndex--;
 	}
 
 	return availableFirstFSUs[randomFirstFSUIndex];
+}
+
+vector<Link *> Generator::shuffleVector(vector<Link *> inputVector) {
+	vector<Link *> outputVector;
+
+	while(!inputVector.empty()) {
+		uint64_t randomVectorElementIndex = rown_v2(x2) * inputVector.size();
+
+		if (randomVectorElementIndex == inputVector.size()) {
+			randomVectorElementIndex--;
+		}
+
+		outputVector.push_back(inputVector.at(randomVectorElementIndex));
+		inputVector.erase(inputVector.begin() + randomVectorElementIndex);
+	}
+	return outputVector;
 }
 
 double Generator::getA() {

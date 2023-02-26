@@ -1,55 +1,50 @@
 #include "../../include/network/Network.h"
 
-bool Network::setFirstFSUOfInputLink(Link *link, Connection &connection, Generator &generator) {
-	vector<uint64_t> availableFirstFSUs = link->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
-
-	if (!availableFirstFSUs.empty()) {
-		connection.setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUs));
-		return true;
-	}
-	return false;
-}
-
-bool Network::setFirstFSUOfOutputLink(Link *link, Connection &connection, Generator &generator) {
-	vector<uint64_t> availableFirstFSUs = link->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
-
-	if (!availableFirstFSUs.empty()) {
-		connection.setFirstFSUOfOutputLink(generator.getRandomFirstFSU(availableFirstFSUs));
-		return true;
-	}
-	return false;
-}
-
-bool Network::setFirstFSUOfInternalLinks(vector<Link *> &path, Connection &connection, Generator &generator) {
+vector<uint64_t> Network::getAvailableFirstFSUsInPath(vector<Link *> &path, Connection &connection) {
 	vector<uint64_t> availableFirstFSUs = path[1]->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
 
 	for (int i = 2; i < path.size() - 1; i++) {
-		if (availableFirstFSUs.empty()) {
-			return false;
-		}
 		vector<uint64_t> availableFirstFSUsInCurrentLink = path[i]->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
 
-		for (auto value: availableFirstFSUsInCurrentLink) {
-			remove(availableFirstFSUs.begin(), availableFirstFSUs.end(), value);
+		for (auto value: availableFirstFSUs) {
+			if (!count(availableFirstFSUsInCurrentLink.begin(), availableFirstFSUsInCurrentLink.end(), value)) {
+				availableFirstFSUs.erase(std::remove(availableFirstFSUs.begin(), availableFirstFSUs.end(), value), availableFirstFSUs.end());
+			}
 		}
 	}
-
-	if (!availableFirstFSUs.empty()) {
-		connection.setFirstFSUOfInternalLinks(generator.getRandomFirstFSU(availableFirstFSUs));
-		return true;
-	}
-	return false;
+	return availableFirstFSUs;
 }
 
 bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &connection, Generator &generator) {
-	bool result = setFirstFSUOfInputLink(path.front(), connection, generator);
-	if (path.size() > 1) {
-		result = result && setFirstFSUOfOutputLink(path.back(), connection, generator);
+	if (path.size() == 1) {
+		vector<uint64_t> availableFirstFSUsInInputLink = path.front()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
+
+		if (!availableFirstFSUsInInputLink.empty()) {
+			connection.setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
+			return true;
+		}
+	} else if (path.size() == 2) {
+		vector<uint64_t> availableFirstFSUsInInputLink = path.front()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
+		vector<uint64_t> availableFirstFSUsInOutputLink = path.back()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
+
+		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInOutputLink.empty()) {
+			connection.setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
+			connection.setFirstFSUOfOutputLink(generator.getRandomFirstFSU(availableFirstFSUsInOutputLink));
+			return true;
+		}
+	} else {
+		vector<uint64_t> availableFirstFSUsInInputLink = path.front()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
+		vector<uint64_t> availableFirstFSUsInInternalLinks = getAvailableFirstFSUsInPath(path, connection);
+		vector<uint64_t> availableFirstFSUsInOutputLink = path.back()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
+
+		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInInternalLinks.empty() && !availableFirstFSUsInOutputLink.empty()) {
+			connection.setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
+			connection.setFirstFSUOfInternalLinks(generator.getRandomFirstFSU(availableFirstFSUsInInternalLinks));
+			connection.setFirstFSUOfOutputLink(generator.getRandomFirstFSU(availableFirstFSUsInOutputLink));
+			return true;
+		}
 	}
-	if (path.size() > 2) {
-		result = result && setFirstFSUOfInternalLinks(path, connection, generator);
-	}
-	return result;
+	return false;
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator) {
@@ -73,7 +68,9 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 			return CONNECTION_CAN_BE_ESTABLISHED;
 		}
 
-		for (auto &link: links[currentPath.back()->getDestinationNode()]) {
+		vector<Link *> availableNextHops = generator.shuffleVector(links[currentPath.back()->getDestinationNode()]);
+
+		for (auto &link: availableNextHops) {
 			if (linkWasNotVisited(currentPath, link->getDestinationNode())) {
 				vector<Link *> newPath(currentPath);
 				newPath.push_back(link);
