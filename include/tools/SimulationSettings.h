@@ -15,7 +15,8 @@ class SimulationSettings {
         ERLANG,
         ENGSET,
         PASCAL,
-        RUNS
+        RUNS,
+		SERVICE_TIME
     };
 
     map<PARAMETER_PREFIX, string> parameterMap = {
@@ -26,7 +27,8 @@ class SimulationSettings {
             {ERLANG,            "-erlang"},
             {ENGSET,            "-engset"},
             {PASCAL,            "-pascal"},
-            {RUNS,              "-runs"}
+            {RUNS,              "-runs"},
+			{SERVICE_TIME,		"-serviceTime"}
     };
 
     bool settingsAreValid;
@@ -40,6 +42,7 @@ class SimulationSettings {
     uint64_t runs;
 	uint64_t numberOfInputLinks;
 	uint64_t numberOfOutputLinks;
+	double serviceTime;
 
     SimulationSettings(map<string, string> args);
 
@@ -62,6 +65,8 @@ class SimulationSettings {
     bool setPascalTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix);
 
     bool setRuns(map<string, string> &args, PARAMETER_PREFIX prefix);
+
+    bool setServiceTime(map<string, string> &args, PARAMETER_PREFIX prefix);
 
     bool maxTrafficClassRequireLessFSUsThanLinkCapacity();
 
@@ -89,6 +94,8 @@ public:
     set<uint64_t> getPascalTrafficClasses();
 
     uint64_t getRuns();
+
+	double getServiceTime();
 
 	void setNumberOfInputLinks(uint64_t numberOfInputLinks);
 

@@ -32,20 +32,22 @@ double Generator::rown_v3(int &x) {
 	return double(x) / 2147483647;
 }
 
-double Generator::getLambda(uint32_t requiredNumberOfFSUs, double serviceTime) {
+double Generator::getLambda(uint32_t requiredNumberOfFSUs ) {
 	uint64_t linkCapacity = SimulationSettings::instance().getLinkCapacity();
 	uint64_t numberOfTrafficClasses = SimulationSettings::instance().getNumberOfTrafficClasses();
+	double serviceTime = SimulationSettings::instance().getServiceTime();
 
 	return (a * linkCapacity) / (numberOfTrafficClasses * serviceTime * requiredNumberOfFSUs);
 }
 
 double Generator::getRandomServiceTime() {
-	// TODO: Get random service time
-	return 1;
+	double serviceTime = SimulationSettings::instance().getServiceTime();
+	return log(rown_v1(x3)) * (-serviceTime);
 }
 
-double Generator::getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, double serviceTime) {
-	return log(rown_v1(x1)) * (-1 / getLambda(requiredNumberOfFSUs, serviceTime));
+
+double Generator::getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs) {
+	return log(rown_v1(x1)) * (-1 / getLambda(requiredNumberOfFSUs));
 }
 
 uint64_t Generator::getRandomInputLink() {

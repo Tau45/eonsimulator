@@ -20,7 +20,7 @@ class Generator {
 
 	double rown_v3(int &x);
 
-	double getLambda(uint32_t requiredNumberOfFSUs, double serviceTime);
+	double getLambda(uint32_t requiredNumberOfFSUs);
 
 public:
 	Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t simulationIndex);
@@ -31,7 +31,7 @@ public:
 
 	double getRandomServiceTime();
 
-	double getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, double serviceTime);
+	double getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs);
 
 	uint64_t getRandomInputLink();
 

@@ -6,7 +6,7 @@ EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double currentTim
 	Link *destinationLink = network.outputLinks[generator.getRandomOutputLink()];
 
 	this->requiredNumberOfFSUs = requiredNumberOfFSUs;
-	this->occurrenceTime = currentTime + generator.getRandomOccurrenceTime(requiredNumberOfFSUs, serviceTime);
+	this->occurrenceTime = currentTime + generator.getRandomOccurrenceTime(requiredNumberOfFSUs);
 	this->connection = Connection(sourceLink, destinationLink, requiredNumberOfFSUs, serviceTime);
 }
 

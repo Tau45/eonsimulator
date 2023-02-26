@@ -10,12 +10,14 @@ SimulationSettings::SimulationSettings(map<string, string> args) {
 	bool engsetTrafficClassesAreValid = setEngsetTrafficClasses(args, ENGSET);
 	bool pascalTrafficClassesAreValid = setPascalTrafficClasses(args, PASCAL);
 	bool runsIsValid = setRuns(args, RUNS);
+	bool serviceTimeIsValid = setServiceTime(args, SERVICE_TIME);
 
 	settingsAreValid = aParametersAreValid
 					   && structureFileNameIsValid
 					   && callsToGenerateIsValid
 					   && linkCapacityIsValid
 					   && runsIsValid
+					   && serviceTimeIsValid
 					   && (erlangTrafficClassesAreValid || engsetTrafficClassesAreValid || pascalTrafficClassesAreValid)
 					   && maxTrafficClassRequireLessFSUsThanLinkCapacity();
 }
@@ -239,6 +241,28 @@ bool SimulationSettings::setRuns(map<string, string> &args, SimulationSettings::
 	return true;
 }
 
+bool SimulationSettings::setServiceTime(map<string, string> &args, SimulationSettings::PARAMETER_PREFIX prefix) {
+	string parameter = parameterMap[prefix];
+	if (!args.count(parameter)) {
+		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
+		return false;
+	}
+	string value = args[parameter];
+	try {
+		serviceTime = stod(value);
+	} catch (...) {
+		Logger::instance().log(Logger::ERROR, "Error while parsing value " + parameter + ". Current value: " + value);
+		return false;
+	}
+
+	if (serviceTime <= 0) {
+		Logger::instance().log(Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
+		return false;
+	}
+
+	return true;
+}
+
 bool SimulationSettings::areValid() {
 	return settingsAreValid;
 }
@@ -277,6 +301,10 @@ set<uint64_t> SimulationSettings::getPascalTrafficClasses() {
 
 uint64_t SimulationSettings::getRuns() {
 	return runs;
+}
+
+double SimulationSettings::getServiceTime() {
+	return serviceTime;
 }
 
 void SimulationSettings::setNumberOfInputLinks(uint64_t numberOfInputs) {
