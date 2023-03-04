@@ -25,7 +25,7 @@ class Simulator {
 	void addPascalTrafficClasses();
 
 public:
-	Simulator(Generator &generator);
+	Simulator(Network *network, Generator *generator);
 
 	~Simulator();
 

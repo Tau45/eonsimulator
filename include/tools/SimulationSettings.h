@@ -31,6 +31,7 @@ class SimulationSettings {
 			{SERVICE_TIME,		"-serviceTime"}
     };
 
+	map<string, string> args;
     bool settingsAreValid;
     set<double> aParameters;
     string structureFileName;
@@ -50,23 +51,25 @@ class SimulationSettings {
 
     void operator=(const SimulationSettings &) = delete;
 
-    bool setA(map<string, string> &args, PARAMETER_PREFIX prefix);
+	void readSettings();
 
-    bool setStructureFileName(map<string, string> &args, PARAMETER_PREFIX prefix);
+    bool setA(PARAMETER_PREFIX prefix);
 
-    bool setCallsToGenerate(map<string, string> &args, PARAMETER_PREFIX prefix);
+    bool setStructureFileName(PARAMETER_PREFIX prefix);
 
-    bool setLinkCapacity(map<string, string> &args, PARAMETER_PREFIX prefix);
+    bool setCallsToGenerate(PARAMETER_PREFIX prefix);
 
-    bool setErlangTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix);
+    bool setLinkCapacity(PARAMETER_PREFIX prefix);
 
-    bool setEngsetTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix);
+    bool setErlangTrafficClasses(PARAMETER_PREFIX prefix);
 
-    bool setPascalTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix);
+    bool setEngsetTrafficClasses(PARAMETER_PREFIX prefix);
 
-    bool setRuns(map<string, string> &args, PARAMETER_PREFIX prefix);
+    bool setPascalTrafficClasses(PARAMETER_PREFIX prefix);
 
-    bool setServiceTime(map<string, string> &args, PARAMETER_PREFIX prefix);
+    bool setRuns(PARAMETER_PREFIX prefix);
+
+    bool setServiceTime(PARAMETER_PREFIX prefix);
 
     bool maxTrafficClassRequireLessFSUsThanLinkCapacity();
 

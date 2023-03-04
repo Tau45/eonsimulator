@@ -7,8 +7,9 @@ SingleSimulationResults runSingleSimulation(double a, vector<int32_t> seedsForSi
 	int32_t x2 = seedsForSimulation[1];
 	int32_t x3 = seedsForSimulation[2];
 
+	Network network;
 	Generator generator(a, x1, x2, x3, simulationIndex);
-	Simulator simulator(generator);
+	Simulator simulator(&network, &generator);
 	return simulator.run();
 }
 

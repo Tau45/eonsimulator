@@ -1,14 +1,10 @@
 #include "../include/Connection.h"
 
-Connection::Connection(Link *sourceLink, Link *destinationLink, uint64_t requiredNumberOfFSUs, double serviceTime) {
-	this->sourceLink = sourceLink;
-	this->destinationLink = destinationLink;
-	this->firstFSUOfInputLink = UINT64_MAX;
-	this->firstFSUOfInternalLinks = UINT64_MAX;
-	this->firstFSUOfOutputLink = UINT64_MAX;
-	this->requiredNumberOfFSUs = requiredNumberOfFSUs;
-	this->serviceTime = serviceTime;
-}
+Connection::Connection(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex, uint64_t requiredNumberOfFSUs, double serviceTime) :
+		sourceLinkIndex(sourceLinkIndex),
+		destinationLinkIndex(destinationLinkIndex),
+		requiredNumberOfFSUs(requiredNumberOfFSUs),
+		serviceTime(serviceTime) {}
 
 void Connection::reserveResources() {
 	assert(!path.empty());
@@ -39,20 +35,20 @@ void Connection::close() {
 	}
 }
 
-Link *Connection::getSourceLink() {
-	return sourceLink;
+uint64_t Connection::getSourceLinkIndex() {
+	return sourceLinkIndex;
 }
 
-Link *Connection::getDestinationLink() {
-	return destinationLink;
+uint64_t Connection::getDestinationLinkIndex() {
+	return destinationLinkIndex;
 }
 
 uint64_t Connection::getPathSize() {
 	return path.size();
 }
 
-void Connection::setPath(vector<Link *> newPath) {
-	this->path = newPath;
+void Connection::setPath(vector<Link *> &path) {
+	this->path = path;
 }
 
 uint64_t Connection::getFirstFSUOfInputLink() {
@@ -85,18 +81,4 @@ uint64_t Connection::getRequiredNumberOfFSUs() {
 
 double Connection::getServiceTime() {
 	return serviceTime;
-}
-
-Connection::Connection() {
-}
-
-Connection::Connection(Connection &connection) {
-	sourceLink = connection.sourceLink;
-	destinationLink = connection.destinationLink;
-	path = connection.path;
-	firstFSUOfInputLink = connection.firstFSUOfInputLink;
-	firstFSUOfInternalLinks = connection.firstFSUOfInternalLinks;
-	firstFSUOfOutputLink = connection.firstFSUOfOutputLink;
-	requiredNumberOfFSUs = connection.requiredNumberOfFSUs;
-	serviceTime = connection.serviceTime;
 }

@@ -1,12 +1,11 @@
 #include "../../include/stats/TrafficClassResults.h"
 
-TrafficClassResults::TrafficClassResults(double avgInternalBlocksRatio, double internalBlocksRatioStandardDeviation,
-										 double avgExternalBlocksRatio, double externalBlocksRatioStandardDeviation,
-										 double avgTotalBlockRatio, double totalBlockConfidenceInterval) {
-	this->avgInternalBlocksRatio = avgInternalBlocksRatio;
-	this->avgExternalBlocksRatio = avgExternalBlocksRatio;
-	this->avgTotalBlockRatio = avgTotalBlockRatio;
-	this->internalBlocksRatioConfidenceInterval = internalBlocksRatioStandardDeviation;
-	this->externalBlocksRatioConfidenceInterval = externalBlocksRatioStandardDeviation;
-	this->totalBlockConfidenceInterval = totalBlockConfidenceInterval;
-}
+TrafficClassResults::TrafficClassResults(double avgInternalBlocksRatio, double internalBlocksRatioConfidenceInterval,
+										 double avgExternalBlocksRatio, double externalBlocksRatioConfidenceInterval,
+										 double avgTotalBlockRatio, double totalBlockConfidenceInterval) :
+		avgInternalBlocksRatio(avgInternalBlocksRatio),
+		internalBlocksRatioConfidenceInterval(internalBlocksRatioConfidenceInterval),
+		avgExternalBlocksRatio(avgExternalBlocksRatio),
+		externalBlocksRatioConfidenceInterval(externalBlocksRatioConfidenceInterval),
+		avgTotalBlockRatio(avgTotalBlockRatio),
+		totalBlockConfidenceInterval(totalBlockConfidenceInterval) {}

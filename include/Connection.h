@@ -7,8 +7,8 @@
 #include "tools/Generator.h"
 
 class Connection {
-	Link *sourceLink;
-	Link *destinationLink;
+	uint64_t sourceLinkIndex;
+	uint64_t destinationLinkIndex;
 	vector<Link *> path;
 	uint64_t firstFSUOfInputLink;
 	uint64_t firstFSUOfInternalLinks;
@@ -16,23 +16,19 @@ class Connection {
 	uint64_t requiredNumberOfFSUs;
 	double serviceTime;
 public:
-	Connection(Link *sourceLink, Link *destinationLink, uint64_t requiredNumberOfFSUs, double serviceTime);
-
-	Connection(Connection &connection);
-
-	Connection();
+	Connection(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex, uint64_t requiredNumberOfFSUs, double serviceTime);
 
 	void reserveResources();
 
 	void close();
 
-	Link *getSourceLink();
+	uint64_t getSourceLinkIndex();
 
-	Link *getDestinationLink();
+	uint64_t getDestinationLinkIndex();
 
 	uint64_t getPathSize();
 
-	void setPath(vector<Link *> path);
+	void setPath(vector<Link *> &path);
 
 	uint64_t getFirstFSUOfInputLink();
 
@@ -40,11 +36,11 @@ public:
 
 	uint64_t getFirstFSUOfOutputLink();
 
-	void setFirstFSUOfInputLink(uint64_t firstFSU);
+	void setFirstFSUOfInputLink(uint64_t firstFSUOfInputLink);
 
-	void setFirstFSUOfInternalLinks(uint64_t firstFSU);
+	void setFirstFSUOfInternalLinks(uint64_t firstFSUOfInternalLinks);
 
-	void setFirstFSUOfOutputLink(uint64_t firstFSU);
+	void setFirstFSUOfOutputLink(uint64_t firstFSUOfOutputLink);
 
 	uint64_t getRequiredNumberOfFSUs();
 

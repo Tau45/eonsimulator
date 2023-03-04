@@ -48,22 +48,25 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator) {
-	if (!connection.getSourceLink()->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs()) && links.size() > 1) {
+	Link* sourceLink = inputLinks[connection.getSourceLinkIndex()];
+	Link* destinationLink = outputLinks[connection.getDestinationLinkIndex()];
+
+	if (!sourceLink->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs()) && links.size() > 1) {
 		return CONNECTION_REJECTED;
 	}
 
-	if (!connection.getDestinationLink()->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs())) {
+	if (!destinationLink->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs())) {
 		return EXTERNAL_BLOCK;
 	}
 
 	queue<vector<Link *>> consideredPaths;
-	consideredPaths.push({connection.getSourceLink()});
+	consideredPaths.push({sourceLink});
 
 	while (!consideredPaths.empty()) {
 		vector<Link *> currentPath = consideredPaths.front();
 		consideredPaths.pop();
 
-		if (currentPath.back() == connection.getDestinationLink() && pathHasRequiredNumberOfFreeFSUs(currentPath, connection, generator)) {
+		if (currentPath.back() == destinationLink && pathHasRequiredNumberOfFreeFSUs(currentPath, connection, generator)) {
 			connection.setPath(currentPath);
 			return CONNECTION_CAN_BE_ESTABLISHED;
 		}

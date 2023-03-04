@@ -1,12 +1,11 @@
 #include "../../include/tools/Generator.h"
 
-Generator::Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t simulationIndex) {
-	this->a = a;
-	this->simulationIndex = simulationIndex;
-	this->x1 = x1;
-	this->x2 = x2;
-	this->x3 = x3;
-}
+Generator::Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t simulationIndex) :
+		a(a),
+		simulationIndex(simulationIndex),
+		x1(x1),
+		x2(x2),
+		x3(x3) {}
 
 double Generator::rown_v1(int &x) {
 	int a = 16807, q = 127773, r = 2836, h;
@@ -32,7 +31,7 @@ double Generator::rown_v3(int &x) {
 	return double(x) / 2147483647;
 }
 
-double Generator::getLambda(uint32_t requiredNumberOfFSUs ) {
+double Generator::getLambda(uint32_t requiredNumberOfFSUs) {
 	uint64_t numberOfInputLinks = SimulationSettings::instance().getNumberOfInputLinks();
 	uint64_t linkCapacity = SimulationSettings::instance().getLinkCapacity();
 	uint64_t numberOfTrafficClasses = SimulationSettings::instance().getNumberOfTrafficClasses();
@@ -83,7 +82,7 @@ uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {
 vector<Link *> Generator::shuffleVector(vector<Link *> inputVector) {
 	vector<Link *> outputVector;
 
-	while(!inputVector.empty()) {
+	while (!inputVector.empty()) {
 		uint64_t randomVectorElementIndex = rown_v2(x2) * inputVector.size();
 
 		if (randomVectorElementIndex == inputVector.size()) {

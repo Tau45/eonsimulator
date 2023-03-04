@@ -1,25 +1,8 @@
 #include <fstream>
 #include "../../include/tools/SimulationSettings.h"
 
-SimulationSettings::SimulationSettings(map<string, string> args) {
-	bool aParametersAreValid = setA(args, A);
-	bool structureFileNameIsValid = setStructureFileName(args, STRUCTURE);
-	bool callsToGenerateIsValid = setCallsToGenerate(args, CALLS_TO_GENERATE);
-	bool linkCapacityIsValid = setLinkCapacity(args, LINK_CAPACITY);
-	bool erlangTrafficClassesAreValid = setErlangTrafficClasses(args, ERLANG);
-	bool engsetTrafficClassesAreValid = setEngsetTrafficClasses(args, ENGSET);
-	bool pascalTrafficClassesAreValid = setPascalTrafficClasses(args, PASCAL);
-	bool runsIsValid = setRuns(args, RUNS);
-	bool serviceTimeIsValid = setServiceTime(args, SERVICE_TIME);
-
-	settingsAreValid = aParametersAreValid
-					   && structureFileNameIsValid
-					   && callsToGenerateIsValid
-					   && linkCapacityIsValid
-					   && runsIsValid
-					   && serviceTimeIsValid
-					   && (erlangTrafficClassesAreValid || engsetTrafficClassesAreValid || pascalTrafficClassesAreValid)
-					   && maxTrafficClassRequireLessFSUsThanLinkCapacity();
+SimulationSettings::SimulationSettings(map<string, string> args) : args(args) {
+	readSettings();
 }
 
 void SimulationSettings::initialize(const map<string, string> &args) {
@@ -32,7 +15,28 @@ SimulationSettings &SimulationSettings::instance(function<SimulationSettings()> 
 	return s;
 }
 
-bool SimulationSettings::setA(map<string, string> &args, PARAMETER_PREFIX prefix) {
+void SimulationSettings::readSettings() {
+	bool aParametersAreValid = setA(A);
+	bool structureFileNameIsValid = setStructureFileName(STRUCTURE);
+	bool callsToGenerateIsValid = setCallsToGenerate(CALLS_TO_GENERATE);
+	bool linkCapacityIsValid = setLinkCapacity(LINK_CAPACITY);
+	bool erlangTrafficClassesAreValid = setErlangTrafficClasses(ERLANG);
+	bool engsetTrafficClassesAreValid = setEngsetTrafficClasses(ENGSET);
+	bool pascalTrafficClassesAreValid = setPascalTrafficClasses(PASCAL);
+	bool runsIsValid = setRuns(RUNS);
+	bool serviceTimeIsValid = setServiceTime(SERVICE_TIME);
+
+	settingsAreValid = aParametersAreValid
+					   && structureFileNameIsValid
+					   && callsToGenerateIsValid
+					   && linkCapacityIsValid
+					   && runsIsValid
+					   && serviceTimeIsValid
+					   && (erlangTrafficClassesAreValid || engsetTrafficClassesAreValid || pascalTrafficClassesAreValid)
+					   && maxTrafficClassRequireLessFSUsThanLinkCapacity();
+}
+
+bool SimulationSettings::setA(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -63,7 +67,7 @@ bool SimulationSettings::setA(map<string, string> &args, PARAMETER_PREFIX prefix
 	return true;
 }
 
-bool SimulationSettings::setStructureFileName(map<string, string> &args, PARAMETER_PREFIX prefix) {
+bool SimulationSettings::setStructureFileName(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -82,7 +86,7 @@ bool SimulationSettings::setStructureFileName(map<string, string> &args, PARAMET
 	return true;
 }
 
-bool SimulationSettings::setCallsToGenerate(map<string, string> &args, PARAMETER_PREFIX prefix) {
+bool SimulationSettings::setCallsToGenerate(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -104,7 +108,7 @@ bool SimulationSettings::setCallsToGenerate(map<string, string> &args, PARAMETER
 	return true;
 }
 
-bool SimulationSettings::setLinkCapacity(map<string, string> &args, PARAMETER_PREFIX prefix) {
+bool SimulationSettings::setLinkCapacity(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -126,7 +130,7 @@ bool SimulationSettings::setLinkCapacity(map<string, string> &args, PARAMETER_PR
 	return true;
 }
 
-bool SimulationSettings::setErlangTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix) {
+bool SimulationSettings::setErlangTrafficClasses(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::WARN, "Parameter " + parameter + " was not found");
@@ -157,7 +161,7 @@ bool SimulationSettings::setErlangTrafficClasses(map<string, string> &args, PARA
 	return true;
 }
 
-bool SimulationSettings::setEngsetTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix) {
+bool SimulationSettings::setEngsetTrafficClasses(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::WARN, "Parameter " + parameter + " was not found");
@@ -188,7 +192,7 @@ bool SimulationSettings::setEngsetTrafficClasses(map<string, string> &args, PARA
 	return true;
 }
 
-bool SimulationSettings::setPascalTrafficClasses(map<string, string> &args, PARAMETER_PREFIX prefix) {
+bool SimulationSettings::setPascalTrafficClasses(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::WARN, "Parameter " + parameter + " was not found");
@@ -219,7 +223,7 @@ bool SimulationSettings::setPascalTrafficClasses(map<string, string> &args, PARA
 	return true;
 }
 
-bool SimulationSettings::setRuns(map<string, string> &args, SimulationSettings::PARAMETER_PREFIX prefix) {
+bool SimulationSettings::setRuns(SimulationSettings::PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -241,7 +245,7 @@ bool SimulationSettings::setRuns(map<string, string> &args, SimulationSettings::
 	return true;
 }
 
-bool SimulationSettings::setServiceTime(map<string, string> &args, SimulationSettings::PARAMETER_PREFIX prefix) {
+bool SimulationSettings::setServiceTime(SimulationSettings::PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");

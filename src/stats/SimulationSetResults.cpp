@@ -1,8 +1,7 @@
 #include "../../include/stats/SimulationSetResults.h"
 
-SimulationSetResults::SimulationSetResults(double a, const vector<SingleSimulationResults> &simulationResults) {
-	this->a = a;
-
+SimulationSetResults::SimulationSetResults(double a, const vector<SingleSimulationResults> &simulationResults) :
+		a(a) {
 	vector<map<uint64_t, TrafficClassResultRatios>> erlangTrafficResultRatiosVector;
 	vector<map<uint64_t, TrafficClassResultRatios>> engsetTrafficResultRatiosVector;
 	vector<map<uint64_t, TrafficClassResultRatios>> pascalTrafficResultRatiosVector;

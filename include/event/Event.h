@@ -17,6 +17,8 @@ public:
 		}
 	};
 
+	Event(double occurrenceTime, Connection &connection) : occurrenceTime(occurrenceTime), connection(connection) {}
+
 	virtual void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) = 0;
 
 	double getOccurrenceTime() { return occurrenceTime; }

@@ -1,10 +1,10 @@
 #include "../../include/network/Link.h"
 
-Link::Link(uint64_t sourceNode, uint64_t destinationNode) {
-	this->isInput = false;
-	this->isOutput = false;
-	this->sourceNode = sourceNode;
-	this->destinationNode = destinationNode;
+Link::Link(uint64_t sourceNode, uint64_t destinationNode) :
+		isInput(false),
+		isOutput(false),
+		sourceNode(sourceNode),
+		destinationNode(destinationNode) {
 	for (int i = 0; i < SimulationSettings::instance().getLinkCapacity(); i++) {
 		FSUs.push_back(false);
 	}
