@@ -22,6 +22,8 @@ class Generator {
 
 	double getLambda(uint32_t requiredNumberOfFSUs);
 
+	uint64_t getRandomNaturalNumber(uint64_t numberOfNumbers);
+
 public:
 	Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t simulationIndex);
 

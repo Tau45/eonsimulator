@@ -42,52 +42,39 @@ double Generator::getLambda(uint32_t requiredNumberOfFSUs) {
 
 double Generator::getRandomServiceTime() {
 	double serviceTime = SimulationSettings::instance().getServiceTime();
-	return log(rown_v1(x3)) * (-serviceTime);
+	return log(rown_v2(x2)) * (-serviceTime);
 }
 
 double Generator::getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs) {
 	return log(rown_v1(x1)) * (-1 / getLambda(requiredNumberOfFSUs));
 }
 
-uint64_t Generator::getRandomInputLink() {
-	uint64_t randomLink = rown_v3(x3) * SimulationSettings::instance().getNumberOfInputLinks();
+uint64_t Generator::getRandomNaturalNumber(uint64_t numberOfNumbers) {
+	uint64_t randomLink = rown_v3(x3) * numberOfNumbers;
 
-	if (randomLink == SimulationSettings::instance().getNumberOfInputLinks()) {
-		return randomLink - 1;
+	if (randomLink == numberOfNumbers) {
+		randomLink--;
 	}
-
 	return randomLink;
+}
+
+uint64_t Generator::getRandomInputLink() {
+	return getRandomNaturalNumber(SimulationSettings::instance().getNumberOfInputLinks());
 }
 
 uint64_t Generator::getRandomOutputLink() {
-	uint64_t randomLink = rown_v3(x3) * SimulationSettings::instance().getNumberOfOutputLinks();
-
-	if (randomLink == SimulationSettings::instance().getNumberOfOutputLinks()) {
-		return randomLink - 1;
-	}
-
-	return randomLink;
+	return getRandomNaturalNumber(SimulationSettings::instance().getNumberOfOutputLinks());
 }
 
 uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {
-	uint64_t randomFirstFSUIndex = rown_v2(x2) * availableFirstFSUs.size();
-
-	if (randomFirstFSUIndex == availableFirstFSUs.size()) {
-		randomFirstFSUIndex--;
-	}
-
-	return availableFirstFSUs[randomFirstFSUIndex];
+	return availableFirstFSUs[getRandomNaturalNumber(availableFirstFSUs.size())];
 }
 
 vector<Link *> Generator::shuffleVector(vector<Link *> inputVector) {
 	vector<Link *> outputVector;
 
 	while (!inputVector.empty()) {
-		uint64_t randomVectorElementIndex = rown_v2(x2) * inputVector.size();
-
-		if (randomVectorElementIndex == inputVector.size()) {
-			randomVectorElementIndex--;
-		}
+		uint64_t randomVectorElementIndex = getRandomNaturalNumber(inputVector.size());
 
 		outputVector.push_back(inputVector.at(randomVectorElementIndex));
 		inputVector.erase(inputVector.begin() + randomVectorElementIndex);

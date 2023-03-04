@@ -194,21 +194,20 @@ uint64_t Structure::getNumberOfOutputLinks() {
 	return outputLinks.size();
 }
 
-bool Structure::checkInputToOutputAvailability(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex) {
+bool Structure::checkInputToOutputAvailability(Link* sourceLink, Link* destinationLink) {
 	queue<vector<Link *>> consideredPaths;
-	consideredPaths.push({inputLinks[sourceLinkIndex]});
+	consideredPaths.push({sourceLink});
 
 	while (!consideredPaths.empty()) {
 		vector<Link *> currentPath = consideredPaths.front();
 		consideredPaths.pop();
-		uint64_t currentPathLastNode = currentPath.back()->getDestinationNode();
 
-		if (currentPathLastNode == outputLinks[destinationLinkIndex]->getDestinationNode()) {
+		if (currentPath.back() == destinationLink) {
 			return true;
 		}
 
-		for (auto &link: links[currentPathLastNode]) {
-			if (linkWasNotVisited(currentPath, link->getDestinationNode())) {
+		for (auto &link: links[currentPath.back()->getDestinationNode()]) {
+			if (linkWasNotVisited(currentPath, link)) {
 				vector<Link *> newPath(currentPath);
 				newPath.push_back(link);
 				consideredPaths.push(newPath);
@@ -219,14 +218,8 @@ bool Structure::checkInputToOutputAvailability(uint64_t sourceLinkIndex, uint64_
 	return false;
 }
 
-bool Structure::linkWasNotVisited(vector<Link *> &path, uint64_t node) {
-	for (auto &link: path) {
-		if (link->getDestinationNode() == node) {
-			return false;
-		}
-	}
-
-	return true;
+bool Structure::linkWasNotVisited(vector<Link *> &path, Link *linkToCheck) {
+	return !ranges::any_of(path.cbegin(), path.cend(), [linkToCheck](Link *link) { return link == linkToCheck; });
 }
 
 bool Structure::isValid() {
@@ -235,10 +228,10 @@ bool Structure::isValid() {
 
 bool Structure::everyOutputNodeIsAvailableFromEveryInputNode() {
 	Logger::instance().log(Logger::STRUCTURE_VALIDATION, "Structure validation started...");
-	for (uint64_t i = 0; i < inputLinks.size(); i++) {
-		for (uint64_t j = 0; j < outputLinks.size(); j++) {
-			if (!checkInputToOutputAvailability(i, j)) {
-				Logger::instance().log(Logger::ERROR, "Structure is not valid. Output " + to_string(outputLinks[j]->getDestinationNode()) + " is not reachable from input " + to_string(inputLinks[i]->getSourceNode()));
+	for (auto & inputLink : inputLinks) {
+		for (auto & outputLink : outputLinks) {
+			if (!checkInputToOutputAvailability(inputLink, outputLink)) {
+				Logger::instance().log(Logger::ERROR, "Structure is not valid. Output " + to_string(outputLink->getDestinationNode()) + " is not reachable from input " + to_string(inputLink->getSourceNode()));
 				return false;
 			}
 		}

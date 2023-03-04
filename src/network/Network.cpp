@@ -74,7 +74,7 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 		vector<Link *> availableNextHops = generator.shuffleVector(links[currentPath.back()->getDestinationNode()]);
 
 		for (auto &link: availableNextHops) {
-			if (linkWasNotVisited(currentPath, link->getDestinationNode())) {
+			if (linkWasNotVisited(currentPath, link)) {
 				vector<Link *> newPath(currentPath);
 				newPath.push_back(link);
 				consideredPaths.push(newPath);

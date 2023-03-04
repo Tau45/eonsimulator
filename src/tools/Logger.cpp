@@ -49,7 +49,6 @@ string Logger::getTimestamp(double clock) {
 	   << setw(2) << h << ":"
 	   << setw(2) << m << ":"
 	   << setw(2) << s << ":"
-	   //           << setw(6) << ms << "] ";
 	   << setw(3) << ms << "] ";
 	return ss.str();
 }

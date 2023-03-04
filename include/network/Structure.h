@@ -17,7 +17,7 @@ class Structure {
 
 	void setInputOutputLinks();
 
-	bool checkInputToOutputAvailability(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex);
+	bool checkInputToOutputAvailability(Link* sourceLink, Link* destinationLink);
 
 	bool everyOutputNodeIsAvailableFromEveryInputNode();
 
@@ -36,7 +36,7 @@ public:
 
 	bool isValid();
 
-	bool linkWasNotVisited(vector<Link *> &path, uint64_t node);
+	bool linkWasNotVisited(vector<Link *> &path, Link *linkToCheck);
 
 	uint64_t getNumberOfInputLinks();
 
