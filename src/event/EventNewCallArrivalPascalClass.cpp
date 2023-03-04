@@ -1,6 +1,6 @@
 #include "../../include/event/EventNewCallArrivalPascalClass.h"
 
-EventNewCallArrivalPascalClass::EventNewCallArrivalPascalClass() {
+EventNewCallArrivalPascalClass::EventNewCallArrivalPascalClass(TrafficClassStatistics &trafficClassStatistics) : trafficClassStatistics(trafficClassStatistics) {
 	// TODO: Pascal event initialization
 }
 

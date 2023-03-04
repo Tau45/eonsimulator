@@ -22,9 +22,9 @@ public:
 		CONNECTION_CAN_BE_ESTABLISHED,
 	};
 
-	map<uint64_t, TrafficClassStatistics> erlangTrafficClasses;
-	map<uint64_t, TrafficClassStatistics> engsetTrafficClasses;
-	map<uint64_t, TrafficClassStatistics> pascalTrafficClasses;
+	map<uint64_t, TrafficClassStatistics> erlangTrafficClassStatistics;
+	map<uint64_t, TrafficClassStatistics> engsetTrafficClassStatistics;
+	map<uint64_t, TrafficClassStatistics> pascalTrafficClassStatistics;
 
 	Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator);
 

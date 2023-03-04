@@ -7,8 +7,9 @@
 #include "EventCallServiceTermination.h"
 
 class EventNewCallArrivalEngsetClass : public Event {
+	TrafficClassStatistics &trafficClassStatistics;
 public:
-	EventNewCallArrivalEngsetClass();
+	EventNewCallArrivalEngsetClass(TrafficClassStatistics &trafficClassStatistics);
 
 	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
 };

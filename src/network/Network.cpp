@@ -85,21 +85,21 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
 	uint64_t result = UINT64_MAX;
 
-	for (auto const &trafficClass: erlangTrafficClasses) {
+	for (auto const &trafficClass: erlangTrafficClassStatistics) {
 		uint64_t numberOfCalls = trafficClass.second.callsGenerated;
 		if (numberOfCalls < result) {
 			result = numberOfCalls;
 		}
 	}
 
-	for (auto const &trafficClass: engsetTrafficClasses) {
+	for (auto const &trafficClass: engsetTrafficClassStatistics) {
 		uint64_t numberOfCalls = trafficClass.second.callsGenerated;
 		if (numberOfCalls < result) {
 			result = numberOfCalls;
 		}
 	}
 
-	for (auto const &trafficClass: pascalTrafficClasses) {
+	for (auto const &trafficClass: pascalTrafficClassStatistics) {
 		uint64_t numberOfCalls = trafficClass.second.callsGenerated;
 		if (numberOfCalls < result) {
 			result = numberOfCalls;

@@ -21,26 +21,26 @@ SingleSimulationResults Simulator::run() {
 
     Logger::instance().log(eventQueue.top()->getOccurrenceTime(), generator->getA(), generator->getSimulationIndex(), Logger::SIMULATION_END, "The simulation has finished");
 
-    return SingleSimulationResults(network->erlangTrafficClasses, network->engsetTrafficClasses, network->pascalTrafficClasses);
+    return SingleSimulationResults(network->erlangTrafficClassStatistics, network->engsetTrafficClassStatistics, network->pascalTrafficClassStatistics);
 }
 
 void Simulator::addErlangTrafficClasses() {
     for (uint64_t erlangTrafficClass: SimulationSettings::instance().getErlangTrafficClasses()) {
-        network->erlangTrafficClasses[erlangTrafficClass] = TrafficClassStatistics();
-        eventQueue.push(new EventNewCallArrivalErlangClass(0, erlangTrafficClass, *network, *generator));
+        network->erlangTrafficClassStatistics[erlangTrafficClass] = TrafficClassStatistics();
+        eventQueue.push(new EventNewCallArrivalErlangClass(0, erlangTrafficClass, *network, *generator, network->erlangTrafficClassStatistics[erlangTrafficClass]));
     }
 }
 
 void Simulator::addEngsetTrafficClasses() {
 	for (uint64_t engsetTrafficClass: SimulationSettings::instance().getEngsetTrafficClasses()) {
-		network->engsetTrafficClasses[engsetTrafficClass] = TrafficClassStatistics();
+		network->engsetTrafficClassStatistics[engsetTrafficClass] = TrafficClassStatistics();
 		eventQueue.push(new EventNewCallArrivalEngsetClass());
 	}
 }
 
 void Simulator::addPascalTrafficClasses() {
 	for (uint64_t pascalTrafficClass: SimulationSettings::instance().getPascalTrafficClasses()) {
-		network->pascalTrafficClasses[pascalTrafficClass] = TrafficClassStatistics();
+		network->pascalTrafficClassStatistics[pascalTrafficClass] = TrafficClassStatistics();
 		eventQueue.push(new EventNewCallArrivalPascalClass());
 	}
 }
