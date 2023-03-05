@@ -28,6 +28,8 @@ public:
 
 	Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator);
 
+	Network::ESTABLISH_CONNECTION_RESULT checkPath(vector<Link *> currentPath, Link *destinationLink, Connection &connection, Generator &generator);
+
 	uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
 };
 

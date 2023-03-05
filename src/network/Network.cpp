@@ -48,8 +48,8 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator) {
-	Link* sourceLink = inputLinks[connection.getSourceLinkIndex()];
-	Link* destinationLink = outputLinks[connection.getDestinationLinkIndex()];
+	Link *sourceLink = inputLinks[connection.getSourceLinkIndex()];
+	Link *destinationLink = outputLinks[connection.getDestinationLinkIndex()];
 
 	if (!sourceLink->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs()) && links.size() > 1) {
 		return CONNECTION_REJECTED;
@@ -59,29 +59,27 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 		return EXTERNAL_BLOCK;
 	}
 
-	queue<vector<Link *>> consideredPaths;
-	consideredPaths.push({sourceLink});
+	return checkPath({sourceLink}, destinationLink, connection, generator);
+}
 
-	while (!consideredPaths.empty()) {
-		vector<Link *> currentPath = consideredPaths.front();
-		consideredPaths.pop();
+Network::ESTABLISH_CONNECTION_RESULT Network::checkPath(vector<Link *> currentPath, Link *destinationLink, Connection &connection, Generator &generator) {
+	if (currentPath.back() == destinationLink && pathHasRequiredNumberOfFreeFSUs(currentPath, connection, generator)) {
+		connection.setPath(currentPath);
+		return CONNECTION_CAN_BE_ESTABLISHED;
+	}
 
-		if (currentPath.back() == destinationLink && pathHasRequiredNumberOfFreeFSUs(currentPath, connection, generator)) {
-			connection.setPath(currentPath);
-			return CONNECTION_CAN_BE_ESTABLISHED;
-		}
+	vector<Link *> availableNextHops = generator.shuffleVector(links[currentPath.back()->getDestinationNode()]);
 
-		vector<Link *> availableNextHops = generator.shuffleVector(links[currentPath.back()->getDestinationNode()]);
+	for (auto &link: availableNextHops) {
+		if (linkWasNotVisited(currentPath, link) && link->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs())) {
+			vector<Link *> newPath(currentPath);
+			newPath.push_back(link);
 
-		for (auto &link: availableNextHops) {
-			if (linkWasNotVisited(currentPath, link)) {
-				vector<Link *> newPath(currentPath);
-				newPath.push_back(link);
-				consideredPaths.push(newPath);
+			if (checkPath(newPath, destinationLink, connection, generator) == CONNECTION_CAN_BE_ESTABLISHED) {
+				return CONNECTION_CAN_BE_ESTABLISHED;
 			}
 		}
 	}
-
 	return INTERNAL_BLOCK;
 }
 
