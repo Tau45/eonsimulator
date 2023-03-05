@@ -7,7 +7,7 @@ EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double occurrence
 void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) {
 	trafficClassStatistics.callsGenerated++;
 
-	Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_SETUP, "Setting up connection between input: " + to_string(connection.getSourceLinkIndex()) + " and output " + to_string(connection.getDestinationLinkIndex()) + "...");
+	Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_SETUP, "Setting up connection between input: " + to_string(network.inputLinks[connection.getSourceLinkIndex()]->getSourceNode()) + " and output " + to_string(network.outputLinks[connection.getDestinationLinkIndex()]->getDestinationNode()) + "...");
 
 	switch (network.checkIfConnectionCanBeEstablished(connection, generator)) {
 		case Network::CONNECTION_CAN_BE_ESTABLISHED:
@@ -19,7 +19,7 @@ void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Ev
 			} else if (connection.getPathSize() == 2) {
 				Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_ESTABLISHED, "Connection has been successfully set up using FSUs: " + to_string(connection.getFirstFSUOfInputLink()) + "-" + to_string(connection.getFirstFSUOfInputLink() + connection.getRequiredNumberOfFSUs() - 1) + " in input link, " + to_string(connection.getFirstFSUOfOutputLink()) + "-" + to_string(connection.getFirstFSUOfOutputLink() + connection.getRequiredNumberOfFSUs() - 1) + " in output link (" + to_string(connection.getRequiredNumberOfFSUs()) + " FSUs)");
 			} else {
-				Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_ESTABLISHED, "Connection has been successfully set up using FSUs: " + to_string(connection.getFirstFSUOfInputLink()) + "-" + to_string(connection.getFirstFSUOfInputLink() + connection.getRequiredNumberOfFSUs() - 1) + " in input link, " + to_string(connection.getFirstFSUOfOutputLink()) + "-" + to_string(connection.getFirstFSUOfOutputLink() + connection.getRequiredNumberOfFSUs() - 1) + " in output link, " + to_string(connection.getFirstFSUOfInternalLinks()) + "-" + to_string(connection.getFirstFSUOfInternalLinks() + connection.getRequiredNumberOfFSUs() - 1) + " in internal links (" + to_string(connection.getRequiredNumberOfFSUs()) + " FSUs)");
+				Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_ESTABLISHED, "Connection has been successfully set up using FSUs: " + to_string(connection.getFirstFSUOfInputLink()) + "-" + to_string(connection.getFirstFSUOfInputLink() + connection.getRequiredNumberOfFSUs() - 1) + " in input link, " + to_string(connection.getFirstFSUOfInternalLinks()) + "-" + to_string(connection.getFirstFSUOfInternalLinks() + connection.getRequiredNumberOfFSUs() - 1) + " in internal links, " + to_string(connection.getFirstFSUOfOutputLink()) + "-" + to_string(connection.getFirstFSUOfOutputLink() + connection.getRequiredNumberOfFSUs() - 1) + " in output link (" + to_string(connection.getRequiredNumberOfFSUs()) + " FSUs)");
 			}
 			break;
 		case Network::CONNECTION_REJECTED:
