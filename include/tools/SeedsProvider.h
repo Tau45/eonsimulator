@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <queue>
-#include "../../include/tools/SimulationSettings.h"
+#include "../../include/tools/GlobalSettings.h"
 
 using namespace std;
 

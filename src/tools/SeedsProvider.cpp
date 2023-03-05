@@ -28,8 +28,8 @@ vector<vector<int32_t>> SeedsProvider::getSeedsForSimulationSet(uint64_t numberO
 
 vector<vector<vector<int32_t>>> SeedsProvider::getSeeds() {
 	vector<vector<vector<int32_t>>> seedVector;
-	for (uint64_t i = 0; i < SimulationSettings::instance().getAParameters().size(); i++) {
-		seedVector.push_back(getSeedsForSimulationSet(SimulationSettings::instance().getRuns()));
+	for (uint64_t i = 0; i < GlobalSettings::instance().getAParameters().size(); i++) {
+		seedVector.push_back(getSeedsForSimulationSet(GlobalSettings::instance().getRuns()));
 	}
 	return seedVector;
 }

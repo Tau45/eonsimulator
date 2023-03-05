@@ -32,16 +32,16 @@ double Generator::rown_v3(int &x) {
 }
 
 double Generator::getLambda(uint32_t requiredNumberOfFSUs) {
-	uint64_t numberOfInputLinks = SimulationSettings::instance().getNumberOfInputLinks();
-	uint64_t linkCapacity = SimulationSettings::instance().getLinkCapacity();
-	uint64_t numberOfTrafficClasses = SimulationSettings::instance().getNumberOfTrafficClasses();
-	double serviceTime = SimulationSettings::instance().getServiceTime();
+	uint64_t numberOfInputLinks = GlobalSettings::instance().getNumberOfInputLinks();
+	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
+	uint64_t numberOfTrafficClasses = GlobalSettings::instance().getNumberOfTrafficClasses();
+	double serviceTime = GlobalSettings::instance().getServiceTime();
 
 	return (a * numberOfInputLinks * linkCapacity) / (numberOfTrafficClasses * serviceTime * requiredNumberOfFSUs);
 }
 
 double Generator::getRandomServiceTime() {
-	double serviceTime = SimulationSettings::instance().getServiceTime();
+	double serviceTime = GlobalSettings::instance().getServiceTime();
 	return log(rown_v2(x2)) * (-serviceTime);
 }
 
@@ -59,11 +59,11 @@ uint64_t Generator::getRandomNaturalNumber(uint64_t numberOfNumbers) {
 }
 
 uint64_t Generator::getRandomInputLink() {
-	return getRandomNaturalNumber(SimulationSettings::instance().getNumberOfInputLinks());
+	return getRandomNaturalNumber(GlobalSettings::instance().getNumberOfInputLinks());
 }
 
 uint64_t Generator::getRandomOutputLink() {
-	return getRandomNaturalNumber(SimulationSettings::instance().getNumberOfOutputLinks());
+	return getRandomNaturalNumber(GlobalSettings::instance().getNumberOfOutputLinks());
 }
 
 uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {

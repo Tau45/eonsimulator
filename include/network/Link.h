@@ -5,7 +5,7 @@
 #include <iostream>
 #include <cassert>
 #include <vector>
-#include "../tools/SimulationSettings.h"
+#include "../tools/GlobalSettings.h"
 
 class Link {
 	bool isInput;

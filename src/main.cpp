@@ -18,11 +18,11 @@ SimulationSetResults runSimulationSet(double a, vector<vector<int32_t>> seedsFor
 	vector<SingleSimulationResults> simulationResults;
 	auto seedsForSimulation = seedsForSimulationSet.begin();
 
-	for (uint64_t i = 0; i < SimulationSettings::instance().getRuns(); i++) {
+	for (uint64_t i = 0; i < GlobalSettings::instance().getRuns(); i++) {
 		simulations.push_back(async(&runSingleSimulation, a, *seedsForSimulation++, i));
 	}
 
-	for (uint64_t i = 0; i < SimulationSettings::instance().getRuns(); i++) {
+	for (uint64_t i = 0; i < GlobalSettings::instance().getRuns(); i++) {
 		simulationResults.push_back(simulations[i].get());
 	}
 
@@ -44,10 +44,10 @@ int main(int argc, char *argv[]) {
 	bool logsEnabled = args.count("-logs");
 	Logger::initialize(logsEnabled);
 
-	/// Initialize and validate SimulationSettings
-	SimulationSettings::initialize(args);
+	/// Initialize and validate GlobalSettings
+	GlobalSettings::initialize(args);
 
-	if (!SimulationSettings::instance().areValid()) {
+	if (!GlobalSettings::instance().areValid()) {
 		return -10;
 	}
 
@@ -59,12 +59,12 @@ int main(int argc, char *argv[]) {
 		return -11;
 	}
 
-	SimulationSettings::instance().setNumberOfInputLinks(network.getNumberOfInputLinks());
-	SimulationSettings::instance().setNumberOfOutputLinks(network.getNumberOfOutputLinks());
+	GlobalSettings::instance().setNumberOfInputLinks(network.getNumberOfInputLinks());
+	GlobalSettings::instance().setNumberOfOutputLinks(network.getNumberOfOutputLinks());
 
 	/// Get seeds for random number generators
 	SeedsProvider seedsProvider;
-	uint64_t requiredNumberOfSeeds = SimulationSettings::instance().getAParameters().size() * SimulationSettings::instance().getRuns() * 3;
+	uint64_t requiredNumberOfSeeds = GlobalSettings::instance().getAParameters().size() * GlobalSettings::instance().getRuns() * 3;
 
 	if (requiredNumberOfSeeds > seedsProvider.getNumberOfAvailableSeeds()) {
 		Logger::instance().log(Logger::ERROR, to_string(requiredNumberOfSeeds) + " seeds are required to perform required number of simulations, and the program can provide " + to_string(seedsProvider.getNumberOfAvailableSeeds()) + " seeds only");
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
 	Logger::instance().log(Logger::STARTING_SIMULATIONS, "Starting simulations...");
 	auto start = chrono::high_resolution_clock::now();
 
-	for (double a: SimulationSettings::instance().getAParameters()) {
+	for (double a: GlobalSettings::instance().getAParameters()) {
 		simulationSets.push_back(async(&runSimulationSet, a, *seedsForSimulationSet++));
 	}
 

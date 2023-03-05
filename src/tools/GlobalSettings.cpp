@@ -1,21 +1,21 @@
 #include <fstream>
-#include "../../include/tools/SimulationSettings.h"
+#include "../../include/tools/GlobalSettings.h"
 
-SimulationSettings::SimulationSettings(map<string, string> args) : args(args) {
+GlobalSettings::GlobalSettings(map<string, string> args) : args(args) {
 	readSettings();
 }
 
-void SimulationSettings::initialize(const map<string, string> &args) {
-	function<SimulationSettings()> init = [args]() { return SimulationSettings(args); };
+void GlobalSettings::initialize(const map<string, string> &args) {
+	function<GlobalSettings()> init = [args]() { return GlobalSettings(args); };
 	instance(&init);
 }
 
-SimulationSettings &SimulationSettings::instance(function<SimulationSettings()> *init) {
-	static SimulationSettings s{(*init)()};
+GlobalSettings &GlobalSettings::instance(function<GlobalSettings()> *init) {
+	static GlobalSettings s{(*init)()};
 	return s;
 }
 
-void SimulationSettings::readSettings() {
+void GlobalSettings::readSettings() {
 	bool aParametersAreValid = setA(A);
 	bool structureFileNameIsValid = setStructureFileName(STRUCTURE);
 	bool callsToGenerateIsValid = setCallsToGenerate(CALLS_TO_GENERATE);
@@ -36,7 +36,7 @@ void SimulationSettings::readSettings() {
 					   && maxTrafficClassRequireLessFSUsThanLinkCapacity();
 }
 
-bool SimulationSettings::setA(PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setA(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -67,7 +67,7 @@ bool SimulationSettings::setA(PARAMETER_PREFIX prefix) {
 	return true;
 }
 
-bool SimulationSettings::setStructureFileName(PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setStructureFileName(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -86,7 +86,7 @@ bool SimulationSettings::setStructureFileName(PARAMETER_PREFIX prefix) {
 	return true;
 }
 
-bool SimulationSettings::setCallsToGenerate(PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setCallsToGenerate(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -108,7 +108,7 @@ bool SimulationSettings::setCallsToGenerate(PARAMETER_PREFIX prefix) {
 	return true;
 }
 
-bool SimulationSettings::setLinkCapacity(PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setLinkCapacity(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -130,7 +130,7 @@ bool SimulationSettings::setLinkCapacity(PARAMETER_PREFIX prefix) {
 	return true;
 }
 
-bool SimulationSettings::setErlangTrafficClasses(PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setErlangTrafficClasses(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::WARN, "Parameter " + parameter + " was not found");
@@ -161,7 +161,7 @@ bool SimulationSettings::setErlangTrafficClasses(PARAMETER_PREFIX prefix) {
 	return true;
 }
 
-bool SimulationSettings::setEngsetTrafficClasses(PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setEngsetTrafficClasses(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::WARN, "Parameter " + parameter + " was not found");
@@ -192,7 +192,7 @@ bool SimulationSettings::setEngsetTrafficClasses(PARAMETER_PREFIX prefix) {
 	return true;
 }
 
-bool SimulationSettings::setPascalTrafficClasses(PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setPascalTrafficClasses(PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::WARN, "Parameter " + parameter + " was not found");
@@ -223,7 +223,7 @@ bool SimulationSettings::setPascalTrafficClasses(PARAMETER_PREFIX prefix) {
 	return true;
 }
 
-bool SimulationSettings::setRuns(SimulationSettings::PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setRuns(GlobalSettings::PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -245,7 +245,7 @@ bool SimulationSettings::setRuns(SimulationSettings::PARAMETER_PREFIX prefix) {
 	return true;
 }
 
-bool SimulationSettings::setServiceTime(SimulationSettings::PARAMETER_PREFIX prefix) {
+bool GlobalSettings::setServiceTime(GlobalSettings::PARAMETER_PREFIX prefix) {
 	string parameter = parameterMap[prefix];
 	if (!args.count(parameter)) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
@@ -267,67 +267,67 @@ bool SimulationSettings::setServiceTime(SimulationSettings::PARAMETER_PREFIX pre
 	return true;
 }
 
-bool SimulationSettings::areValid() {
+bool GlobalSettings::areValid() {
 	return settingsAreValid;
 }
 
-set<double> SimulationSettings::getAParameters() {
+set<double> GlobalSettings::getAParameters() {
 	return aParameters;
 }
 
-string SimulationSettings::getStructureFileName() {
+string GlobalSettings::getStructureFileName() {
 	return structureFileName;
 }
 
-uint64_t SimulationSettings::getCallsToGenerate() {
+uint64_t GlobalSettings::getCallsToGenerate() {
 	return callsToGenerate;
 }
 
-uint64_t SimulationSettings::getLinkCapacity() {
+uint64_t GlobalSettings::getLinkCapacity() {
 	return linkCapacity;
 }
 
-uint64_t SimulationSettings::getNumberOfTrafficClasses() {
+uint64_t GlobalSettings::getNumberOfTrafficClasses() {
 	return erlangTrafficClasses.size() + engsetTrafficClasses.size() + pascalTrafficClasses.size();
 }
 
-set<uint64_t> SimulationSettings::getErlangTrafficClasses() {
+set<uint64_t> GlobalSettings::getErlangTrafficClasses() {
 	return erlangTrafficClasses;
 }
 
-set<uint64_t> SimulationSettings::getEngsetTrafficClasses() {
+set<uint64_t> GlobalSettings::getEngsetTrafficClasses() {
 	return engsetTrafficClasses;
 }
 
-set<uint64_t> SimulationSettings::getPascalTrafficClasses() {
+set<uint64_t> GlobalSettings::getPascalTrafficClasses() {
 	return pascalTrafficClasses;
 }
 
-uint64_t SimulationSettings::getRuns() {
+uint64_t GlobalSettings::getRuns() {
 	return runs;
 }
 
-double SimulationSettings::getServiceTime() {
+double GlobalSettings::getServiceTime() {
 	return serviceTime;
 }
 
-void SimulationSettings::setNumberOfInputLinks(uint64_t numberOfInputs) {
+void GlobalSettings::setNumberOfInputLinks(uint64_t numberOfInputs) {
 	this->numberOfInputLinks = numberOfInputs;
 }
 
-void SimulationSettings::setNumberOfOutputLinks(uint64_t numberOfOutputs) {
+void GlobalSettings::setNumberOfOutputLinks(uint64_t numberOfOutputs) {
 	this->numberOfOutputLinks = numberOfOutputs;
 }
 
-uint64_t SimulationSettings::getNumberOfInputLinks() {
+uint64_t GlobalSettings::getNumberOfInputLinks() {
 	return numberOfInputLinks;
 }
 
-uint64_t SimulationSettings::getNumberOfOutputLinks() {
+uint64_t GlobalSettings::getNumberOfOutputLinks() {
 	return numberOfOutputLinks;
 }
 
-bool SimulationSettings::maxTrafficClassRequireLessFSUsThanLinkCapacity() {
+bool GlobalSettings::maxTrafficClassRequireLessFSUsThanLinkCapacity() {
 	uint64_t erlangMaxTrafficClass = *max_element(erlangTrafficClasses.begin(), erlangTrafficClasses.end());
 	uint64_t engsetMaxTrafficClass = *max_element(engsetTrafficClasses.begin(), engsetTrafficClasses.end());
 	uint64_t pascalMaxTrafficClass = *max_element(pascalTrafficClasses.begin(), pascalTrafficClasses.end());

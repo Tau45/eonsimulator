@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <math.h>
-#include "SimulationSettings.h"
+#include "GlobalSettings.h"
 #include "../../include/network/Link.h"
 
 class Generator {

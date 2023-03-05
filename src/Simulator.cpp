@@ -11,7 +11,7 @@ Simulator::Simulator(Network *network, Generator *generator) :
 SingleSimulationResults Simulator::run() {
 	Logger::instance().log(0, generator->getA(), generator->getSimulationIndex(), Logger::SIMULATION_START, "The simulation has started...");
 
-	while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < SimulationSettings::instance().getCallsToGenerate()) {
+	while (network->getNumberOfGeneratedCallsOfTheLeastActiveClass() < GlobalSettings::instance().getCallsToGenerate()) {
 		Event *event = eventQueue.top();
 		event->execute(*network, eventQueue, *generator);
 		eventQueue.pop();
@@ -24,7 +24,7 @@ SingleSimulationResults Simulator::run() {
 }
 
 void Simulator::addErlangTrafficClasses() {
-	for (uint64_t requiredNumberOfFSUs: SimulationSettings::instance().getErlangTrafficClasses()) {
+	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getErlangTrafficClasses()) {
 		network->erlangTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
 
 		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs);
@@ -34,7 +34,7 @@ void Simulator::addErlangTrafficClasses() {
 }
 
 void Simulator::addEngsetTrafficClasses() {
-	for (uint64_t requiredNumberOfFSUs: SimulationSettings::instance().getEngsetTrafficClasses()) {
+	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getEngsetTrafficClasses()) {
 		network->engsetTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
 
 		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs);
@@ -44,7 +44,7 @@ void Simulator::addEngsetTrafficClasses() {
 }
 
 void Simulator::addPascalTrafficClasses() {
-	for (uint64_t requiredNumberOfFSUs: SimulationSettings::instance().getPascalTrafficClasses()) {
+	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getPascalTrafficClasses()) {
 		network->pascalTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
 
 		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs);

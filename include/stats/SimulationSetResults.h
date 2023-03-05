@@ -7,7 +7,7 @@
 #include <cmath>
 #include "TrafficClassResults.h"
 #include "SingleSimulationResults.h"
-#include "../tools/SimulationSettings.h"
+#include "../tools/GlobalSettings.h"
 
 using namespace std;
 

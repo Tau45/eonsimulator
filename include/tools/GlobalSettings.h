@@ -1,12 +1,12 @@
-#ifndef EONSIMULATOR_SIMULATIONSETTINGS_H
-#define EONSIMULATOR_SIMULATIONSETTINGS_H
+#ifndef EONSIMULATOR_GLOBALSETTINGS_H
+#define EONSIMULATOR_GLOBALSETTINGS_H
 
 #include <iostream>
 #include <set>
 #include <regex>
 #include "Logger.h"
 
-class SimulationSettings {
+class GlobalSettings {
     enum PARAMETER_PREFIX {
         A,
         STRUCTURE,
@@ -45,11 +45,11 @@ class SimulationSettings {
 	uint64_t numberOfOutputLinks;
 	double serviceTime;
 
-    SimulationSettings(map<string, string> args);
+    GlobalSettings(map<string, string> args);
 
-    SimulationSettings(const SimulationSettings &) = delete;
+    GlobalSettings(const GlobalSettings &) = delete;
 
-    void operator=(const SimulationSettings &) = delete;
+    void operator=(const GlobalSettings &) = delete;
 
 	void readSettings();
 
@@ -74,7 +74,7 @@ class SimulationSettings {
     bool maxTrafficClassRequireLessFSUsThanLinkCapacity();
 
 public:
-    static SimulationSettings &instance(function<SimulationSettings()> *init = nullptr);
+    static GlobalSettings &instance(function<GlobalSettings()> *init = nullptr);
 
     static void initialize(const map<string, string> &args);
 
@@ -109,4 +109,4 @@ public:
 	uint64_t getNumberOfOutputLinks();
 };
 
-#endif //EONSIMULATOR_SIMULATIONSETTINGS_H
+#endif //EONSIMULATOR_GLOBALSETTINGS_H

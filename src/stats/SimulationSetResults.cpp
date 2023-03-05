@@ -12,9 +12,9 @@ SimulationSetResults::SimulationSetResults(double a, const vector<SingleSimulati
 		pascalTrafficResultRatiosVector.push_back(simulationResult.pascalTrafficResultRatios);
 	}
 
-	setTrafficSourceResults(erlangTrafficResults, erlangTrafficResultRatiosVector, SimulationSettings::instance().getErlangTrafficClasses());
-	setTrafficSourceResults(engsetTrafficResults, engsetTrafficResultRatiosVector, SimulationSettings::instance().getEngsetTrafficClasses());
-	setTrafficSourceResults(pascalTrafficResults, pascalTrafficResultRatiosVector, SimulationSettings::instance().getPascalTrafficClasses());
+	setTrafficSourceResults(erlangTrafficResults, erlangTrafficResultRatiosVector, GlobalSettings::instance().getErlangTrafficClasses());
+	setTrafficSourceResults(engsetTrafficResults, engsetTrafficResultRatiosVector, GlobalSettings::instance().getEngsetTrafficClasses());
+	setTrafficSourceResults(pascalTrafficResults, pascalTrafficResultRatiosVector, GlobalSettings::instance().getPascalTrafficClasses());
 }
 
 void SimulationSetResults::setTrafficSourceResults(map<uint64_t, TrafficClassResults> &trafficResults, const vector<map<uint64_t, TrafficClassResultRatios>> &trafficResultRatiosVector, const set<uint64_t> &trafficClasses) {
@@ -38,9 +38,9 @@ void SimulationSetResults::setTrafficSourceResults(map<uint64_t, TrafficClassRes
 	}
 
 	for (uint64_t trafficClass: trafficClasses) {
-		avgInternalBlockRatios[trafficClass] = avgInternalBlockRatios[trafficClass] / SimulationSettings::instance().getRuns();
-		avgExternalBlockRatios[trafficClass] = avgExternalBlockRatios[trafficClass] / SimulationSettings::instance().getRuns();
-		avgTotalBlockRatios[trafficClass] = avgTotalBlockRatios[trafficClass] / SimulationSettings::instance().getRuns();
+		avgInternalBlockRatios[trafficClass] = avgInternalBlockRatios[trafficClass] / GlobalSettings::instance().getRuns();
+		avgExternalBlockRatios[trafficClass] = avgExternalBlockRatios[trafficClass] / GlobalSettings::instance().getRuns();
+		avgTotalBlockRatios[trafficClass] = avgTotalBlockRatios[trafficClass] / GlobalSettings::instance().getRuns();
 	}
 
 	/// Calculate standard deviations
@@ -80,9 +80,9 @@ void SimulationSetResults::setTrafficSourceResults(map<uint64_t, TrafficClassRes
 	map<uint64_t, double> totalBlockConfidenceIntervals;
 
 	for (uint64_t trafficClass: trafficClasses) {
-		internalBlockConfidenceIntervals[trafficClass] = 1.96 * (internalBlockStandardDeviations[trafficClass] / sqrt(SimulationSettings::instance().getRuns()));
-		externalBlockConfidenceIntervals[trafficClass] = 1.96 * (externalBlockStandardDeviations[trafficClass] / sqrt(SimulationSettings::instance().getRuns()));
-		totalBlockConfidenceIntervals[trafficClass] = 1.96 * (totalBlockStandardDeviations[trafficClass] / sqrt(SimulationSettings::instance().getRuns()));
+		internalBlockConfidenceIntervals[trafficClass] = 1.96 * (internalBlockStandardDeviations[trafficClass] / sqrt(GlobalSettings::instance().getRuns()));
+		externalBlockConfidenceIntervals[trafficClass] = 1.96 * (externalBlockStandardDeviations[trafficClass] / sqrt(GlobalSettings::instance().getRuns()));
+		totalBlockConfidenceIntervals[trafficClass] = 1.96 * (totalBlockStandardDeviations[trafficClass] / sqrt(GlobalSettings::instance().getRuns()));
 	}
 
 	/// Save results

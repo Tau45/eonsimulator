@@ -5,7 +5,7 @@ Link::Link(uint64_t sourceNode, uint64_t destinationNode) :
 		isOutput(false),
 		sourceNode(sourceNode),
 		destinationNode(destinationNode) {
-	for (int i = 0; i < SimulationSettings::instance().getLinkCapacity(); i++) {
+	for (int i = 0; i < GlobalSettings::instance().getLinkCapacity(); i++) {
 		FSUs.push_back(false);
 	}
 }
@@ -26,7 +26,7 @@ void Link::freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
 
 vector<uint64_t> Link::getAvailableFirstFSUs(uint64_t requiredNumberOfFSUs) {
 	vector<uint64_t> availableFirstFSUs;
-	for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - requiredNumberOfFSUs; i++) {
+	for (int i = 0; i <= GlobalSettings::instance().getLinkCapacity() - requiredNumberOfFSUs; i++) {
 		if (hasFreeNeighboringFSUs(requiredNumberOfFSUs, i)) {
 			availableFirstFSUs.push_back(i);
 		}
@@ -35,7 +35,7 @@ vector<uint64_t> Link::getAvailableFirstFSUs(uint64_t requiredNumberOfFSUs) {
 }
 
 bool Link::hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs) {
-	for (int i = 0; i <= SimulationSettings::instance().getLinkCapacity() - requiredNumberOfFSUs; i++) {
+	for (int i = 0; i <= GlobalSettings::instance().getLinkCapacity() - requiredNumberOfFSUs; i++) {
 		if (hasFreeNeighboringFSUs(requiredNumberOfFSUs, i)) {
 			return true;
 		}
@@ -44,9 +44,9 @@ bool Link::hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs) {
 }
 
 bool Link::hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs, uint64_t startingFromFSU) {
-	assert(requiredNumberOfFSUs < SimulationSettings::instance().getLinkCapacity());
-	assert(startingFromFSU < SimulationSettings::instance().getLinkCapacity());
-	assert(startingFromFSU + requiredNumberOfFSUs <= SimulationSettings::instance().getLinkCapacity());
+	assert(requiredNumberOfFSUs < GlobalSettings::instance().getLinkCapacity());
+	assert(startingFromFSU < GlobalSettings::instance().getLinkCapacity());
+	assert(startingFromFSU + requiredNumberOfFSUs <= GlobalSettings::instance().getLinkCapacity());
 
 	for (uint64_t i = startingFromFSU; i < startingFromFSU + requiredNumberOfFSUs; i++) {
 		if (FSUIsOccupied(i)) {

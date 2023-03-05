@@ -20,7 +20,7 @@ void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode) {
 void Structure::buildNetworkStructure() {
 	Logger::instance().log(Logger::CREATING_STRUCTURE, "Structure creating started...");
 	string line;
-	ifstream file(SimulationSettings::instance().getStructureFileName());
+	ifstream file(GlobalSettings::instance().getStructureFileName());
 
 	while (getline(file, line)) {
 		vector<uint64_t> linkData = parseLine(line);

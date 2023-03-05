@@ -8,7 +8,7 @@
 #include <fstream>
 #include "Link.h"
 #include "../tools/Logger.h"
-#include "../tools/SimulationSettings.h"
+#include "../tools/GlobalSettings.h"
 
 class Structure {
 	vector<uint64_t> parseLine(const string &line);
