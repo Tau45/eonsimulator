@@ -186,6 +186,18 @@ void Structure::printStructureDetails() {
 	Logger::instance().log(Logger::CREATING_STRUCTURE, outputNodesMessage.str());
 }
 
+Link *Structure::getInputLink(uint64_t inputLinkIndex) {
+	return inputLinks[inputLinkIndex];
+}
+
+Link *Structure::getOutputLink(uint64_t outputLinkIndex) {
+	return outputLinks[outputLinkIndex];
+}
+
+vector<Link *> Structure::getNextHops(Link *sourceLink) {
+	return links[sourceLink->getDestinationNode()];
+}
+
 uint64_t Structure::getNumberOfInputLinks() {
 	return inputLinks.size();
 }
@@ -194,7 +206,7 @@ uint64_t Structure::getNumberOfOutputLinks() {
 	return outputLinks.size();
 }
 
-bool Structure::checkInputToOutputAvailability(Link* sourceLink, Link* destinationLink) {
+bool Structure::checkInputToOutputAvailability(Link *sourceLink, Link *destinationLink) {
 	queue<vector<Link *>> consideredPaths;
 	consideredPaths.push({sourceLink});
 
@@ -228,8 +240,8 @@ bool Structure::isValid() {
 
 bool Structure::everyOutputNodeIsAvailableFromEveryInputNode() {
 	Logger::instance().log(Logger::STRUCTURE_VALIDATION, "Structure validation started...");
-	for (auto & inputLink : inputLinks) {
-		for (auto & outputLink : outputLinks) {
+	for (auto &inputLink: inputLinks) {
+		for (auto &outputLink: outputLinks) {
 			if (!checkInputToOutputAvailability(inputLink, outputLink)) {
 				Logger::instance().log(Logger::ERROR, "Structure is not valid. Output " + to_string(outputLink->getDestinationNode()) + " is not reachable from input " + to_string(inputLink->getSourceNode()));
 				return false;
@@ -238,6 +250,10 @@ bool Structure::everyOutputNodeIsAvailableFromEveryInputNode() {
 	}
 	Logger::instance().log(Logger::STRUCTURE_VALIDATION, "Structure is valid");
 	return true;
+}
+
+bool Structure::structureIsOneLink() {
+	return links.size() == 1;
 }
 
 Structure::Structure() {

@@ -7,7 +7,7 @@ EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double occurrence
 void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) {
 	trafficClassStatistics.callsGenerated++;
 
-	Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_SETUP, "Setting up connection between input: " + to_string(network.inputLinks[connection.getSourceLinkIndex()]->getSourceNode()) + " and output " + to_string(network.outputLinks[connection.getDestinationLinkIndex()]->getDestinationNode()) + "...");
+	Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_SETUP, "Setting up connection between input: " + to_string(network.getInputLink(connection.getSourceLinkIndex())->getSourceNode()) + " and output " + to_string(network.getOutputLink(connection.getDestinationLinkIndex())->getDestinationNode()) + "...");
 
 	switch (network.checkIfConnectionCanBeEstablished(connection, generator)) {
 		case Network::CONNECTION_CAN_BE_ESTABLISHED:

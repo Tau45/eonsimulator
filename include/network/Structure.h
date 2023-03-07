@@ -11,32 +11,41 @@
 #include "../tools/GlobalSettings.h"
 
 class Structure {
+	map<uint64_t, vector<Link *>> links;
+	vector<Link *> inputLinks;
+	vector<Link *> outputLinks;
+
+	void buildNetworkStructure();
+
 	vector<uint64_t> parseLine(const string &line);
 
 	void createLink(uint64_t sourceNode, uint64_t destinationNode);
 
 	void setInputOutputLinks();
 
-	bool checkInputToOutputAvailability(Link* sourceLink, Link* destinationLink);
+	bool checkInputToOutputAvailability(Link *sourceLink, Link *destinationLink);
 
 	bool everyOutputNodeIsAvailableFromEveryInputNode();
 
-public:
-	map<uint64_t, vector<Link *>> links;
-	vector<Link *> inputLinks;
-	vector<Link *> outputLinks;
+protected:
+	bool linkWasNotVisited(vector<Link *> &path, Link *linkToCheck);
 
+	bool structureIsOneLink();
+
+public:
 	Structure();
 
 	~Structure();
 
-	void buildNetworkStructure();
+	Link *getInputLink(uint64_t inputLinkIndex);
+
+	Link *getOutputLink(uint64_t outputLinkIndex);
+
+	vector<Link *> getNextHops(Link *sourceLink);
 
 	void printStructureDetails();
 
 	bool isValid();
-
-	bool linkWasNotVisited(vector<Link *> &path, Link *linkToCheck);
 
 	uint64_t getNumberOfInputLinks();
 
