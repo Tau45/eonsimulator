@@ -28,7 +28,7 @@ void Simulator::addErlangTrafficClasses() {
 		network->erlangTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
 
 		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs);
-		Connection connection = Connection(generator->getRandomInputLink(), generator->getRandomOutputLink(), requiredNumberOfFSUs, generator->getRandomServiceTime());
+		Connection connection = Connection(network->getInputLink(generator->getRandomInputLinkIndex()), generator->getRandomOutputDirectionIndex(), requiredNumberOfFSUs, generator->getRandomServiceTime());
 		eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime, connection, network->erlangTrafficClassStatistics[requiredNumberOfFSUs]));
 	}
 }
@@ -38,7 +38,7 @@ void Simulator::addEngsetTrafficClasses() {
 		network->engsetTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
 
 		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs);
-		Connection connection = Connection(generator->getRandomInputLink(), generator->getRandomOutputLink(), requiredNumberOfFSUs, generator->getRandomServiceTime());
+		Connection connection = Connection(network->getInputLink(generator->getRandomInputLinkIndex()), generator->getRandomOutputDirectionIndex(), requiredNumberOfFSUs, generator->getRandomServiceTime());
 		eventQueue.push(new EventNewCallArrivalEngsetClass(occurrenceTime, connection, network->engsetTrafficClassStatistics[requiredNumberOfFSUs]));
 	}
 }
@@ -48,7 +48,7 @@ void Simulator::addPascalTrafficClasses() {
 		network->pascalTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
 
 		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs);
-		Connection connection = Connection(generator->getRandomInputLink(), generator->getRandomOutputLink(), requiredNumberOfFSUs, generator->getRandomServiceTime());
+		Connection connection = Connection(network->getInputLink(generator->getRandomInputLinkIndex()), generator->getRandomOutputDirectionIndex(), requiredNumberOfFSUs, generator->getRandomServiceTime());
 		eventQueue.push(new EventNewCallArrivalPascalClass(occurrenceTime, connection, network->pascalTrafficClassStatistics[requiredNumberOfFSUs]));
 	}
 }

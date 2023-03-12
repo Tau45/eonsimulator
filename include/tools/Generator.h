@@ -35,9 +35,11 @@ public:
 
 	double getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs);
 
-	uint64_t getRandomInputLink();
+	uint64_t getRandomInputLinkIndex();
 
-	uint64_t getRandomOutputLink();
+	uint64_t getRandomOutputDirectionIndex();
+
+	Link *getRandomOutputLink(vector<Link *> outputLinks);
 
 	uint64_t getRandomFirstFSU(vector<uint64_t> availableFirstFSUs);
 

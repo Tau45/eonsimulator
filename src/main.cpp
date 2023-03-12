@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	GlobalSettings::instance().setNumberOfInputLinks(network.getNumberOfInputLinks());
-	GlobalSettings::instance().setNumberOfOutputLinks(network.getNumberOfOutputLinks());
+	GlobalSettings::instance().setNumberOfOutputDirections(network.getNumberOfOutputDirections());
 
 	/// Get seeds for random number generators
 	SeedsProvider seedsProvider;

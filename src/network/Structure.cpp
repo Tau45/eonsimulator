@@ -5,15 +5,15 @@ vector<uint64_t> Structure::parseLine(const string &line) {
 	stringstream ss(line);
 	string item;
 
-	while (getline(ss, item, ';') && result.size() < 2) {
+	while (getline(ss, item, ';') && result.size() < 3) {
 		result.push_back(stoull(item));
 	}
 
 	return result;
 }
 
-void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode) {
-	Link *link = new Link(sourceNode, destinationNode);
+void Structure::createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t outputDirectionIndex) {
+	Link *link = new Link(sourceNode, destinationNode, outputDirectionIndex);
 	links[sourceNode].push_back(link);
 }
 
@@ -24,7 +24,7 @@ void Structure::buildNetworkStructure() {
 
 	while (getline(file, line)) {
 		vector<uint64_t> linkData = parseLine(line);
-		createLink(linkData[0], linkData[1]);
+		createLink(linkData[0], linkData[1], linkData[2]);
 	}
 
 	setInputOutputLinks();
@@ -61,25 +61,28 @@ void Structure::setInputOutputLinks() {
 
 	for (const auto &node: links) {
 		for (const auto &link: node.second) {
-			if (std::count(sourceNodes.begin(), sourceNodes.end(), link->getSourceNode())) {
+			if (count(sourceNodes.begin(), sourceNodes.end(), link->getSourceNode())) {
 				link->setAsInput();
 				inputLinks.push_back(link);
 			}
-			if (std::count(destinationNodes.begin(), destinationNodes.end(), link->getDestinationNode())) {
+			if (count(destinationNodes.begin(), destinationNodes.end(), link->getDestinationNode())) {
 				link->setAsOutput();
-				outputLinks.push_back(link);
+				outputDirections[link->getOutputDirectionIndex()].push_back(link);
 			}
 		}
 	}
 }
 
 void Structure::printStructureDetails() {
+	string separator;
+
+	/// Print information about input nodes
 	stringstream inputNodesMessage;
 	inputNodesMessage << "Input nodes created: ";
-	for (uint64_t i = 0; i < inputLinks.size() - 1; i++) {
-		inputNodesMessage << to_string(inputLinks[i]->getSourceNode()) << ", ";
+	for (auto &inputLink: inputLinks) {
+		inputNodesMessage << separator << to_string(inputLink->getSourceNode());
+		separator = ", ";
 	}
-	inputNodesMessage << to_string(inputLinks[inputLinks.size() - 1]->getSourceNode());
 	Logger::instance().log(Logger::CREATING_STRUCTURE, inputNodesMessage.str());
 
 	set<uint64_t> internalNodeIndexes;
@@ -92,6 +95,7 @@ void Structure::printStructureDetails() {
 		}
 	}
 
+	/// Print information about internal nodes
 	for (const auto &index: internalNodeIndexes) {
 		uint64_t numberOfInputs = 0;
 		for (auto inputLink: inputLinks) {
@@ -101,10 +105,11 @@ void Structure::printStructureDetails() {
 		}
 
 		uint64_t numberOfOutputs = 0;
-		for (auto outputLink: outputLinks) {
-			if (outputLink->getSourceNode() == index) {
-				numberOfOutputs++;
-			}
+		for (const auto &outputDirection: outputDirections) {
+			for (auto outputLink: outputDirection.second)
+				if (outputLink->getSourceNode() == index) {
+					numberOfOutputs++;
+				}
 		}
 
 		uint64_t numberOfLinksToOtherNodes = 0;
@@ -117,41 +122,34 @@ void Structure::printStructureDetails() {
 		stringstream message;
 		message << "Node " << to_string(index) << " created: ";
 
-		/// Print information about input links
+		/// Print information about input nodes linked to node
 		if (numberOfInputs > 0) {
-			message << to_string(numberOfInputs) << " inputs";
+			message << to_string(numberOfInputs) << " inputs (";
 
-			message << " (";
-			bool listSeparatorNeedsToBePrinted = false;
+			separator = "";
 			for (auto inputLink: inputLinks) {
 				if (inputLink->getDestinationNode() == index) {
-					if (listSeparatorNeedsToBePrinted) {
-						message << ", ";
-					}
-					listSeparatorNeedsToBePrinted = true;
-					message << inputLink->getSourceNode();
+					message << separator << inputLink->getSourceNode();
+					separator = ", ";
 				}
 			}
 			message << ")";
 		}
 
-		/// Print information about output links
+		/// Print information about output nodes from this node
 		if (numberOfOutputs > 0) {
 			if (numberOfInputs > 0) {
-				message << ", ";
+				message << separator;
 			}
-			message << to_string(numberOfOutputs) << " outputs";
+			message << to_string(numberOfOutputs) << " outputs (";
 
-			message << " (";
-			bool listSeparatorNeedsToBePrinted = false;
-			for (auto &outputLink: outputLinks) {
-				if (outputLink->getSourceNode() == index) {
-					if (listSeparatorNeedsToBePrinted) {
-						message << ", ";
+			separator = "";
+			for (const auto &outputDirection: outputDirections) {
+				for (auto outputLink: outputDirection.second)
+					if (outputLink->getSourceNode() == index) {
+						message << separator << outputLink->getDestinationNode();
+						separator = ", ";
 					}
-					listSeparatorNeedsToBePrinted = true;
-					message << outputLink->getDestinationNode();
-				}
 			}
 			message << ")";
 		}
@@ -159,17 +157,15 @@ void Structure::printStructureDetails() {
 		/// Print information about links to other nodes
 		if (numberOfLinksToOtherNodes > 0) {
 			if (numberOfInputs > 0 || numberOfOutputs > 0) {
-				message << ", ";
+				message << separator;
 			}
-			message << to_string(numberOfLinksToOtherNodes) << " links to nodes";
+			message << to_string(numberOfLinksToOtherNodes) << " links to nodes (";
 
-			message << " (";
-			for (int i = 0; i < links[index].size(); i++) {
-				if (!links[index][i]->isOutputLink()) {
-					message << links[index][i]->getDestinationNode();
-					if (i < links[index].size() - 1) {
-						message << ", ";
-					}
+			separator = "";
+			for (auto &link: links[index]) {
+				if (!link->isOutputLink()) {
+					message << separator << link->getDestinationNode();
+					separator = ", ";
 				}
 			}
 			message << ")";
@@ -177,21 +173,45 @@ void Structure::printStructureDetails() {
 		Logger::instance().log(Logger::CREATING_STRUCTURE, message.str());
 	}
 
+	/// Print information about output nodes
 	stringstream outputNodesMessage;
 	outputNodesMessage << "Output nodes created: ";
-	for (uint64_t i = 0; i < outputLinks.size() - 1; i++) {
-		outputNodesMessage << to_string(outputLinks[i]->getDestinationNode()) << ", ";
+
+	separator = "";
+	for (const auto &outputDirection: outputDirections) {
+		for (auto outputLink: outputDirection.second) {
+			outputNodesMessage << separator << to_string(outputLink->getDestinationNode());
+			separator = ", ";
+		}
 	}
-	outputNodesMessage << to_string(outputLinks[outputLinks.size() - 1]->getDestinationNode());
 	Logger::instance().log(Logger::CREATING_STRUCTURE, outputNodesMessage.str());
+
+	/// Print information about output directions
+	for (const auto &outputDirection: outputDirections) {
+		stringstream outputDirectionMessage;
+		separator = "";
+		outputDirectionMessage << "Direction " << outputDirection.first << " created (";
+		for (const auto &outputLink: outputDirection.second) {
+			outputDirectionMessage << separator << outputLink->getDestinationNode();
+			separator = ", ";
+		}
+		outputDirectionMessage << ")";
+		Logger::instance().log(Logger::CREATING_STRUCTURE, outputDirectionMessage.str());
+	}
 }
 
 Link *Structure::getInputLink(uint64_t inputLinkIndex) {
 	return inputLinks[inputLinkIndex];
 }
 
-Link *Structure::getOutputLink(uint64_t outputLinkIndex) {
-	return outputLinks[outputLinkIndex];
+vector<Link *> Structure::getAvailableLinksInOutputDirection(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs) {
+	vector<Link *> availableOutputLinks;
+	for (auto outputLink: outputDirections[outputDirectionIndex]) {
+		if (outputLink->hasFreeNeighboringFSUs(requiredNumberOfFSUs)) {
+			availableOutputLinks.push_back(outputLink);
+		}
+	}
+	return availableOutputLinks;
 }
 
 vector<Link *> Structure::getNextHops(Link *sourceLink) {
@@ -202,8 +222,8 @@ uint64_t Structure::getNumberOfInputLinks() {
 	return inputLinks.size();
 }
 
-uint64_t Structure::getNumberOfOutputLinks() {
-	return outputLinks.size();
+uint64_t Structure::getNumberOfOutputDirections() {
+	return outputDirections.size();
 }
 
 bool Structure::checkInputToOutputAvailability(Link *sourceLink, Link *destinationLink) {
@@ -235,20 +255,40 @@ bool Structure::linkWasNotVisited(vector<Link *> &path, Link *linkToCheck) {
 }
 
 bool Structure::isValid() {
-	return everyOutputNodeIsAvailableFromEveryInputNode();
+	return everyOutputNodeIsAvailableFromEveryInputNode()
+		   && atLeastOneInputExists()
+		   && atLeastOneOutputDirectionExists();
 }
 
 bool Structure::everyOutputNodeIsAvailableFromEveryInputNode() {
 	Logger::instance().log(Logger::STRUCTURE_VALIDATION, "Structure validation started...");
 	for (auto &inputLink: inputLinks) {
-		for (auto &outputLink: outputLinks) {
-			if (!checkInputToOutputAvailability(inputLink, outputLink)) {
-				Logger::instance().log(Logger::ERROR, "Structure is not valid. Output " + to_string(outputLink->getDestinationNode()) + " is not reachable from input " + to_string(inputLink->getSourceNode()));
-				return false;
+		for (const auto &outputDirection: outputDirections) {
+			for (auto outputLink: outputDirection.second) {
+				if (!checkInputToOutputAvailability(inputLink, outputLink)) {
+					Logger::instance().log(Logger::ERROR, "Structure is not valid. Output " + to_string(outputLink->getDestinationNode()) + " is not reachable from input " + to_string(inputLink->getSourceNode()));
+					return false;
+				}
 			}
 		}
 	}
 	Logger::instance().log(Logger::STRUCTURE_VALIDATION, "Structure is valid");
+	return true;
+}
+
+bool Structure::atLeastOneInputExists() {
+	if (inputLinks.empty()) {
+		Logger::instance().log(Logger::ERROR, "Structure is not valid. No input links found");
+		return false;
+	}
+	return true;
+}
+
+bool Structure::atLeastOneOutputDirectionExists() {
+	if (outputDirections.empty()) {
+		Logger::instance().log(Logger::ERROR, "Structure is not valid. No output links found");
+		return false;
+	}
 	return true;
 }
 

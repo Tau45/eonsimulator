@@ -1,8 +1,8 @@
 #include "../include/Connection.h"
 
-Connection::Connection(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex, uint64_t requiredNumberOfFSUs, double serviceTime) :
-		sourceLinkIndex(sourceLinkIndex),
-		destinationLinkIndex(destinationLinkIndex),
+Connection::Connection(Link *sourceLink, uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs, double serviceTime) :
+		sourceLink(sourceLink),
+		outputDirectionIndex(outputDirectionIndex),
 		requiredNumberOfFSUs(requiredNumberOfFSUs),
 		serviceTime(serviceTime) {}
 
@@ -35,12 +35,16 @@ void Connection::close() {
 	}
 }
 
-uint64_t Connection::getSourceLinkIndex() {
-	return sourceLinkIndex;
+Link *Connection::getSourceLink() {
+	return sourceLink;
 }
 
-uint64_t Connection::getDestinationLinkIndex() {
-	return destinationLinkIndex;
+Link *Connection::getDestinationLink() {
+	return destinationLink;
+}
+
+uint64_t Connection::getOutputDirectionIndex() {
+	return outputDirectionIndex;
 }
 
 uint64_t Connection::getPathSize() {
@@ -49,6 +53,7 @@ uint64_t Connection::getPathSize() {
 
 void Connection::setPath(vector<Link *> &path) {
 	this->path = path;
+	this->destinationLink = path.back();
 }
 
 uint64_t Connection::getFirstFSUOfInputLink() {

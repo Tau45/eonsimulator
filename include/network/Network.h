@@ -14,12 +14,14 @@ class Network : public Structure {
 
 	vector<uint64_t> getAvailableFirstFSUsInPath(vector<Link *> &path, Connection &connection);
 
+	bool checkPath(vector<Link *> currentPath, Link *destinationLink, Connection &connection, Generator &generator);
+
 public:
 	enum ESTABLISH_CONNECTION_RESULT {
 		CONNECTION_REJECTED,
 		INTERNAL_BLOCK,
 		EXTERNAL_BLOCK,
-		CONNECTION_CAN_BE_ESTABLISHED,
+		CONNECTION_CAN_BE_ESTABLISHED
 	};
 
 	map<uint64_t, TrafficClassStatistics> erlangTrafficClassStatistics;
@@ -27,8 +29,6 @@ public:
 	map<uint64_t, TrafficClassStatistics> pascalTrafficClassStatistics;
 
 	Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator);
-
-	Network::ESTABLISH_CONNECTION_RESULT checkPath(vector<Link *> currentPath, Link *destinationLink, Connection &connection, Generator &generator);
 
 	uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
 };

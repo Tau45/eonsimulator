@@ -6,9 +6,10 @@ vector<uint64_t> Network::getAvailableFirstFSUsInPath(vector<Link *> &path, Conn
 	for (int i = 2; i < path.size() - 1; i++) {
 		vector<uint64_t> availableFirstFSUsInCurrentLink = path[i]->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
 
-		for (auto value: availableFirstFSUs) {
+		vector<uint64_t> availableFirstFSUList = availableFirstFSUs;
+		for (auto value: availableFirstFSUList) {
 			if (!count(availableFirstFSUsInCurrentLink.begin(), availableFirstFSUsInCurrentLink.end(), value)) {
-				availableFirstFSUs.erase(std::remove(availableFirstFSUs.begin(), availableFirstFSUs.end(), value), availableFirstFSUs.end());
+				availableFirstFSUs.erase(remove(availableFirstFSUs.begin(), availableFirstFSUs.end(), value), availableFirstFSUs.end());
 			}
 		}
 	}
@@ -48,24 +49,38 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator) {
-	Link *sourceLink = getInputLink(connection.getSourceLinkIndex());
-	Link *destinationLink = getOutputLink(connection.getDestinationLinkIndex());
+	Link *sourceLink = connection.getSourceLink();
+	vector<Link *> availableOutputLinks = getAvailableLinksInOutputDirection(connection.getOutputDirectionIndex(), connection.getRequiredNumberOfFSUs());
 
 	if (!sourceLink->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs()) && !structureIsOneLink()) {
 		return CONNECTION_REJECTED;
 	}
 
-	if (!destinationLink->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs())) {
+	if (availableOutputLinks.empty()) {
 		return EXTERNAL_BLOCK;
 	}
 
-	return checkPath({sourceLink}, destinationLink, connection, generator);
+	switch (GlobalSettings::instance().getSelectedAlgorithm()) {
+		case GlobalSettings::POINT_TO_GROUP:
+			availableOutputLinks = generator.shuffleVector(availableOutputLinks);
+			for (auto link: availableOutputLinks) {
+				if (checkPath({sourceLink}, link, connection, generator)) {
+					return CONNECTION_CAN_BE_ESTABLISHED;
+				}
+			}
+		case GlobalSettings::POINT_TO_POINT:
+			Link *destinationLink = generator.getRandomOutputLink(availableOutputLinks);
+			if (checkPath({sourceLink}, destinationLink, connection, generator)) {
+				return CONNECTION_CAN_BE_ESTABLISHED;
+			}
+	}
+	return INTERNAL_BLOCK;
 }
 
-Network::ESTABLISH_CONNECTION_RESULT Network::checkPath(vector<Link *> currentPath, Link *destinationLink, Connection &connection, Generator &generator) {
+bool Network::checkPath(vector<Link *> currentPath, Link *destinationLink, Connection &connection, Generator &generator) {
 	if (currentPath.back() == destinationLink && pathHasRequiredNumberOfFreeFSUs(currentPath, connection, generator)) {
 		connection.setPath(currentPath);
-		return CONNECTION_CAN_BE_ESTABLISHED;
+		return true;
 	}
 
 	vector<Link *> availableNextHops = generator.shuffleVector(getNextHops(currentPath.back()));
@@ -75,12 +90,12 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkPath(vector<Link *> currentPa
 			vector<Link *> newPath(currentPath);
 			newPath.push_back(link);
 
-			if (checkPath(newPath, destinationLink, connection, generator) == CONNECTION_CAN_BE_ESTABLISHED) {
-				return CONNECTION_CAN_BE_ESTABLISHED;
+			if (checkPath(newPath, destinationLink, connection, generator)) {
+				return true;
 			}
 		}
 	}
-	return INTERNAL_BLOCK;
+	return false;
 }
 
 uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {

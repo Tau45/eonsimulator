@@ -25,6 +25,7 @@ void GlobalSettings::readSettings() {
 	bool pascalTrafficClassesAreValid = setPascalTrafficClasses(PASCAL);
 	bool runsIsValid = setRuns(RUNS);
 	bool serviceTimeIsValid = setServiceTime(SERVICE_TIME);
+	bool selectedAlgorithmIsValid = setSelectedAlgorithm(MODE);
 
 	settingsAreValid = aParametersAreValid
 					   && structureFileNameIsValid
@@ -32,6 +33,7 @@ void GlobalSettings::readSettings() {
 					   && linkCapacityIsValid
 					   && runsIsValid
 					   && serviceTimeIsValid
+					   && selectedAlgorithmIsValid
 					   && (erlangTrafficClassesAreValid || engsetTrafficClassesAreValid || pascalTrafficClassesAreValid)
 					   && maxTrafficClassRequireLessFSUsThanLinkCapacity();
 }
@@ -46,7 +48,7 @@ bool GlobalSettings::setA(PARAMETER_PREFIX prefix) {
 	stringstream ss(value);
 	string token;
 
-	while (std::getline(ss, token, ',')) {
+	while (getline(ss, token, ',')) {
 		double aParameter;
 
 		try {
@@ -140,7 +142,7 @@ bool GlobalSettings::setErlangTrafficClasses(PARAMETER_PREFIX prefix) {
 	stringstream ss(value);
 	string token;
 
-	while (std::getline(ss, token, ',')) {
+	while (getline(ss, token, ',')) {
 		int trafficClass;
 
 		try {
@@ -171,7 +173,7 @@ bool GlobalSettings::setEngsetTrafficClasses(PARAMETER_PREFIX prefix) {
 	stringstream ss(value);
 	string token;
 
-	while (std::getline(ss, token, ',')) {
+	while (getline(ss, token, ',')) {
 		int trafficClass;
 
 		try {
@@ -202,7 +204,7 @@ bool GlobalSettings::setPascalTrafficClasses(PARAMETER_PREFIX prefix) {
 	stringstream ss(value);
 	string token;
 
-	while (std::getline(ss, token, ',')) {
+	while (getline(ss, token, ',')) {
 		int trafficClass;
 
 		try {
@@ -267,6 +269,25 @@ bool GlobalSettings::setServiceTime(GlobalSettings::PARAMETER_PREFIX prefix) {
 	return true;
 }
 
+bool GlobalSettings::setSelectedAlgorithm(GlobalSettings::PARAMETER_PREFIX prefix) {
+	string parameter = parameterMap[prefix];
+	if (!args.count(parameter)) {
+		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
+		return false;
+	}
+	string value = args[parameter];
+	if (value == "ptg") {
+		selectedAlgorithm = POINT_TO_GROUP;
+	} else if (value == "ptp") {
+		selectedAlgorithm = POINT_TO_POINT;
+	} else {
+		Logger::instance().log(Logger::ERROR, parameter + " must be either ptg or ptp, which corresponds to point-to-group and point-to-point path selection algorithms");
+		return false;
+	}
+
+	return true;
+}
+
 bool GlobalSettings::areValid() {
 	return settingsAreValid;
 }
@@ -311,20 +332,24 @@ double GlobalSettings::getServiceTime() {
 	return serviceTime;
 }
 
+GlobalSettings::PATH_SELECTION_ALGORITHM GlobalSettings::getSelectedAlgorithm() {
+	return selectedAlgorithm;
+}
+
 void GlobalSettings::setNumberOfInputLinks(uint64_t numberOfInputs) {
 	this->numberOfInputLinks = numberOfInputs;
 }
 
-void GlobalSettings::setNumberOfOutputLinks(uint64_t numberOfOutputs) {
-	this->numberOfOutputLinks = numberOfOutputs;
+void GlobalSettings::setNumberOfOutputDirections(uint64_t numberOfDirections) {
+	this->numberOfOutputDirections = numberOfDirections;
 }
 
 uint64_t GlobalSettings::getNumberOfInputLinks() {
 	return numberOfInputLinks;
 }
 
-uint64_t GlobalSettings::getNumberOfOutputLinks() {
-	return numberOfOutputLinks;
+uint64_t GlobalSettings::getNumberOfOutputDirections() {
+	return numberOfOutputDirections;
 }
 
 bool GlobalSettings::maxTrafficClassRequireLessFSUsThanLinkCapacity() {

@@ -7,8 +7,9 @@
 #include "tools/Generator.h"
 
 class Connection {
-	uint64_t sourceLinkIndex;
-	uint64_t destinationLinkIndex;
+	Link *sourceLink;
+	Link *destinationLink;
+	uint64_t outputDirectionIndex;
 	vector<Link *> path;
 	uint64_t firstFSUOfInputLink;
 	uint64_t firstFSUOfInternalLinks;
@@ -16,15 +17,17 @@ class Connection {
 	uint64_t requiredNumberOfFSUs;
 	double serviceTime;
 public:
-	Connection(uint64_t sourceLinkIndex, uint64_t destinationLinkIndex, uint64_t requiredNumberOfFSUs, double serviceTime);
+	Connection(Link *sourceLink, uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs, double serviceTime);
 
 	void reserveResources();
 
 	void close();
 
-	uint64_t getSourceLinkIndex();
+	Link *getSourceLink();
 
-	uint64_t getDestinationLinkIndex();
+	Link *getDestinationLink();
+
+	uint64_t getOutputDirectionIndex();
 
 	uint64_t getPathSize();
 

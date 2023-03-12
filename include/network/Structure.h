@@ -13,19 +13,23 @@
 class Structure {
 	map<uint64_t, vector<Link *>> links;
 	vector<Link *> inputLinks;
-	vector<Link *> outputLinks;
+	map<uint64_t, vector<Link *>> outputDirections;
 
 	void buildNetworkStructure();
 
 	vector<uint64_t> parseLine(const string &line);
 
-	void createLink(uint64_t sourceNode, uint64_t destinationNode);
+	void createLink(uint64_t sourceNode, uint64_t destinationNode, uint64_t outputDirectionIndex);
 
 	void setInputOutputLinks();
 
 	bool checkInputToOutputAvailability(Link *sourceLink, Link *destinationLink);
 
 	bool everyOutputNodeIsAvailableFromEveryInputNode();
+
+	bool atLeastOneInputExists();
+
+	bool atLeastOneOutputDirectionExists();
 
 protected:
 	bool linkWasNotVisited(vector<Link *> &path, Link *linkToCheck);
@@ -39,7 +43,7 @@ public:
 
 	Link *getInputLink(uint64_t inputLinkIndex);
 
-	Link *getOutputLink(uint64_t outputLinkIndex);
+	vector<Link *> getAvailableLinksInOutputDirection(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs);
 
 	vector<Link *> getNextHops(Link *sourceLink);
 
@@ -49,7 +53,7 @@ public:
 
 	uint64_t getNumberOfInputLinks();
 
-	uint64_t getNumberOfOutputLinks();
+	uint64_t getNumberOfOutputDirections();
 };
 
 #endif //EONSIMULATOR_STRUCTURE_H

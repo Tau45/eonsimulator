@@ -58,12 +58,16 @@ uint64_t Generator::getRandomNaturalNumber(uint64_t numberOfNumbers) {
 	return randomLink;
 }
 
-uint64_t Generator::getRandomInputLink() {
+uint64_t Generator::getRandomInputLinkIndex() {
 	return getRandomNaturalNumber(GlobalSettings::instance().getNumberOfInputLinks());
 }
 
-uint64_t Generator::getRandomOutputLink() {
-	return getRandomNaturalNumber(GlobalSettings::instance().getNumberOfOutputLinks());
+uint64_t Generator::getRandomOutputDirectionIndex() {
+	return getRandomNaturalNumber(GlobalSettings::instance().getNumberOfOutputDirections());
+}
+
+Link *Generator::getRandomOutputLink(vector<Link *> outputLinks) {
+	return outputLinks[getRandomNaturalNumber(outputLinks.size())];
 }
 
 uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {
