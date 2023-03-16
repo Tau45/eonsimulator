@@ -40,7 +40,7 @@ Link *Connection::getSourceLink() {
 }
 
 Link *Connection::getDestinationLink() {
-	return destinationLink;
+	return path.back();
 }
 
 uint64_t Connection::getOutputDirectionIndex() {
@@ -53,7 +53,6 @@ uint64_t Connection::getPathSize() {
 
 void Connection::setPath(vector<Link *> &path) {
 	this->path = path;
-	this->destinationLink = path.back();
 }
 
 uint64_t Connection::getFirstFSUOfInputLink() {

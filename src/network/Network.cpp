@@ -20,6 +20,7 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &
 	if (path.size() == 1) {
 		vector<uint64_t> availableFirstFSUsInInputLink = path.front()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
 
+		assert(!availableFirstFSUsInInputLink.empty());
 		if (!availableFirstFSUsInInputLink.empty()) {
 			connection.setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
 			return true;
@@ -28,6 +29,7 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &
 		vector<uint64_t> availableFirstFSUsInInputLink = path.front()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
 		vector<uint64_t> availableFirstFSUsInOutputLink = path.back()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
 
+		assert(!availableFirstFSUsInOutputLink.empty());
 		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInOutputLink.empty()) {
 			connection.setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
 			connection.setFirstFSUOfOutputLink(generator.getRandomFirstFSU(availableFirstFSUsInOutputLink));
@@ -38,6 +40,8 @@ bool Network::pathHasRequiredNumberOfFreeFSUs(vector<Link *> &path, Connection &
 		vector<uint64_t> availableFirstFSUsInInternalLinks = getAvailableFirstFSUsInPath(path, connection);
 		vector<uint64_t> availableFirstFSUsInOutputLink = path.back()->getAvailableFirstFSUs(connection.getRequiredNumberOfFSUs());
 
+		assert(!availableFirstFSUsInInputLink.empty());
+		assert(!availableFirstFSUsInOutputLink.empty());
 		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInInternalLinks.empty() && !availableFirstFSUsInOutputLink.empty()) {
 			connection.setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
 			connection.setFirstFSUOfInternalLinks(generator.getRandomFirstFSU(availableFirstFSUsInInternalLinks));
@@ -102,21 +106,21 @@ uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
 	uint64_t result = UINT64_MAX;
 
 	for (auto const &trafficClass: erlangTrafficClassStatistics) {
-		uint64_t numberOfCalls = trafficClass.second.callsGenerated;
+		uint64_t numberOfCalls = trafficClass.second.establishedConnections + trafficClass.second.callsRejected + trafficClass.second.internalBlocksCount + trafficClass.second.externalBlocksCount;
 		if (numberOfCalls < result) {
 			result = numberOfCalls;
 		}
 	}
 
 	for (auto const &trafficClass: engsetTrafficClassStatistics) {
-		uint64_t numberOfCalls = trafficClass.second.callsGenerated;
+		uint64_t numberOfCalls = trafficClass.second.establishedConnections + trafficClass.second.callsRejected + trafficClass.second.internalBlocksCount + trafficClass.second.externalBlocksCount;
 		if (numberOfCalls < result) {
 			result = numberOfCalls;
 		}
 	}
 
 	for (auto const &trafficClass: pascalTrafficClassStatistics) {
-		uint64_t numberOfCalls = trafficClass.second.callsGenerated;
+		uint64_t numberOfCalls = trafficClass.second.establishedConnections + trafficClass.second.callsRejected + trafficClass.second.internalBlocksCount + trafficClass.second.externalBlocksCount;
 		if (numberOfCalls < result) {
 			result = numberOfCalls;
 		}

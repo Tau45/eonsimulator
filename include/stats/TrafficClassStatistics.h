@@ -5,7 +5,8 @@
 
 class TrafficClassStatistics {
 public:
-	uint64_t callsGenerated;
+	uint64_t establishedConnections;
+	uint64_t callsRejected;
 	uint64_t internalBlocksCount;
 	uint64_t externalBlocksCount;
 
