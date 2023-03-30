@@ -3,13 +3,7 @@
 #include "../include/tools/SeedsProvider.h"
 
 SingleSimulationResults runSingleSimulation(double a, vector<int32_t> seedsForSimulation, uint64_t simulationIndex) {
-	int32_t x1 = seedsForSimulation[0];
-	int32_t x2 = seedsForSimulation[1];
-	int32_t x3 = seedsForSimulation[2];
-
-	Network network;
-	Generator generator(a, x1, x2, x3, simulationIndex);
-	Simulator simulator(&network, &generator);
+	Simulator simulator(a, seedsForSimulation, simulationIndex);
 	return simulator.run();
 }
 
@@ -51,16 +45,9 @@ int main(int argc, char *argv[]) {
 		return -10;
 	}
 
-	/// Build and validate network node structure
+	/// Build and print network node structure
 	Network network;
-	network.printStructureDetails();
-
-	if (!network.isValid()) {
-		return -11;
-	}
-
-	GlobalSettings::instance().setNumberOfInputLinks(network.getNumberOfInputLinks());
-	GlobalSettings::instance().setNumberOfOutputDirections(network.getNumberOfOutputDirections());
+	network.printNetworkStructure();
 
 	/// Get seeds for random number generators
 	SeedsProvider seedsProvider;

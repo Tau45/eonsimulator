@@ -75,16 +75,40 @@ bool GlobalSettings::setStructureFileName(PARAMETER_PREFIX prefix) {
 		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
 		return false;
 	}
-	string value = args[parameter];
+	structureFileName = args[parameter];
 	regex rx("^.+\\.[cC][sS][vV]$");
-	bool fileExtensionIsCorrect = regex_match(value, rx);
+	bool fileExtensionIsCorrect = regex_match(structureFileName, rx);
 
 	if (!fileExtensionIsCorrect) {
 		Logger::instance().log(Logger::ERROR, parameter + " must point to a .csv file");
 		return false;
 	}
 
-	structureFileName = value;
+	ifstream file(structureFileName);
+
+	string line;
+	while (getline(file, line)) {
+		stringstream ss(line);
+		string inputNodeIndexString;
+		string outputNodeIndexString;
+
+		if (getline(ss, inputNodeIndexString, ';') && getline(ss, outputNodeIndexString, ';')) {
+			try {
+				stoull(inputNodeIndexString);
+			} catch (...) {
+				Logger::instance().log(Logger::ERROR, "Error while parsing " + structureFileName + ": input node index: \"" + inputNodeIndexString + "\" cannot be converted to integer");
+				return false;
+			}
+			try {
+				stoull(outputNodeIndexString);
+			} catch (...) {
+				Logger::instance().log(Logger::ERROR, "Error while parsing " + structureFileName + ": output node index: \"" + outputNodeIndexString + "\" cannot be converted to integer");
+				return false;
+			}
+		}
+	}
+	file.close();
+
 	return true;
 }
 
@@ -334,22 +358,6 @@ double GlobalSettings::getServiceTime() {
 
 GlobalSettings::PATH_SELECTION_ALGORITHM GlobalSettings::getSelectedAlgorithm() {
 	return selectedAlgorithm;
-}
-
-void GlobalSettings::setNumberOfInputLinks(uint64_t numberOfInputs) {
-	this->numberOfInputLinks = numberOfInputs;
-}
-
-void GlobalSettings::setNumberOfOutputDirections(uint64_t numberOfDirections) {
-	this->numberOfOutputDirections = numberOfDirections;
-}
-
-uint64_t GlobalSettings::getNumberOfInputLinks() {
-	return numberOfInputLinks;
-}
-
-uint64_t GlobalSettings::getNumberOfOutputDirections() {
-	return numberOfOutputDirections;
 }
 
 bool GlobalSettings::maxTrafficClassRequireLessFSUsThanLinkCapacity() {

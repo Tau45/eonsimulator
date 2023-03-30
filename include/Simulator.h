@@ -3,6 +3,7 @@
 #define EONSIMULATOR_SIMULATOR_H
 
 #include <iostream>
+#include <chrono>
 #include <vector>
 #include <queue>
 #include "network/Network.h"
@@ -25,7 +26,7 @@ class Simulator {
 	void addPascalTrafficClasses();
 
 public:
-	Simulator(Network *network, Generator *generator);
+	Simulator(double a, vector<int32_t> &seedsForSimulation, uint64_t simulationIndex);
 
 	~Simulator();
 

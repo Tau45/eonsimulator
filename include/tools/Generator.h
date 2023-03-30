@@ -5,6 +5,7 @@
 #include <math.h>
 #include "GlobalSettings.h"
 #include "../../include/network/Link.h"
+#include "../network/Path.h"
 
 class Generator {
 	double a;
@@ -20,7 +21,7 @@ class Generator {
 
 	double rown_v3(int &x);
 
-	double getLambda(uint32_t requiredNumberOfFSUs);
+	double getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks);
 
 	uint64_t getRandomNaturalNumber(uint64_t numberOfNumbers);
 
@@ -33,17 +34,17 @@ public:
 
 	double getRandomServiceTime();
 
-	double getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs);
+	double getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks);
 
-	uint64_t getRandomInputLinkIndex();
+	Link *getRandomLink(vector<Link *> &links);
 
-	uint64_t getRandomOutputDirectionIndex();
-
-	Link *getRandomOutputLink(vector<Link *> outputLinks);
+	vector<Link *> &getRandomOutputDirection(vector<vector<Link *>> &outputDirections);
 
 	uint64_t getRandomFirstFSU(vector<uint64_t> availableFirstFSUs);
 
 	vector<Link *> shuffleVector(vector<Link *> inputVector);
+
+	vector<Path *> shuffleVector(vector<Path *> inputVector);
 };
 
 #endif //EONSIMULATOR_GENERATOR_H

@@ -1,13 +1,9 @@
 #include "../../include/network/Link.h"
 
-Link::Link(uint64_t sourceNode, uint64_t destinationNode, uint64_t outputDirectionIndex) :
-		isInput(false),
-		isOutput(false),
+Link::Link(uint64_t sourceNode, uint64_t destinationNode) :
 		sourceNode(sourceNode),
-		destinationNode(destinationNode),
-		outputDirectionIndex(outputDirectionIndex) {
+		destinationNode(destinationNode) {
 	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
-
 	for (int i = 0; i < linkCapacity; i++) {
 		FSUs.push_back(false);
 	}
@@ -68,25 +64,4 @@ uint64_t Link::getSourceNode() {
 
 uint64_t Link::getDestinationNode() {
 	return destinationNode;
-}
-
-uint64_t Link::getOutputDirectionIndex() {
-	assert(isOutput);
-	return outputDirectionIndex;
-}
-
-void Link::setAsInput() {
-	this->isInput = true;
-}
-
-void Link::setAsOutput() {
-	this->isOutput = true;
-}
-
-bool Link::isInputLink() {
-	return isInput;
-}
-
-bool Link::isOutputLink() {
-	return isOutput;
 }

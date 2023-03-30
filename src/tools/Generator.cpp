@@ -31,8 +31,7 @@ double Generator::rown_v3(int &x) {
 	return double(x) / 2147483647;
 }
 
-double Generator::getLambda(uint32_t requiredNumberOfFSUs) {
-	uint64_t numberOfInputLinks = GlobalSettings::instance().getNumberOfInputLinks();
+double Generator::getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks) {
 	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
 	uint64_t numberOfTrafficClasses = GlobalSettings::instance().getNumberOfTrafficClasses();
 	double serviceTime = GlobalSettings::instance().getServiceTime();
@@ -45,8 +44,8 @@ double Generator::getRandomServiceTime() {
 	return log(rown_v2(x2)) * (-serviceTime);
 }
 
-double Generator::getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs) {
-	return log(rown_v1(x1)) * (-1 / getLambda(requiredNumberOfFSUs));
+double Generator::getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks) {
+	return log(rown_v1(x1)) * (-1 / getLambda(requiredNumberOfFSUs, numberOfInputLinks));
 }
 
 uint64_t Generator::getRandomNaturalNumber(uint64_t numberOfNumbers) {
@@ -58,16 +57,12 @@ uint64_t Generator::getRandomNaturalNumber(uint64_t numberOfNumbers) {
 	return randomLink;
 }
 
-uint64_t Generator::getRandomInputLinkIndex() {
-	return getRandomNaturalNumber(GlobalSettings::instance().getNumberOfInputLinks());
+vector<Link *> &Generator::getRandomOutputDirection(vector<vector<Link *>> &outputDirections) {
+	return outputDirections[getRandomNaturalNumber(outputDirections.size())];
 }
 
-uint64_t Generator::getRandomOutputDirectionIndex() {
-	return getRandomNaturalNumber(GlobalSettings::instance().getNumberOfOutputDirections());
-}
-
-Link *Generator::getRandomOutputLink(vector<Link *> outputLinks) {
-	return outputLinks[getRandomNaturalNumber(outputLinks.size())];
+Link *Generator::getRandomLink(vector<Link *> &links) {
+	return links[getRandomNaturalNumber(links.size())];
 }
 
 uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {
@@ -76,6 +71,18 @@ uint64_t Generator::getRandomFirstFSU(vector<uint64_t> availableFirstFSUs) {
 
 vector<Link *> Generator::shuffleVector(vector<Link *> inputVector) {
 	vector<Link *> outputVector;
+
+	while (!inputVector.empty()) {
+		uint64_t randomVectorElementIndex = getRandomNaturalNumber(inputVector.size());
+
+		outputVector.push_back(inputVector.at(randomVectorElementIndex));
+		inputVector.erase(inputVector.begin() + randomVectorElementIndex);
+	}
+	return outputVector;
+}
+
+vector<Path *> Generator::shuffleVector(vector<Path *> inputVector) {
+	vector<Path *> outputVector;
 
 	while (!inputVector.empty()) {
 		uint64_t randomVectorElementIndex = getRandomNaturalNumber(inputVector.size());

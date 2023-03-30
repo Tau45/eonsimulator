@@ -49,8 +49,6 @@ private:
 	set<uint64_t> engsetTrafficClasses;
 	set<uint64_t> pascalTrafficClasses;
 	uint64_t runs;
-	uint64_t numberOfInputLinks;
-	uint64_t numberOfOutputDirections;
 	double serviceTime;
 	PATH_SELECTION_ALGORITHM selectedAlgorithm;
 
@@ -112,14 +110,6 @@ public:
 	double getServiceTime();
 
 	PATH_SELECTION_ALGORITHM getSelectedAlgorithm();
-
-	void setNumberOfInputLinks(uint64_t numberOfInputLinks);
-
-	void setNumberOfOutputDirections(uint64_t numberOfDirections);
-
-	uint64_t getNumberOfInputLinks();
-
-	uint64_t getNumberOfOutputDirections();
 };
 
 #endif //EONSIMULATOR_GLOBALSETTINGS_H

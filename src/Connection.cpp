@@ -1,36 +1,35 @@
 #include "../include/Connection.h"
 
-Connection::Connection(Link *sourceLink, uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs, double serviceTime) :
+Connection::Connection(Link *sourceLink, vector<Link *> &outputDirection, uint64_t requiredNumberOfFSUs, double serviceTime) :
 		sourceLink(sourceLink),
-		outputDirectionIndex(outputDirectionIndex),
+		outputDirection(outputDirection),
 		requiredNumberOfFSUs(requiredNumberOfFSUs),
 		serviceTime(serviceTime) {}
 
 void Connection::reserveResources() {
-	assert(!path.empty());
-	path.front()->reserveFSUs(firstFSUOfInputLink, requiredNumberOfFSUs);
+	path->getInputLink()->reserveFSUs(firstFSUOfInputLink, requiredNumberOfFSUs);
 
-	if (path.size() > 1) {
-		path.back()->reserveFSUs(firstFSUOfOutputLink, requiredNumberOfFSUs);
+	if (getPathSize() > 1) {
+		path->getOutputLink()->reserveFSUs(firstFSUOfOutputLink, requiredNumberOfFSUs);
 	}
 
-	if (path.size() > 2) {
-		for (int i = 1; i < path.size() - 1; i++) {
-			path[i]->reserveFSUs(firstFSUOfInternalLinks, requiredNumberOfFSUs);
+	if (getPathSize() > 2) {
+		for (auto internalLink: path->getInternalLinks()) {
+			internalLink->reserveFSUs(firstFSUOfInternalLinks, requiredNumberOfFSUs);
 		}
 	}
 }
 
 void Connection::close() {
-	path.front()->freeFSUs(firstFSUOfInputLink, requiredNumberOfFSUs);
+	path->getInputLink()->freeFSUs(firstFSUOfInputLink, requiredNumberOfFSUs);
 
-	if (path.size() > 1) {
-		path.back()->freeFSUs(firstFSUOfOutputLink, requiredNumberOfFSUs);
+	if (getPathSize() > 1) {
+		path->getOutputLink()->freeFSUs(firstFSUOfOutputLink, requiredNumberOfFSUs);
 	}
 
-	if (path.size() > 2) {
-		for (int i = 1; i < path.size() - 1; i++) {
-			path[i]->freeFSUs(firstFSUOfInternalLinks, requiredNumberOfFSUs);
+	if (getPathSize() > 2) {
+		for (auto internalLink: path->getInternalLinks()) {
+			internalLink->freeFSUs(firstFSUOfInternalLinks, requiredNumberOfFSUs);
 		}
 	}
 }
@@ -40,19 +39,51 @@ Link *Connection::getSourceLink() {
 }
 
 Link *Connection::getDestinationLink() {
-	return path.back();
+	return path->getOutputLink();
 }
 
-uint64_t Connection::getOutputDirectionIndex() {
-	return outputDirectionIndex;
+vector<Link *> Connection::getOutputDirection() {
+	return outputDirection;
 }
 
 uint64_t Connection::getPathSize() {
-	return path.size();
+	return path->getPathSize();
 }
 
-void Connection::setPath(vector<Link *> &path) {
-	this->path = path;
+bool Connection::pathHasFreeResources(Path *pathToCheck, Generator &generator) {
+	if (pathToCheck->getPathSize() == 1) {
+		vector<uint64_t> availableFirstFSUsInInputLink = pathToCheck->getAvailableFirstFSUsInInputLink(requiredNumberOfFSUs);
+
+		if (!availableFirstFSUsInInputLink.empty()) {
+			setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
+			path = pathToCheck;
+			return true;
+		}
+
+	} else if (pathToCheck->getPathSize() == 2) {
+		vector<uint64_t> availableFirstFSUsInInputLink = pathToCheck->getAvailableFirstFSUsInInputLink(requiredNumberOfFSUs);
+		vector<uint64_t> availableFirstFSUsInOutputLink = pathToCheck->getAvailableFirstFSUsInOutputLink(requiredNumberOfFSUs);
+
+		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInOutputLink.empty()) {
+			setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
+			setFirstFSUOfOutputLink(generator.getRandomFirstFSU(availableFirstFSUsInOutputLink));
+			path = pathToCheck;
+			return true;
+		}
+	} else {
+		vector<uint64_t> availableFirstFSUsInInputLink = pathToCheck->getAvailableFirstFSUsInInputLink(requiredNumberOfFSUs);
+		vector<uint64_t> availableFirstFSUsInInternalLinks = pathToCheck->getAvailableFirstFSUsInInternalLinks(requiredNumberOfFSUs);
+		vector<uint64_t> availableFirstFSUsInOutputLink = pathToCheck->getAvailableFirstFSUsInOutputLink(requiredNumberOfFSUs);
+
+		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInInternalLinks.empty() && !availableFirstFSUsInOutputLink.empty()) {
+			setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
+			setFirstFSUOfInternalLinks(generator.getRandomFirstFSU(availableFirstFSUsInInternalLinks));
+			setFirstFSUOfOutputLink(generator.getRandomFirstFSU(availableFirstFSUsInOutputLink));
+			path = pathToCheck;
+			return true;
+		}
+	}
+	return false;
 }
 
 uint64_t Connection::getFirstFSUOfInputLink() {

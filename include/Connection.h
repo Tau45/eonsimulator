@@ -3,21 +3,20 @@
 
 #include <iostream>
 #include <vector>
-#include "network/Link.h"
+#include "network/Path.h"
 #include "tools/Generator.h"
 
 class Connection {
 	Link *sourceLink;
-	Link *destinationLink;
-	uint64_t outputDirectionIndex;
-	vector<Link *> path;
+	vector<Link *> outputDirection;
+	Path *path;
 	uint64_t firstFSUOfInputLink;
 	uint64_t firstFSUOfInternalLinks;
 	uint64_t firstFSUOfOutputLink;
 	uint64_t requiredNumberOfFSUs;
 	double serviceTime;
 public:
-	Connection(Link *sourceLink, uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs, double serviceTime);
+	Connection(Link *sourceLink, vector<Link *> &outputDirection, uint64_t requiredNumberOfFSUs, double serviceTime);
 
 	void reserveResources();
 
@@ -27,11 +26,11 @@ public:
 
 	Link *getDestinationLink();
 
-	uint64_t getOutputDirectionIndex();
+	vector<Link *> getOutputDirection();
 
 	uint64_t getPathSize();
 
-	void setPath(vector<Link *> &path);
+	bool pathHasFreeResources(Path *path, Generator &generator);
 
 	uint64_t getFirstFSUOfInputLink();
 
