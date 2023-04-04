@@ -44,7 +44,7 @@ public:
 
 	uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
 
-	Link *getRandomInputLink(Generator &generator, uint64_t requiredNumberOfFSUs);
+	Link *getRandomInputLink(Generator &generator);
 
 	vector<Link *> getRandomOutputDirection(Generator &generator);
 

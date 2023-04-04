@@ -6,6 +6,7 @@ EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double occurrence
 
 void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) {
 	Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_SETUP, "Setting up connection from input: " + to_string(connection.getSourceLink()->getSourceNode()) + " to direction " + to_string(connection.getOutputDirection()[0]->getDestinationNode()) + "...");
+	trafficClassStatistics.totalNumberOfCalls++;
 
 	switch (network.checkIfConnectionCanBeEstablished(connection, generator)) {
 		case Network::CONNECTION_CAN_BE_ESTABLISHED:
@@ -22,7 +23,7 @@ void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Ev
 			}
 			break;
 		case Network::CONNECTION_REJECTED:
-			trafficClassStatistics.callsRejected++;
+			trafficClassStatistics.totalNumberOfCalls--;
 			Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_REJECTED, "Connection rejected: free FSUs not found in source link (" + to_string(connection.getRequiredNumberOfFSUs()) + " FSUs)");
 			break;
 		case Network::INTERNAL_BLOCK:
@@ -37,6 +38,6 @@ void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Ev
 
 	double newOccurrenceTime = occurrenceTime + generator.getRandomOccurrenceTime(connection.getRequiredNumberOfFSUs(), network.getNumberOfInputLinks());
 	vector<Link *> outputDirection = network.getRandomOutputDirection(generator);
-	Connection newConnection = Connection(network.getRandomInputLink(generator, connection.getRequiredNumberOfFSUs()), outputDirection, connection.getRequiredNumberOfFSUs(), generator.getRandomServiceTime());
+	Connection newConnection = Connection(network.getRandomInputLink(generator), outputDirection, connection.getRequiredNumberOfFSUs(), generator.getRandomServiceTime());
 	eventQueue.push(new EventNewCallArrivalErlangClass(newOccurrenceTime, newConnection, trafficClassStatistics));
 }

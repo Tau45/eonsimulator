@@ -171,40 +171,28 @@ uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
 	uint64_t result = UINT64_MAX;
 
 	for (auto const &trafficClass: erlangTrafficClassStatistics) {
-		uint64_t numberOfCalls = trafficClass.second.establishedConnections + trafficClass.second.callsRejected + trafficClass.second.internalBlocksCount + trafficClass.second.externalBlocksCount;
-		if (numberOfCalls < result) {
-			result = numberOfCalls;
+		if (trafficClass.second.totalNumberOfCalls < result) {
+			result = trafficClass.second.totalNumberOfCalls;
 		}
 	}
 
 	for (auto const &trafficClass: engsetTrafficClassStatistics) {
-		uint64_t numberOfCalls = trafficClass.second.establishedConnections + trafficClass.second.callsRejected + trafficClass.second.internalBlocksCount + trafficClass.second.externalBlocksCount;
-		if (numberOfCalls < result) {
-			result = numberOfCalls;
+		if (trafficClass.second.totalNumberOfCalls < result) {
+			result = trafficClass.second.totalNumberOfCalls;
 		}
 	}
 
 	for (auto const &trafficClass: pascalTrafficClassStatistics) {
-		uint64_t numberOfCalls = trafficClass.second.establishedConnections + trafficClass.second.callsRejected + trafficClass.second.internalBlocksCount + trafficClass.second.externalBlocksCount;
-		if (numberOfCalls < result) {
-			result = numberOfCalls;
+		if (trafficClass.second.totalNumberOfCalls < result) {
+			result = trafficClass.second.totalNumberOfCalls;
 		}
 	}
 
 	return result;
 }
 
-Link *Network::getRandomInputLink(Generator &generator, uint64_t requiredNumberOfFSUs) {
-	vector<Link *> availableInputLinks;
-	for (auto inputLink: inputLinks) {
-		if (inputLink->hasFreeNeighboringFSUs(requiredNumberOfFSUs)) {
-			availableInputLinks.push_back(inputLink);
-		}
-	}
-	if (availableInputLinks.empty()) {
-		return generator.getRandomLink(inputLinks);
-	}
-	return generator.getRandomLink(availableInputLinks);
+Link *Network::getRandomInputLink(Generator &generator) {
+	return generator.getRandomLink(inputLinks);
 }
 
 vector<Link *> Network::getAvailableLinksToDestination(vector<Link *> &outputDirection, uint64_t requiredNumberOfFSUs) {
