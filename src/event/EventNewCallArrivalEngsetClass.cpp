@@ -1,6 +1,6 @@
 #include "../../include/event/EventNewCallArrivalEngsetClass.h"
 
-EventNewCallArrivalEngsetClass::EventNewCallArrivalEngsetClass(double occurrenceTime, Connection &connection, TrafficClassStatistics &trafficClassStatistics) :
+EventNewCallArrivalEngsetClass::EventNewCallArrivalEngsetClass(double occurrenceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics) :
 		Event(occurrenceTime, connection),
 		trafficClassStatistics(trafficClassStatistics) {
 	// TODO: Engset event initialization

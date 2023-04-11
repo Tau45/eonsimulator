@@ -7,7 +7,7 @@
 
 class EventCallServiceTermination : public Event {
 public:
-	EventCallServiceTermination(double occurrenceTime, Connection &connection);
+	EventCallServiceTermination(double occurrenceTime, Connection *connection);
 
 	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
 };

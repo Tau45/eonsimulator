@@ -8,7 +8,7 @@
 
 class Connection {
 	Link *sourceLink;
-	vector<Link *> outputDirection;
+	vector<Link *> *outputDirection;
 	Path *path;
 	uint64_t firstFSUOfInputLink;
 	uint64_t firstFSUOfInternalLinks;
@@ -16,7 +16,7 @@ class Connection {
 	uint64_t requiredNumberOfFSUs;
 	double serviceTime;
 public:
-	Connection(Link *sourceLink, vector<Link *> &outputDirection, uint64_t requiredNumberOfFSUs, double serviceTime);
+	Connection(Link *sourceLink, vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs, double serviceTime);
 
 	void reserveResources();
 
@@ -26,7 +26,7 @@ public:
 
 	Link *getDestinationLink();
 
-	vector<Link *> getOutputDirection();
+	vector<Link *> *getOutputDirection();
 
 	uint64_t getPathSize();
 

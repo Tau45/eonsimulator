@@ -57,7 +57,7 @@ uint64_t Generator::getRandomNaturalNumber(uint64_t numberOfNumbers) {
 	return randomLink;
 }
 
-vector<Link *> &Generator::getRandomOutputDirection(vector<vector<Link *>> &outputDirections) {
+vector<Link *> *Generator::getRandomOutputDirection(vector<vector<Link *> *> outputDirections) {
 	return outputDirections[getRandomNaturalNumber(outputDirections.size())];
 }
 

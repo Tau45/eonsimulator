@@ -38,7 +38,7 @@ public:
 
 	Link *getRandomLink(vector<Link *> &links);
 
-	vector<Link *> &getRandomOutputDirection(vector<vector<Link *>> &outputDirections);
+	vector<Link *> *getRandomOutputDirection(vector<vector<Link *> *> outputDirections);
 
 	uint64_t getRandomFirstFSU(vector<uint64_t> availableFirstFSUs);
 

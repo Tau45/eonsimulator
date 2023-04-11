@@ -48,7 +48,15 @@ void Network::buildNetworkStructure() {
 	}
 
 	/// Group output links pointing towards the same direction:
-	map<uint64_t, vector<Link *>> outputDirectionsMap;
+	map<uint64_t, vector<Link *> *> outputDirectionsMap;
+
+	for (const auto &node: links) {
+		for (const auto &link: node.second) {
+			if (count(outputNodes.begin(), outputNodes.end(), link->getDestinationNode())) {
+				outputDirectionsMap[link->getDestinationNode()] = new vector<Link *>();
+			}
+		}
+	}
 
 	for (const auto &node: links) {
 		for (const auto &link: node.second) {
@@ -56,7 +64,7 @@ void Network::buildNetworkStructure() {
 				inputLinks.push_back(link);
 			}
 			if (count(outputNodes.begin(), outputNodes.end(), link->getDestinationNode())) {
-				outputDirectionsMap[link->getDestinationNode()].push_back(link);
+				outputDirectionsMap[link->getDestinationNode()]->push_back(link);
 			}
 		}
 	}
@@ -107,9 +115,9 @@ void Network::printNetworkStructure() {
 	/// Print information about output directions
 	for (auto outputDirection: outputDirections) {
 		stringstream outputDirectionMessage;
-		outputDirectionMessage << "Created output direction " << outputDirection[0]->getDestinationNode() << ", reachable from nodes: ";
+		outputDirectionMessage << "Created output direction " << outputDirection->at(0)->getDestinationNode() << ", reachable from nodes: ";
 		separator = "";
-		for (auto &outputNode: outputDirection) {
+		for (auto outputNode: *outputDirection) {
 			outputDirectionMessage << separator << to_string(outputNode->getSourceNode());
 			separator = ", ";
 		}
@@ -139,29 +147,43 @@ void Network::printNetworkStructure() {
 	Logger::instance().log(Logger::CREATING_STRUCTURE, "Total number of paths: " + to_string(totalNumberOfPaths));
 }
 
-Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection &connection, Generator &generator) {
-	Link *sourceLink = connection.getSourceLink();
-	vector<Link *> outputDirection = connection.getOutputDirection();
-	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(outputDirection, connection.getRequiredNumberOfFSUs());
-	availableOutputLinks = generator.shuffleVector(availableOutputLinks);
-
-	if (!sourceLink->hasFreeNeighboringFSUs(connection.getRequiredNumberOfFSUs()) && !structureIsOneLink()) {
+Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection *connection, Generator &generator) {
+	if (!connection->getSourceLink()->hasFreeNeighboringFSUs(connection->getRequiredNumberOfFSUs()) && !structureIsOneLink()) {
 		return CONNECTION_REJECTED;
 	}
 
-	if (availableOutputLinks.empty()) {
+	if (!anyOutputLinkHasFreeResources(connection->getOutputDirection(), connection->getRequiredNumberOfFSUs())) {
 		return EXTERNAL_BLOCK;
 	}
 
-	for (auto outputLink: availableOutputLinks) {
-		for (auto path: generator.shuffleVector(getPaths(sourceLink, outputLink))) {
-			if (connection.pathHasFreeResources(path, generator)) {
+	switch (GlobalSettings::instance().getSelectedAlgorithm()) {
+		case GlobalSettings::POINT_TO_GROUP:
+			return checkIfConnectionCanBeEstablishedPointToGroup(connection, generator);
+		case GlobalSettings::POINT_TO_POINT:
+			return checkIfConnectionCanBeEstablishedPointToPoint(connection, generator);
+	}
+}
+
+Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedPointToGroup(Connection *connection, Generator &generator) {
+	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirection(), connection->getRequiredNumberOfFSUs());
+
+	for (auto outputLink: generator.shuffleVector(availableOutputLinks)) {
+		for (auto internalPath: generator.shuffleVector(getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink))) {
+			if (connection->pathHasFreeResources(internalPath, generator)) {
 				return CONNECTION_CAN_BE_ESTABLISHED;
 			}
 		}
+	}
+	return INTERNAL_BLOCK;
+}
 
-		if (GlobalSettings::instance().getSelectedAlgorithm() == GlobalSettings::POINT_TO_POINT) {
-			break;
+Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedPointToPoint(Connection *connection, Generator &generator) {
+	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirection(), connection->getRequiredNumberOfFSUs());
+	Link *destinationLink = generator.getRandomLink(availableOutputLinks);
+
+	for (auto internalPath: generator.shuffleVector(getAllInternalPathsBetweenLinks(connection->getSourceLink(), destinationLink))) {
+		if (connection->pathHasFreeResources(internalPath, generator)) {
+			return CONNECTION_CAN_BE_ESTABLISHED;
 		}
 	}
 	return INTERNAL_BLOCK;
@@ -195,14 +217,23 @@ Link *Network::getRandomInputLink(Generator &generator) {
 	return generator.getRandomLink(inputLinks);
 }
 
-vector<Link *> Network::getAvailableLinksToDestination(vector<Link *> &outputDirection, uint64_t requiredNumberOfFSUs) {
+vector<Link *> Network::getAvailableLinksToDestination(vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs) {
 	vector<Link *> availableOutputLinks;
-	for (auto outputLink: outputDirection) {
+	for (auto outputLink: *outputDirection) {
 		if (outputLink->hasFreeNeighboringFSUs(requiredNumberOfFSUs)) {
 			availableOutputLinks.push_back(outputLink);
 		}
 	}
 	return availableOutputLinks;
+}
+
+bool Network::anyOutputLinkHasFreeResources(vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs) {
+	for (auto outputLink: *outputDirection) {
+		if (outputLink->hasFreeNeighboringFSUs(requiredNumberOfFSUs)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 uint64_t Network::getNumberOfInputLinks() {
@@ -238,10 +269,10 @@ Network::~Network() {
 	}
 }
 
-vector<Path *> Network::getPaths(Link *inputLink, Link *destinationLink) {
+vector<Path *> Network::getAllInternalPathsBetweenLinks(Link *inputLink, Link *destinationLink) {
 	return paths[inputLink->getSourceNode()][destinationLink->getDestinationNode()];
 }
 
-vector<Link *> Network::getRandomOutputDirection(Generator &generator) {
+vector<Link *> *Network::getRandomOutputDirection(Generator &generator) {
 	return generator.getRandomOutputDirection(outputDirections);
 }

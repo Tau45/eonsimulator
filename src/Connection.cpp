@@ -1,6 +1,6 @@
 #include "../include/Connection.h"
 
-Connection::Connection(Link *sourceLink, vector<Link *> &outputDirection, uint64_t requiredNumberOfFSUs, double serviceTime) :
+Connection::Connection(Link *sourceLink, vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs, double serviceTime) :
 		sourceLink(sourceLink),
 		outputDirection(outputDirection),
 		requiredNumberOfFSUs(requiredNumberOfFSUs),
@@ -42,7 +42,7 @@ Link *Connection::getDestinationLink() {
 	return path->getOutputLink();
 }
 
-vector<Link *> Connection::getOutputDirection() {
+vector<Link *> *Connection::getOutputDirection() {
 	return outputDirection;
 }
 

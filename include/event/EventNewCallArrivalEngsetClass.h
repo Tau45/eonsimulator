@@ -9,7 +9,7 @@
 class EventNewCallArrivalEngsetClass : public Event {
 	TrafficClassStatistics &trafficClassStatistics;
 public:
-	EventNewCallArrivalEngsetClass(double occurrenceTime, Connection &connection, TrafficClassStatistics &trafficClassStatistics);
+	EventNewCallArrivalEngsetClass(double occurrenceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
 
 	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
 };

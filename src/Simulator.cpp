@@ -35,33 +35,30 @@ void Simulator::addErlangTrafficClasses() {
 	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getErlangTrafficClasses()) {
 		network->erlangTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
 
-		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks());
-		vector<Link *> outputDirection = network->getRandomOutputDirection(*generator);
-		Connection connection = Connection(network->getRandomInputLink(*generator), outputDirection, requiredNumberOfFSUs, generator->getRandomServiceTime());
-		eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime, connection, network->erlangTrafficClassStatistics[requiredNumberOfFSUs]));
+		eventQueue.push(new EventNewCallArrivalErlangClass(generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks()),
+														   new Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs, generator->getRandomServiceTime()),
+														   network->erlangTrafficClassStatistics[requiredNumberOfFSUs]));
 	}
 }
 
 void Simulator::addEngsetTrafficClasses() {
-	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getEngsetTrafficClasses()) {
-		network->engsetTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
-
-		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks());
-		vector<Link *> outputDirection = network->getRandomOutputDirection(*generator);
-		Connection connection = Connection(network->getRandomInputLink(*generator), outputDirection, requiredNumberOfFSUs, generator->getRandomServiceTime());
-		eventQueue.push(new EventNewCallArrivalEngsetClass(occurrenceTime, connection, network->engsetTrafficClassStatistics[requiredNumberOfFSUs]));
-	}
+//	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getEngsetTrafficClasses()) {
+//		network->engsetTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
+//
+//		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks());
+//		Connection connection = Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs, generator->getRandomServiceTime());
+//		eventQueue.push(new EventNewCallArrivalEngsetClass(occurrenceTime, connection, network->engsetTrafficClassStatistics[requiredNumberOfFSUs]));
+//	}
 }
 
 void Simulator::addPascalTrafficClasses() {
-	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getPascalTrafficClasses()) {
-		network->pascalTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
-
-		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks());
-		vector<Link *> outputDirection = network->getRandomOutputDirection(*generator);
-		Connection connection = Connection(network->getRandomInputLink(*generator), outputDirection, requiredNumberOfFSUs, generator->getRandomServiceTime());
-		eventQueue.push(new EventNewCallArrivalPascalClass(occurrenceTime, connection, network->pascalTrafficClassStatistics[requiredNumberOfFSUs]));
-	}
+//	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getPascalTrafficClasses()) {
+//		network->pascalTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
+//
+//		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks());
+//		Connection connection = Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs, generator->getRandomServiceTime());
+//		eventQueue.push(new EventNewCallArrivalPascalClass(occurrenceTime, connection, network->pascalTrafficClassStatistics[requiredNumberOfFSUs]));
+//	}
 }
 
 Simulator::~Simulator() {
