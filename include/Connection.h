@@ -14,9 +14,8 @@ class Connection {
 	uint64_t firstFSUOfInternalLinks;
 	uint64_t firstFSUOfOutputLink;
 	uint64_t requiredNumberOfFSUs;
-	double serviceTime;
 public:
-	Connection(Link *sourceLink, vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs, double serviceTime);
+	Connection(Link *sourceLink, vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs);
 
 	void reserveResources();
 
@@ -45,8 +44,6 @@ public:
 	void setFirstFSUOfOutputLink(uint64_t firstFSUOfOutputLink);
 
 	uint64_t getRequiredNumberOfFSUs();
-
-	double getServiceTime();
 };
 
 #endif //EONSIMULATOR_CONNECTION_H

@@ -1,10 +1,9 @@
 #include "../include/Connection.h"
 
-Connection::Connection(Link *sourceLink, vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs, double serviceTime) :
+Connection::Connection(Link *sourceLink, vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs) :
 		sourceLink(sourceLink),
 		outputDirection(outputDirection),
-		requiredNumberOfFSUs(requiredNumberOfFSUs),
-		serviceTime(serviceTime) {}
+		requiredNumberOfFSUs(requiredNumberOfFSUs) {}
 
 void Connection::reserveResources() {
 	path->getInputLink()->reserveFSUs(firstFSUOfInputLink, requiredNumberOfFSUs);
@@ -112,8 +111,4 @@ void Connection::setFirstFSUOfOutputLink(uint64_t firstFSUOfOutputLink) {
 
 uint64_t Connection::getRequiredNumberOfFSUs() {
 	return requiredNumberOfFSUs;
-}
-
-double Connection::getServiceTime() {
-	return serviceTime;
 }

@@ -36,7 +36,7 @@ void Simulator::addErlangTrafficClasses() {
 		network->erlangTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
 
 		eventQueue.push(new EventNewCallArrivalErlangClass(generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks()),
-														   new Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs, generator->getRandomServiceTime()),
+														   new Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs),
 														   network->erlangTrafficClassStatistics[requiredNumberOfFSUs]));
 	}
 }

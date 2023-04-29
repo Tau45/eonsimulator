@@ -9,14 +9,14 @@ void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Ev
 	trafficClassStatistics.totalNumberOfCalls++;
 
 	eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime + generator.getRandomOccurrenceTime(connection->getRequiredNumberOfFSUs(), network.getNumberOfInputLinks()),
-													   new Connection(network.getRandomInputLink(generator), network.getRandomOutputDirection(generator), connection->getRequiredNumberOfFSUs(), generator.getRandomServiceTime()),
+													   new Connection(network.getRandomInputLink(generator), network.getRandomOutputDirection(generator), connection->getRequiredNumberOfFSUs()),
 													   trafficClassStatistics));
 
 	switch (network.checkIfConnectionCanBeEstablished(connection, generator)) {
 		case Network::CONNECTION_CAN_BE_ESTABLISHED:
 			trafficClassStatistics.establishedConnections++;
 			connection->reserveResources();
-			eventQueue.push(new EventCallServiceTermination(occurrenceTime + connection->getServiceTime(), connection));
+			eventQueue.push(new EventCallServiceTermination(occurrenceTime + generator.getRandomServiceTime(), connection));
 
 			if (connection->getPathSize() == 1) {
 				Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_ESTABLISHED, "Connection has been successfully set up using FSUs: " + to_string(connection->getFirstFSUOfInputLink()) + "-" + to_string(connection->getFirstFSUOfInputLink() + connection->getRequiredNumberOfFSUs() - 1) + " (" + to_string(connection->getRequiredNumberOfFSUs()) + " FSUs)");
