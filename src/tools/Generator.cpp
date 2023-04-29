@@ -31,21 +31,13 @@ double Generator::rown_v3(int &x) {
 	return double(x) / 2147483647;
 }
 
-double Generator::getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks) {
-	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
-	uint64_t numberOfTrafficClasses = GlobalSettings::instance().getNumberOfTrafficClasses();
-	double serviceTime = GlobalSettings::instance().getServiceTime();
-
-	return (a * numberOfInputLinks * linkCapacity) / (numberOfTrafficClasses * serviceTime * requiredNumberOfFSUs);
-}
-
 double Generator::getRandomServiceTime() {
 	double serviceTime = GlobalSettings::instance().getServiceTime();
 	return log(rown_v2(x2)) * (-serviceTime);
 }
 
-double Generator::getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks) {
-	return log(rown_v1(x1)) * (-1 / getLambda(requiredNumberOfFSUs, numberOfInputLinks));
+double Generator::getRandomOccurrenceTime(double lambda) {
+	return log(rown_v1(x1)) * (-1 / lambda);
 }
 
 uint64_t Generator::getRandomNaturalNumber(uint64_t numberOfNumbers) {

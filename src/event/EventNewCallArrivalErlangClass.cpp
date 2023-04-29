@@ -1,14 +1,16 @@
 #include "../../include/event/EventNewCallArrivalErlangClass.h"
 
-EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double occurrenceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics) :
+EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double occurrenceTime, double lambda, Connection *connection, TrafficClassStatistics &trafficClassStatistics) :
 		Event(occurrenceTime, connection),
+		lambda(lambda),
 		trafficClassStatistics(trafficClassStatistics) {}
 
 void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) {
 	Logger::instance().log(occurrenceTime, generator.getA(), generator.getSimulationIndex(), Logger::CONNECTION_SETUP, "Setting up connection from input: " + to_string(connection->getSourceLink()->getSourceNode()) + " to direction " + to_string(connection->getOutputDirection()->at(0)->getDestinationNode()) + "...");
 	trafficClassStatistics.totalNumberOfCalls++;
 
-	eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime + generator.getRandomOccurrenceTime(connection->getRequiredNumberOfFSUs(), network.getNumberOfInputLinks()),
+	eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime + generator.getRandomOccurrenceTime(lambda),
+													   lambda,
 													   new Connection(network.getRandomInputLink(generator), network.getRandomOutputDirection(generator), connection->getRequiredNumberOfFSUs()),
 													   trafficClassStatistics));
 

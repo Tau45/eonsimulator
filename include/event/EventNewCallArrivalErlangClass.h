@@ -7,9 +7,10 @@
 #include "EventCallServiceTermination.h"
 
 class EventNewCallArrivalErlangClass : public Event {
+	double lambda;
 	TrafficClassStatistics &trafficClassStatistics;
 public:
-	EventNewCallArrivalErlangClass(double occurrenceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
+	EventNewCallArrivalErlangClass(double occurrenceTime, double lambda, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
 
 	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
 };

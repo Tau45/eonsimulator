@@ -34,8 +34,10 @@ SingleSimulationResults Simulator::run() {
 void Simulator::addErlangTrafficClasses() {
 	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getErlangTrafficClasses()) {
 		network->erlangTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
+		double lambda = getLambda(requiredNumberOfFSUs, network->getNumberOfInputLinks());
 
-		eventQueue.push(new EventNewCallArrivalErlangClass(generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks()),
+		eventQueue.push(new EventNewCallArrivalErlangClass(generator->getRandomOccurrenceTime(lambda),
+														   lambda,
 														   new Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs),
 														   network->erlangTrafficClassStatistics[requiredNumberOfFSUs]));
 	}
@@ -59,6 +61,14 @@ void Simulator::addPascalTrafficClasses() {
 //		Connection connection = Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs, generator->getRandomServiceTime());
 //		eventQueue.push(new EventNewCallArrivalPascalClass(occurrenceTime, connection, network->pascalTrafficClassStatistics[requiredNumberOfFSUs]));
 //	}
+}
+
+double Simulator::getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks) {
+	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
+	uint64_t numberOfTrafficClasses = GlobalSettings::instance().getNumberOfTrafficClasses();
+	double serviceTime = GlobalSettings::instance().getServiceTime();
+
+	return (generator->getA() * numberOfInputLinks * linkCapacity) / (numberOfTrafficClasses * serviceTime * requiredNumberOfFSUs);
 }
 
 Simulator::~Simulator() {

@@ -21,8 +21,6 @@ class Generator {
 
 	double rown_v3(int &x);
 
-	double getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks);
-
 	uint64_t getRandomNaturalNumber(uint64_t numberOfNumbers);
 
 public:
@@ -34,7 +32,7 @@ public:
 
 	double getRandomServiceTime();
 
-	double getRandomOccurrenceTime(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks);
+	double getRandomOccurrenceTime(double lambda);
 
 	Link *getRandomLink(vector<Link *> &links);
 
