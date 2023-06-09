@@ -8,8 +8,6 @@ class Path {
 	vector<Link *> path;
 
 public:
-	Path() {}
-
 	Path(vector<Link *> &path);
 
 	Link *getInputLink();

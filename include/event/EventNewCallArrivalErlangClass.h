@@ -10,7 +10,7 @@ class EventNewCallArrivalErlangClass : public Event {
 public:
 	EventNewCallArrivalErlangClass(double occurrenceTime, double lambda, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
 
-	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
+	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator, SimulationId &simulationId) override;
 };
 
 #endif //EONSIMULATOR_EVENTNEWCALLARRIVALERLANGCLASS_H

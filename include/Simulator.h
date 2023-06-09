@@ -9,9 +9,10 @@
 #include "stats/SimulationSetResults.h"
 
 class Simulator {
-	Network *network;
+	SimulationId simulationId;
+	Network network;
 	priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
-	Generator *generator;
+	Generator generator;
 
 	double getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks);
 
@@ -22,7 +23,7 @@ class Simulator {
 	void addPascalTrafficClasses();
 
 public:
-	Simulator(double a, vector<int32_t> &seedsForSimulation, uint64_t simulationIndex);
+	Simulator(double a, uint64_t simulationIndex, vector<int32_t> &seedsForSimulation);
 
 	~Simulator();
 

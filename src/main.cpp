@@ -2,8 +2,8 @@
 #include "../include/Simulator.h"
 #include "../include/tools/SeedsProvider.h"
 
-SingleSimulationResults runSingleSimulation(double a, vector<int32_t> seedsForSimulation, uint64_t simulationIndex) {
-	Simulator simulator(a, seedsForSimulation, simulationIndex);
+SingleSimulationResults runSingleSimulation(double a, uint64_t simulationIndex, vector<int32_t> seedsForSimulation) {
+	Simulator simulator(a, simulationIndex, seedsForSimulation);
 	return simulator.run();
 }
 
@@ -13,7 +13,7 @@ SimulationSetResults runSimulationSet(double a, vector<vector<int32_t>> seedsFor
 	auto seedsForSimulation = seedsForSimulationSet.begin();
 
 	for (uint64_t i = 0; i < GlobalSettings::instance().getRuns(); i++) {
-		simulations.push_back(async(&runSingleSimulation, a, *seedsForSimulation++, i));
+		simulations.push_back(async(&runSingleSimulation, a, i, *seedsForSimulation++));
 	}
 
 	for (uint64_t i = 0; i < GlobalSettings::instance().getRuns(); i++) {

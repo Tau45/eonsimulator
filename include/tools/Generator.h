@@ -6,9 +6,6 @@
 #include "../../include/network/Link.h"
 
 class Generator {
-	double a;
-	uint64_t simulationIndex;
-
 	int32_t x1;
 	int32_t x2;
 	int32_t x3;
@@ -22,11 +19,7 @@ class Generator {
 	uint64_t getRandomNaturalNumber(uint64_t numberOfNumbers);
 
 public:
-	Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t simulationIndex);
-
-	double getA();
-
-	uint64_t getSimulationIndex();
+	Generator(int32_t x1, int32_t x2, int32_t x3);
 
 	double getRandomServiceTime();
 

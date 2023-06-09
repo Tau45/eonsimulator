@@ -28,11 +28,11 @@ private:
 
 	vector<Path *> getAllInternalPathsBetweenLinks(Link *inputLink, Link *destinationLink);
 
-	vector<Link *> getAvailableLinksToDestination(vector<Link *> outputDirection, uint64_t requiredNumberOfFSUs);
+	vector<Link *> getAvailableLinksToDestination(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs);
 
 	bool findInputLinkWithFreeResources(Connection *connection, Generator &generator);
 
-	bool anyOutputLinkHasFreeResources(vector<Link *> outputDirection, uint64_t requiredNumberOfFSUs);
+	bool anyOutputLinkHasFreeResources(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs);
 
 	bool structureIsOneLink();
 

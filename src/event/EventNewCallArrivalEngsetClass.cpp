@@ -6,6 +6,6 @@ EventNewCallArrivalEngsetClass::EventNewCallArrivalEngsetClass(double occurrence
 	// TODO: Engset event initialization
 }
 
-void EventNewCallArrivalEngsetClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) {
+void EventNewCallArrivalEngsetClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator, SimulationId &simulationId) {
 	// TODO: Engset event execution
 }

@@ -9,7 +9,7 @@ class EventNewCallArrivalPascalClass : public Event {
 public:
 	EventNewCallArrivalPascalClass(double occurrenceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
 
-	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) override;
+	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator, SimulationId &simulationId) override;
 };
 
 #endif //EONSIMULATOR_EVENTNEWCALLARRIVALPASCALCLASS_H

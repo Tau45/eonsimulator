@@ -1,11 +1,10 @@
 #include "../../include/tools/Generator.h"
 
-Generator::Generator(double a, int32_t x1, int32_t x2, int32_t x3, uint64_t simulationIndex) :
-		a(a),
-		simulationIndex(simulationIndex),
-		x1(x1),
-		x2(x2),
-		x3(x3) {}
+Generator::Generator(int32_t seed1, int32_t seed2, int32_t seed3) {
+	this->x1 = seed1;
+	this->x2 = seed2;
+	this->x3 = seed3;
+}
 
 double Generator::rown_v1(int &x) {
 	int a = 16807, q = 127773, r = 2836, h;
@@ -67,12 +66,4 @@ vector<Link *> Generator::shuffleVector(vector<Link *> inputVector) {
 		inputVector.erase(inputVector.begin() + randomVectorElementIndex);
 	}
 	return outputVector;
-}
-
-double Generator::getA() {
-	return a;
-}
-
-uint64_t Generator::getSimulationIndex() {
-	return simulationIndex;
 }

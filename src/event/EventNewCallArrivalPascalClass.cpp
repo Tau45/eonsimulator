@@ -6,6 +6,6 @@ EventNewCallArrivalPascalClass::EventNewCallArrivalPascalClass(double occurrence
 	// TODO: Pascal event initialization
 }
 
-void EventNewCallArrivalPascalClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator) {
+void EventNewCallArrivalPascalClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator, SimulationId &simulationId) {
 	// TODO: Pascal event execution
 }

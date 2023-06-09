@@ -144,7 +144,7 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 		return CONNECTION_REJECTED;
 	}
 
-	if (!anyOutputLinkHasFreeResources(outputDirections[connection->getOutputDirectionIndex()], connection->getRequiredNumberOfFSUs())) {
+	if (!anyOutputLinkHasFreeResources(connection->getOutputDirectionIndex(), connection->getRequiredNumberOfFSUs())) {
 		return EXTERNAL_BLOCK;
 	}
 
@@ -157,7 +157,7 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedPointToGroup(Connection *connection, Generator &generator) {
-	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(outputDirections[connection->getOutputDirectionIndex()], connection->getRequiredNumberOfFSUs());
+	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirectionIndex(), connection->getRequiredNumberOfFSUs());
 
 	for (auto outputLink: generator.shuffleVector(availableOutputLinks)) {
 		for (auto internalPath: getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink)) {
@@ -170,7 +170,7 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedP
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedPointToPoint(Connection *connection, Generator &generator) {
-	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(outputDirections[connection->getOutputDirectionIndex()], connection->getRequiredNumberOfFSUs());
+	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirectionIndex(), connection->getRequiredNumberOfFSUs());
 
 	for (auto internalPath: getAllInternalPathsBetweenLinks(connection->getSourceLink(), availableOutputLinks[0])) {
 		if (connection->pathHasFreeResources(internalPath, generator)) {
@@ -204,9 +204,9 @@ uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
 	return result;
 }
 
-vector<Link *> Network::getAvailableLinksToDestination(vector<Link *> outputDirection, uint64_t requiredNumberOfFSUs) {
+vector<Link *> Network::getAvailableLinksToDestination(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs) {
 	vector<Link *> availableOutputLinks;
-	for (auto outputLink: outputDirection) {
+	for (auto outputLink: outputDirections[outputDirectionIndex]) {
 		if (outputLink->hasFreeNeighboringFSUs(requiredNumberOfFSUs)) {
 			availableOutputLinks.push_back(outputLink);
 		}
@@ -224,8 +224,8 @@ bool Network::findInputLinkWithFreeResources(Connection *connection, Generator &
 	return false;
 }
 
-bool Network::anyOutputLinkHasFreeResources(vector<Link *> outputDirection, uint64_t requiredNumberOfFSUs) {
-	for (auto outputLink: outputDirection) {
+bool Network::anyOutputLinkHasFreeResources(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs) {
+	for (auto outputLink: outputDirections[outputDirectionIndex]) {
 		if (outputLink->hasFreeNeighboringFSUs(requiredNumberOfFSUs)) {
 			return true;
 		}
