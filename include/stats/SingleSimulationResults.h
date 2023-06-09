@@ -1,7 +1,7 @@
+#pragma once
 #ifndef EONSIMULATOR_SINGLESIMULATIONRESULTS_H
 #define EONSIMULATOR_SINGLESIMULATIONRESULTS_H
 
-#include <iostream>
 #include <map>
 #include "TrafficClassResultRatios.h"
 #include "TrafficClassStatistics.h"

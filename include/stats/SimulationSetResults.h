@@ -1,15 +1,11 @@
+#pragma once
 #ifndef EONSIMULATOR_SIMULATIONSETRESULTS_H
 #define EONSIMULATOR_SIMULATIONSETRESULTS_H
 
-#include <iostream>
-#include <map>
-#include <vector>
 #include <cmath>
 #include "TrafficClassResults.h"
 #include "SingleSimulationResults.h"
 #include "../tools/GlobalSettings.h"
-
-using namespace std;
 
 class SimulationSetResults {
 	void setTrafficSourceResults(map<uint64_t, TrafficClassResults> &trafficResults,

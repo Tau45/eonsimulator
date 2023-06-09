@@ -2,8 +2,6 @@
 #ifndef EONSIMULATOR_EVENTNEWCALLARRIVALENGSETCLASS_H
 #define EONSIMULATOR_EVENTNEWCALLARRIVALENGSETCLASS_H
 
-#include <iostream>
-#include "../tools/Generator.h"
 #include "EventCallServiceTermination.h"
 
 class EventNewCallArrivalEngsetClass : public Event {

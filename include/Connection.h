@@ -1,7 +1,7 @@
+#pragma once
 #ifndef EONSIMULATOR_CONNECTION_H
 #define EONSIMULATOR_CONNECTION_H
 
-#include <iostream>
 #include "network/Path.h"
 #include "tools/Generator.h"
 

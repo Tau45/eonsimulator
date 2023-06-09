@@ -2,7 +2,6 @@
 #ifndef EONSIMULATOR_SIMULATOR_H
 #define EONSIMULATOR_SIMULATOR_H
 
-#include <iostream>
 #include <chrono>
 #include "event/EventNewCallArrivalErlangClass.h"
 #include "event/EventNewCallArrivalEngsetClass.h"

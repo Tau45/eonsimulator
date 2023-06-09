@@ -2,9 +2,7 @@
 #ifndef EONSIMULATOR_NETWORK_H
 #define EONSIMULATOR_NETWORK_H
 
-#include <iostream>
 #include <queue>
-#include <set>
 #include <fstream>
 #include "../Connection.h"
 #include "../stats/TrafficClassStatistics.h"

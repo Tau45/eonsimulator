@@ -1,7 +1,7 @@
+#pragma once
 #ifndef EONSIMULATOR_SEEDSPROVIDER_H
 #define EONSIMULATOR_SEEDSPROVIDER_H
 
-#include <iostream>
 #include <queue>
 #include "../../include/tools/GlobalSettings.h"
 

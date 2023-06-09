@@ -2,7 +2,6 @@
 #ifndef EONSIMULATOR_EVENT_H
 #define EONSIMULATOR_EVENT_H
 
-#include <iostream>
 #include "../network/Network.h"
 
 class Event {

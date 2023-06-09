@@ -2,8 +2,6 @@
 #ifndef EONSIMULATOR_EVENTNEWCALLARRIVALPASCALCLASS_H
 #define EONSIMULATOR_EVENTNEWCALLARRIVALPASCALCLASS_H
 
-#include <iostream>
-#include "../tools/Generator.h"
 #include "EventCallServiceTermination.h"
 
 class EventNewCallArrivalPascalClass : public Event {

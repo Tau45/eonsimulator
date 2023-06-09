@@ -2,9 +2,7 @@
 #ifndef EONSIMULATOR_LINK_H
 #define EONSIMULATOR_LINK_H
 
-#include <iostream>
 #include <cassert>
-#include <vector>
 #include "../tools/GlobalSettings.h"
 
 class Link {

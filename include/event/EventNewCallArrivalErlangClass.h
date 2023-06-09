@@ -2,8 +2,6 @@
 #ifndef EONSIMULATOR_EVENTNEWCALLARRIVALERLANGCLASS_H
 #define EONSIMULATOR_EVENTNEWCALLARRIVALERLANGCLASS_H
 
-#include <iostream>
-#include "../tools/Generator.h"
 #include "EventCallServiceTermination.h"
 
 class EventNewCallArrivalErlangClass : public Event {

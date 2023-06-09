@@ -1,8 +1,7 @@
+#pragma once
 #ifndef EONSIMULATOR_PATH_H
 #define EONSIMULATOR_PATH_H
 
-#include <iostream>
-#include <vector>
 #include "Link.h"
 
 class Path {

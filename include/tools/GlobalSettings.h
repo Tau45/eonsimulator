@@ -1,7 +1,7 @@
+#pragma once
 #ifndef EONSIMULATOR_GLOBALSETTINGS_H
 #define EONSIMULATOR_GLOBALSETTINGS_H
 
-#include <iostream>
 #include <set>
 #include <regex>
 #include "Logger.h"

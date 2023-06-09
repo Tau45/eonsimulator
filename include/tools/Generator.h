@@ -1,11 +1,9 @@
+#pragma once
 #ifndef EONSIMULATOR_GENERATOR_H
 #define EONSIMULATOR_GENERATOR_H
 
-#include <iostream>
 #include <math.h>
-#include "GlobalSettings.h"
 #include "../../include/network/Link.h"
-#include "../network/Path.h"
 
 class Generator {
 	double a;
