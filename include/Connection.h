@@ -2,30 +2,31 @@
 #define EONSIMULATOR_CONNECTION_H
 
 #include <iostream>
-#include <vector>
 #include "network/Path.h"
 #include "tools/Generator.h"
 
 class Connection {
 	Link *sourceLink;
-	vector<Link *> *outputDirection;
+	uint64_t outputDirectionIndex;
 	Path *path;
 	uint64_t firstFSUOfInputLink;
 	uint64_t firstFSUOfInternalLinks;
 	uint64_t firstFSUOfOutputLink;
 	uint64_t requiredNumberOfFSUs;
 public:
-	Connection(Link *sourceLink, vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs);
+	Connection(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs);
 
 	void reserveResources();
 
 	void close();
 
+	void setSourceLink(Link* newSourceLink);
+
 	Link *getSourceLink();
 
 	Link *getDestinationLink();
 
-	vector<Link *> *getOutputDirection();
+	uint64_t getOutputDirectionIndex();
 
 	uint64_t getPathSize();
 
@@ -36,12 +37,6 @@ public:
 	uint64_t getFirstFSUOfInternalLinks();
 
 	uint64_t getFirstFSUOfOutputLink();
-
-	void setFirstFSUOfInputLink(uint64_t firstFSUOfInputLink);
-
-	void setFirstFSUOfInternalLinks(uint64_t firstFSUOfInternalLinks);
-
-	void setFirstFSUOfOutputLink(uint64_t firstFSUOfOutputLink);
 
 	uint64_t getRequiredNumberOfFSUs();
 };

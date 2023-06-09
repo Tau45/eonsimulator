@@ -38,30 +38,14 @@ void Simulator::addErlangTrafficClasses() {
 
 		eventQueue.push(new EventNewCallArrivalErlangClass(generator->getRandomOccurrenceTime(lambda),
 														   lambda,
-														   new Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs),
+														   new Connection(generator->getRandomOutputDirectionIndex(network->getNumberOfOutputDirections()), requiredNumberOfFSUs),
 														   network->erlangTrafficClassStatistics[requiredNumberOfFSUs]));
 	}
 }
 
-void Simulator::addEngsetTrafficClasses() {
-//	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getEngsetTrafficClasses()) {
-//		network->engsetTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
-//
-//		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks());
-//		Connection connection = Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs, generator->getRandomServiceTime());
-//		eventQueue.push(new EventNewCallArrivalEngsetClass(occurrenceTime, connection, network->engsetTrafficClassStatistics[requiredNumberOfFSUs]));
-//	}
-}
+void Simulator::addEngsetTrafficClasses() {}
 
-void Simulator::addPascalTrafficClasses() {
-//	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getPascalTrafficClasses()) {
-//		network->pascalTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
-//
-//		double occurrenceTime = generator->getRandomOccurrenceTime(requiredNumberOfFSUs, network->getNumberOfInputLinks());
-//		Connection connection = Connection(network->getRandomInputLink(*generator), network->getRandomOutputDirection(*generator), requiredNumberOfFSUs, generator->getRandomServiceTime());
-//		eventQueue.push(new EventNewCallArrivalPascalClass(occurrenceTime, connection, network->pascalTrafficClassStatistics[requiredNumberOfFSUs]));
-//	}
-}
+void Simulator::addPascalTrafficClasses() {}
 
 double Simulator::getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks) {
 	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();

@@ -19,9 +19,9 @@ public:
 	};
 
 private:
-	map<uint64_t, map<uint64_t, vector<Path *>>> paths;
+	map<Link *, map<Link *, vector<Path *>>> paths;
 	vector<Link *> inputLinks;
-	vector<vector<Link *> *> outputDirections;
+	vector<vector<Link *>> outputDirections;
 
 	Network::ESTABLISH_CONNECTION_RESULT checkIfConnectionCanBeEstablishedPointToGroup(Connection *connection, Generator &generator);
 
@@ -29,13 +29,13 @@ private:
 
 	void buildNetworkStructure();
 
-	bool linkWasVisited(vector<Link *> &path, Link *linkToCheck);
-
 	vector<Path *> getAllInternalPathsBetweenLinks(Link *inputLink, Link *destinationLink);
 
-	vector<Link *> getAvailableLinksToDestination(vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs);
+	vector<Link *> getAvailableLinksToDestination(vector<Link *> outputDirection, uint64_t requiredNumberOfFSUs);
 
-	bool anyOutputLinkHasFreeResources(vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs);
+	bool findInputLinkWithFreeResources(Connection *connection, Generator &generator);
+
+	bool anyOutputLinkHasFreeResources(vector<Link *> outputDirection, uint64_t requiredNumberOfFSUs);
 
 	bool structureIsOneLink();
 
@@ -52,9 +52,7 @@ public:
 
 	uint64_t getNumberOfGeneratedCallsOfTheLeastActiveClass();
 
-	Link *getRandomInputLink(Generator &generator);
-
-	vector<Link *> *getRandomOutputDirection(Generator &generator);
+	uint64_t getNumberOfOutputDirections();
 
 	uint64_t getNumberOfInputLinks();
 

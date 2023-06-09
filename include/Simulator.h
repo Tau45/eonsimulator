@@ -4,14 +4,9 @@
 
 #include <iostream>
 #include <chrono>
-#include <vector>
-#include <queue>
-#include "network/Network.h"
 #include "event/EventNewCallArrivalErlangClass.h"
 #include "event/EventNewCallArrivalEngsetClass.h"
 #include "event/EventNewCallArrivalPascalClass.h"
-#include "tools/GlobalSettings.h"
-#include "stats/SingleSimulationResults.h"
 #include "stats/SimulationSetResults.h"
 
 class Simulator {

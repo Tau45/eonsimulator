@@ -1,8 +1,7 @@
 #include "../include/Connection.h"
 
-Connection::Connection(Link *sourceLink, vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs) :
-		sourceLink(sourceLink),
-		outputDirection(outputDirection),
+Connection::Connection(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs) :
+		outputDirectionIndex(outputDirectionIndex),
 		requiredNumberOfFSUs(requiredNumberOfFSUs) {}
 
 void Connection::reserveResources() {
@@ -33,6 +32,10 @@ void Connection::close() {
 	}
 }
 
+void Connection::setSourceLink(Link *newSourceLink) {
+	this->sourceLink = newSourceLink;
+}
+
 Link *Connection::getSourceLink() {
 	return sourceLink;
 }
@@ -41,8 +44,8 @@ Link *Connection::getDestinationLink() {
 	return path->getOutputLink();
 }
 
-vector<Link *> *Connection::getOutputDirection() {
-	return outputDirection;
+uint64_t Connection::getOutputDirectionIndex() {
+	return outputDirectionIndex;
 }
 
 uint64_t Connection::getPathSize() {
@@ -54,18 +57,17 @@ bool Connection::pathHasFreeResources(Path *pathToCheck, Generator &generator) {
 		vector<uint64_t> availableFirstFSUsInInputLink = pathToCheck->getAvailableFirstFSUsInInputLink(requiredNumberOfFSUs);
 
 		if (!availableFirstFSUsInInputLink.empty()) {
-			setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
+			firstFSUOfInputLink = generator.getRandomFirstFSU(availableFirstFSUsInInputLink);
 			path = pathToCheck;
 			return true;
 		}
-
 	} else if (pathToCheck->getPathSize() == 2) {
 		vector<uint64_t> availableFirstFSUsInInputLink = pathToCheck->getAvailableFirstFSUsInInputLink(requiredNumberOfFSUs);
 		vector<uint64_t> availableFirstFSUsInOutputLink = pathToCheck->getAvailableFirstFSUsInOutputLink(requiredNumberOfFSUs);
 
 		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInOutputLink.empty()) {
-			setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
-			setFirstFSUOfOutputLink(generator.getRandomFirstFSU(availableFirstFSUsInOutputLink));
+			firstFSUOfInputLink = generator.getRandomFirstFSU(availableFirstFSUsInInputLink);
+			firstFSUOfOutputLink = availableFirstFSUsInOutputLink[0];
 			path = pathToCheck;
 			return true;
 		}
@@ -75,9 +77,9 @@ bool Connection::pathHasFreeResources(Path *pathToCheck, Generator &generator) {
 		vector<uint64_t> availableFirstFSUsInOutputLink = pathToCheck->getAvailableFirstFSUsInOutputLink(requiredNumberOfFSUs);
 
 		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInInternalLinks.empty() && !availableFirstFSUsInOutputLink.empty()) {
-			setFirstFSUOfInputLink(generator.getRandomFirstFSU(availableFirstFSUsInInputLink));
-			setFirstFSUOfInternalLinks(generator.getRandomFirstFSU(availableFirstFSUsInInternalLinks));
-			setFirstFSUOfOutputLink(generator.getRandomFirstFSU(availableFirstFSUsInOutputLink));
+			firstFSUOfInputLink = generator.getRandomFirstFSU(availableFirstFSUsInInputLink);
+			firstFSUOfInternalLinks = availableFirstFSUsInInternalLinks[0];
+			firstFSUOfOutputLink = availableFirstFSUsInOutputLink[0];
 			path = pathToCheck;
 			return true;
 		}
@@ -95,18 +97,6 @@ uint64_t Connection::getFirstFSUOfInternalLinks() {
 
 uint64_t Connection::getFirstFSUOfOutputLink() {
 	return firstFSUOfOutputLink;
-}
-
-void Connection::setFirstFSUOfInputLink(uint64_t firstFSUOfInputLink) {
-	this->firstFSUOfInputLink = firstFSUOfInputLink;
-}
-
-void Connection::setFirstFSUOfInternalLinks(uint64_t firstFSUOfInternalLinks) {
-	this->firstFSUOfInternalLinks = firstFSUOfInternalLinks;
-}
-
-void Connection::setFirstFSUOfOutputLink(uint64_t firstFSUOfOutputLink) {
-	this->firstFSUOfOutputLink = firstFSUOfOutputLink;
 }
 
 uint64_t Connection::getRequiredNumberOfFSUs() {

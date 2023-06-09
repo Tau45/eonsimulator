@@ -48,15 +48,7 @@ void Network::buildNetworkStructure() {
 	}
 
 	/// Group output links pointing towards the same direction:
-	map<uint64_t, vector<Link *> *> outputDirectionsMap;
-
-	for (const auto &node: links) {
-		for (const auto &link: node.second) {
-			if (count(outputNodes.begin(), outputNodes.end(), link->getDestinationNode())) {
-				outputDirectionsMap[link->getDestinationNode()] = new vector<Link *>();
-			}
-		}
-	}
+	map<uint64_t, vector<Link *>> outputDirectionsMap;
 
 	for (const auto &node: links) {
 		for (const auto &link: node.second) {
@@ -64,7 +56,7 @@ void Network::buildNetworkStructure() {
 				inputLinks.push_back(link);
 			}
 			if (count(outputNodes.begin(), outputNodes.end(), link->getDestinationNode())) {
-				outputDirectionsMap[link->getDestinationNode()]->push_back(link);
+				outputDirectionsMap[link->getDestinationNode()].push_back(link);
 			}
 		}
 	}
@@ -83,10 +75,10 @@ void Network::buildNetworkStructure() {
 			incompletePaths.pop();
 
 			if (outputDirectionsMap.contains(currentPath.back()->getDestinationNode())) {
-				paths[inputLink->getSourceNode()][currentPath.back()->getDestinationNode()].emplace_back(new Path(currentPath));
+				paths[inputLink][currentPath.back()].emplace_back(new Path(currentPath));
 			} else {
 				for (auto &link: links[currentPath.back()->getDestinationNode()]) {
-					if (!linkWasVisited(currentPath, link)) {
+					if (!(find(currentPath.begin(), currentPath.end(), link) != currentPath.end())) {
 						vector<Link *> newPath(currentPath);
 						newPath.push_back(link);
 						incompletePaths.push(newPath);
@@ -115,10 +107,10 @@ void Network::printNetworkStructure() {
 	/// Print information about output directions
 	for (auto outputDirection: outputDirections) {
 		stringstream outputDirectionMessage;
-		outputDirectionMessage << "Created output direction " << outputDirection->at(0)->getDestinationNode() << ", reachable from nodes: ";
+		outputDirectionMessage << "Created output direction " << outputDirection.at(0)->getDestinationNode() << " (" << outputDirection.size() << " nodes), reachable from nodes: ";
 		separator = "";
-		for (auto outputNode: *outputDirection) {
-			outputDirectionMessage << separator << to_string(outputNode->getSourceNode());
+		for (auto outputNode: outputDirection) {
+			outputDirectionMessage << separator << to_string(outputNode->getSourceNode()) << "-" << to_string(outputNode->getDestinationNode());
 			separator = ", ";
 		}
 		Logger::instance().log(Logger::CREATING_STRUCTURE, outputDirectionMessage.str());
@@ -128,7 +120,7 @@ void Network::printNetworkStructure() {
 	separator = " -> ";
 	uint64_t totalNumberOfPaths = 0;
 	for (const auto &pathsFromInput: paths) {
-		Logger::instance().log(Logger::CREATING_STRUCTURE, "Paths starting from input " + to_string(pathsFromInput.first) + ":");
+		Logger::instance().log(Logger::CREATING_STRUCTURE, "Paths starting from input " + to_string(pathsFromInput.first->getSourceNode()) + ":");
 		uint64_t numberOfPathsFromInput = 0;
 		for (const auto &pathsToDirection: pathsFromInput.second) {
 			numberOfPathsFromInput += pathsToDirection.second.size();
@@ -141,18 +133,18 @@ void Network::printNetworkStructure() {
 				Logger::instance().log(Logger::CREATING_STRUCTURE, pathMessage.str());
 			}
 		}
-		Logger::instance().log(Logger::CREATING_STRUCTURE, "Total number of paths starting from input " + to_string(pathsFromInput.first) + ": " + to_string(numberOfPathsFromInput));
+		Logger::instance().log(Logger::CREATING_STRUCTURE, "Total number of paths starting from input " + to_string(pathsFromInput.first->getSourceNode()) + ": " + to_string(numberOfPathsFromInput));
 		totalNumberOfPaths += numberOfPathsFromInput;
 	}
 	Logger::instance().log(Logger::CREATING_STRUCTURE, "Total number of paths: " + to_string(totalNumberOfPaths));
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection *connection, Generator &generator) {
-	if (!connection->getSourceLink()->hasFreeNeighboringFSUs(connection->getRequiredNumberOfFSUs()) && !structureIsOneLink()) {
+	if (!findInputLinkWithFreeResources(connection, generator) && !structureIsOneLink()) {
 		return CONNECTION_REJECTED;
 	}
 
-	if (!anyOutputLinkHasFreeResources(connection->getOutputDirection(), connection->getRequiredNumberOfFSUs())) {
+	if (!anyOutputLinkHasFreeResources(outputDirections[connection->getOutputDirectionIndex()], connection->getRequiredNumberOfFSUs())) {
 		return EXTERNAL_BLOCK;
 	}
 
@@ -165,10 +157,10 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedPointToGroup(Connection *connection, Generator &generator) {
-	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirection(), connection->getRequiredNumberOfFSUs());
+	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(outputDirections[connection->getOutputDirectionIndex()], connection->getRequiredNumberOfFSUs());
 
 	for (auto outputLink: generator.shuffleVector(availableOutputLinks)) {
-		for (auto internalPath: generator.shuffleVector(getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink))) {
+		for (auto internalPath: getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink)) {
 			if (connection->pathHasFreeResources(internalPath, generator)) {
 				return CONNECTION_CAN_BE_ESTABLISHED;
 			}
@@ -178,10 +170,9 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedP
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedPointToPoint(Connection *connection, Generator &generator) {
-	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirection(), connection->getRequiredNumberOfFSUs());
-	Link *destinationLink = generator.getRandomLink(availableOutputLinks);
+	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(outputDirections[connection->getOutputDirectionIndex()], connection->getRequiredNumberOfFSUs());
 
-	for (auto internalPath: generator.shuffleVector(getAllInternalPathsBetweenLinks(connection->getSourceLink(), destinationLink))) {
+	for (auto internalPath: getAllInternalPathsBetweenLinks(connection->getSourceLink(), availableOutputLinks[0])) {
 		if (connection->pathHasFreeResources(internalPath, generator)) {
 			return CONNECTION_CAN_BE_ESTABLISHED;
 		}
@@ -213,13 +204,9 @@ uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
 	return result;
 }
 
-Link *Network::getRandomInputLink(Generator &generator) {
-	return generator.getRandomLink(inputLinks);
-}
-
-vector<Link *> Network::getAvailableLinksToDestination(vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs) {
+vector<Link *> Network::getAvailableLinksToDestination(vector<Link *> outputDirection, uint64_t requiredNumberOfFSUs) {
 	vector<Link *> availableOutputLinks;
-	for (auto outputLink: *outputDirection) {
+	for (auto outputLink: outputDirection) {
 		if (outputLink->hasFreeNeighboringFSUs(requiredNumberOfFSUs)) {
 			availableOutputLinks.push_back(outputLink);
 		}
@@ -227,8 +214,18 @@ vector<Link *> Network::getAvailableLinksToDestination(vector<Link *> *outputDir
 	return availableOutputLinks;
 }
 
-bool Network::anyOutputLinkHasFreeResources(vector<Link *> *outputDirection, uint64_t requiredNumberOfFSUs) {
-	for (auto outputLink: *outputDirection) {
+bool Network::findInputLinkWithFreeResources(Connection *connection, Generator &generator) {
+	for (auto inputLink: generator.shuffleVector(inputLinks)) {
+		if (inputLink->hasFreeNeighboringFSUs(connection->getRequiredNumberOfFSUs())) {
+			connection->setSourceLink(inputLink);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool Network::anyOutputLinkHasFreeResources(vector<Link *> outputDirection, uint64_t requiredNumberOfFSUs) {
+	for (auto outputLink: outputDirection) {
 		if (outputLink->hasFreeNeighboringFSUs(requiredNumberOfFSUs)) {
 			return true;
 		}
@@ -238,10 +235,6 @@ bool Network::anyOutputLinkHasFreeResources(vector<Link *> *outputDirection, uin
 
 uint64_t Network::getNumberOfInputLinks() {
 	return paths.size();
-}
-
-bool Network::linkWasVisited(vector<Link *> &path, Link *linkToCheck) {
-	return find(path.begin(), path.end(), linkToCheck) != path.end();
 }
 
 bool Network::structureIsOneLink() {
@@ -270,9 +263,9 @@ Network::~Network() {
 }
 
 vector<Path *> Network::getAllInternalPathsBetweenLinks(Link *inputLink, Link *destinationLink) {
-	return paths[inputLink->getSourceNode()][destinationLink->getDestinationNode()];
+	return paths[inputLink][destinationLink];
 }
 
-vector<Link *> *Network::getRandomOutputDirection(Generator &generator) {
-	return generator.getRandomOutputDirection(outputDirections);
+uint64_t Network::getNumberOfOutputDirections() {
+	return outputDirections.size();
 }
