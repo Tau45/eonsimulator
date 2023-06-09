@@ -3,7 +3,6 @@
 #define EONSIMULATOR_NETWORK_H
 
 #include <queue>
-#include <fstream>
 #include "../Connection.h"
 #include "../stats/TrafficClassStatistics.h"
 

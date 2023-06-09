@@ -1,4 +1,3 @@
-#include <fstream>
 #include "../../include/tools/GlobalSettings.h"
 
 GlobalSettings::GlobalSettings(map<string, string> args) : args(args) {

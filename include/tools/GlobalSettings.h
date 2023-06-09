@@ -4,6 +4,7 @@
 
 #include <set>
 #include <regex>
+#include <fstream>
 #include "Logger.h"
 
 class GlobalSettings {
