@@ -160,7 +160,7 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedP
 	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirectionIndex(), connection->getRequiredNumberOfFSUs());
 
 	for (auto outputLink: generator.shuffleVector(availableOutputLinks)) {
-		for (auto internalPath: getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink)) {
+		for (auto internalPath: generator.shuffleVector(getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink))) {
 			if (connection->pathHasFreeResources(internalPath, generator)) {
 				return CONNECTION_CAN_BE_ESTABLISHED;
 			}
@@ -171,8 +171,9 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedP
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedPointToPoint(Connection *connection, Generator &generator) {
 	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirectionIndex(), connection->getRequiredNumberOfFSUs());
+	Link *randomDestinationLink = generator.getRandomLink(availableOutputLinks);
 
-	for (auto internalPath: getAllInternalPathsBetweenLinks(connection->getSourceLink(), availableOutputLinks[0])) {
+	for (auto internalPath: generator.shuffleVector(getAllInternalPathsBetweenLinks(connection->getSourceLink(), randomDestinationLink))) {
 		if (connection->pathHasFreeResources(internalPath, generator)) {
 			return CONNECTION_CAN_BE_ESTABLISHED;
 		}

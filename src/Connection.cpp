@@ -67,7 +67,7 @@ bool Connection::pathHasFreeResources(Path *pathToCheck, Generator &generator) {
 
 		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInOutputLink.empty()) {
 			firstFSUOfInputLink = generator.getRandomFirstFSU(availableFirstFSUsInInputLink);
-			firstFSUOfOutputLink = availableFirstFSUsInOutputLink[0];
+			firstFSUOfOutputLink = generator.getRandomFirstFSU(availableFirstFSUsInOutputLink);
 			path = pathToCheck;
 			return true;
 		}
@@ -78,8 +78,9 @@ bool Connection::pathHasFreeResources(Path *pathToCheck, Generator &generator) {
 
 		if (!availableFirstFSUsInInputLink.empty() && !availableFirstFSUsInInternalLinks.empty() && !availableFirstFSUsInOutputLink.empty()) {
 			firstFSUOfInputLink = generator.getRandomFirstFSU(availableFirstFSUsInInputLink);
-			firstFSUOfInternalLinks = availableFirstFSUsInInternalLinks[0];
-			firstFSUOfOutputLink = availableFirstFSUsInOutputLink[0];
+			firstFSUOfInternalLinks = generator.getRandomFirstFSU(availableFirstFSUsInInternalLinks);
+			firstFSUOfOutputLink = generator.getRandomFirstFSU(availableFirstFSUsInOutputLink);
+
 			path = pathToCheck;
 			return true;
 		}

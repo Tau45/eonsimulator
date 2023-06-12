@@ -2,7 +2,6 @@
 #ifndef EONSIMULATOR_CONNECTION_H
 #define EONSIMULATOR_CONNECTION_H
 
-#include "network/Path.h"
 #include "tools/Generator.h"
 
 class Connection {
