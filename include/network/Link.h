@@ -6,7 +6,8 @@
 #include "../tools/GlobalSettings.h"
 
 class Link {
-	vector<bool> FSUs;
+	/// change
+	uint64_t FSUs;
 	uint64_t sourceNode;
 	uint64_t destinationNode;
 

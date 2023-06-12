@@ -4,23 +4,20 @@ Link::Link(uint64_t sourceNode, uint64_t destinationNode) :
 		sourceNode(sourceNode),
 		destinationNode(destinationNode) {
 	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
-	for (int i = 0; i < linkCapacity; i++) {
-		FSUs.push_back(false);
-	}
+	/// change
+	FSUs = linkCapacity;
 }
 
+/// change
 void Link::reserveFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
-	for (uint64_t i = firstFSU; i < firstFSU + numberOfFSUs; i++) {
-		assert(!FSUs[i]);
-		FSUs[i] = true;
-	}
+	FSUs -= numberOfFSUs;
+	assert(FSUs >= 0);
 }
 
+/// change
 void Link::freeFSUs(uint16_t firstFSU, uint16_t numberOfFSUs) {
-	for (uint64_t i = firstFSU; i < firstFSU + numberOfFSUs; i++) {
-		assert(FSUs[i]);
-		FSUs[i] = false;
-	}
+	FSUs += numberOfFSUs;
+	assert(FSUs <= GlobalSettings::instance().getLinkCapacity());
 }
 
 vector<uint64_t> Link::getAvailableFirstFSUs(uint64_t requiredNumberOfFSUs) {
@@ -40,22 +37,14 @@ bool Link::hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs) {
 	return !getAvailableFirstFSUs(requiredNumberOfFSUs).empty();
 }
 
+/// change
 bool Link::hasFreeNeighboringFSUs(uint64_t requiredNumberOfFSUs, uint64_t startingFromFSU) {
-	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
-	assert(requiredNumberOfFSUs < linkCapacity);
-	assert(startingFromFSU < linkCapacity);
-	assert(startingFromFSU + requiredNumberOfFSUs <= linkCapacity);
-
-	for (uint64_t i = startingFromFSU; i < startingFromFSU + requiredNumberOfFSUs; i++) {
-		if (FSUIsOccupied(i)) {
-			return false;
-		}
-	}
-	return true;
+	return FSUs >= requiredNumberOfFSUs;
 }
 
+/// unused
 bool Link::FSUIsOccupied(uint64_t FSUIndex) {
-	return FSUs[FSUIndex];
+	return false;
 }
 
 uint64_t Link::getSourceNode() {
