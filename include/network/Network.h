@@ -28,9 +28,13 @@ private:
 
 	vector<Path *> getAllInternalPathsBetweenLinks(Link *inputLink, Link *destinationLink);
 
+	bool pathHasFreeResources(Path *path, Connection *connection);
+
 	vector<Link *> getAvailableLinksToDestination(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs);
 
-	bool findInputLinkWithFreeResources(Connection *connection, Generator &generator);
+	bool inputLinkWithFreeResourcesWasFound(Connection *connection, Generator &generator);
+
+	void setFirstFSUOfOutputLink(Link *outputLink, Connection *connection);
 
 	bool anyOutputLinkHasFreeResources(uint64_t outputDirectionIndex, uint64_t requiredNumberOfFSUs);
 

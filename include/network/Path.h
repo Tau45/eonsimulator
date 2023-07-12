@@ -20,11 +20,7 @@ public:
 
 	vector<Link *> getPath();
 
-	vector<uint64_t> getAvailableFirstFSUsInInputLink(uint64_t requiredNumberOfFSUs);
-
 	vector<uint64_t> getAvailableFirstFSUsInInternalLinks(uint64_t requiredNumberOfFSUs);
-
-	vector<uint64_t> getAvailableFirstFSUsInOutputLink(uint64_t requiredNumberOfFSUs);
 };
 
 #endif //EONSIMULATOR_PATH_H

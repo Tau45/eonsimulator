@@ -19,7 +19,7 @@ public:
 
 	void close();
 
-	void setSourceLink(Link* newSourceLink);
+	void setSourceLink(Link *newSourceLink);
 
 	Link *getSourceLink();
 
@@ -29,13 +29,19 @@ public:
 
 	uint64_t getPathSize();
 
-	bool pathHasFreeResources(Path *path, Generator &generator);
+	void setPath(Path *newPath);
 
 	uint64_t getFirstFSUOfInputLink();
 
 	uint64_t getFirstFSUOfInternalLinks();
 
 	uint64_t getFirstFSUOfOutputLink();
+
+	void setFirstFSUOfInputLink(uint64_t firstFSU);
+
+	void setFirstFSUOfInternalLinks(uint64_t firstFSU);
+
+	void setFirstFSUOfOutputLink(uint64_t firstFSU);
 
 	uint64_t getRequiredNumberOfFSUs();
 };

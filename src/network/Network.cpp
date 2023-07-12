@@ -140,7 +140,7 @@ void Network::printNetworkStructure() {
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablished(Connection *connection, Generator &generator) {
-	if (!findInputLinkWithFreeResources(connection, generator) && !structureIsOneLink()) {
+	if (!inputLinkWithFreeResourcesWasFound(connection, generator) && !structureIsOneLink()) {
 		return CONNECTION_REJECTED;
 	}
 
@@ -160,8 +160,10 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedP
 	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirectionIndex(), connection->getRequiredNumberOfFSUs());
 
 	for (auto outputLink: generator.shuffleVector(availableOutputLinks)) {
-		for (auto internalPath: generator.shuffleVector(getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink))) {
-			if (connection->pathHasFreeResources(internalPath, generator)) {
+		setFirstFSUOfOutputLink(outputLink, connection);
+
+		for (auto internalPath: getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink)) {
+			if (pathHasFreeResources(internalPath, connection)) {
 				return CONNECTION_CAN_BE_ESTABLISHED;
 			}
 		}
@@ -170,15 +172,36 @@ Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedP
 }
 
 Network::ESTABLISH_CONNECTION_RESULT Network::checkIfConnectionCanBeEstablishedPointToPoint(Connection *connection, Generator &generator) {
-	vector<Link *> availableOutputLinks = getAvailableLinksToDestination(connection->getOutputDirectionIndex(), connection->getRequiredNumberOfFSUs());
-	Link *randomDestinationLink = generator.getRandomLink(availableOutputLinks);
+	Link *outputLink = getAvailableLinksToDestination(connection->getOutputDirectionIndex(), connection->getRequiredNumberOfFSUs())[0];
+	setFirstFSUOfOutputLink(outputLink, connection);
 
-	for (auto internalPath: generator.shuffleVector(getAllInternalPathsBetweenLinks(connection->getSourceLink(), randomDestinationLink))) {
-		if (connection->pathHasFreeResources(internalPath, generator)) {
+	for (auto internalPath: getAllInternalPathsBetweenLinks(connection->getSourceLink(), outputLink)) {
+		if (pathHasFreeResources(internalPath, connection)) {
 			return CONNECTION_CAN_BE_ESTABLISHED;
 		}
 	}
 	return INTERNAL_BLOCK;
+}
+
+void Network::setFirstFSUOfOutputLink(Link *outputLink, Connection *connection) {
+	vector<uint64_t> availableFirstFSUsInOutputLink = outputLink->getAvailableFirstFSUs(connection->getRequiredNumberOfFSUs());
+	connection->setFirstFSUOfOutputLink(availableFirstFSUsInOutputLink[0]);
+}
+
+bool Network::pathHasFreeResources(Path *path, Connection *connection) {
+	if (path->getPathSize() < 3) {
+		connection->setPath(path);
+		return true;
+	} else {
+		vector<uint64_t> availableFirstFSUsInInternalLinks = path->getAvailableFirstFSUsInInternalLinks(connection->getRequiredNumberOfFSUs());
+
+		if (!availableFirstFSUsInInternalLinks.empty()) {
+			connection->setFirstFSUOfInternalLinks(availableFirstFSUsInInternalLinks[0]);
+			connection->setPath(path);
+			return true;
+		}
+	}
+	return false;
 }
 
 uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
@@ -215,10 +238,13 @@ vector<Link *> Network::getAvailableLinksToDestination(uint64_t outputDirectionI
 	return availableOutputLinks;
 }
 
-bool Network::findInputLinkWithFreeResources(Connection *connection, Generator &generator) {
+bool Network::inputLinkWithFreeResourcesWasFound(Connection *connection, Generator &generator) {
 	for (auto inputLink: generator.shuffleVector(inputLinks)) {
-		if (inputLink->hasFreeNeighboringFSUs(connection->getRequiredNumberOfFSUs())) {
+		vector<uint64_t> availableFirstFSUsInInputLink = inputLink->getAvailableFirstFSUs(connection->getRequiredNumberOfFSUs());
+
+		if (!availableFirstFSUsInInputLink.empty()) {
 			connection->setSourceLink(inputLink);
+			connection->setFirstFSUOfInputLink(availableFirstFSUsInInputLink[0]);
 			return true;
 		}
 	}

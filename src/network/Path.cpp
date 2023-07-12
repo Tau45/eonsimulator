@@ -23,10 +23,6 @@ vector<Link *> Path::getPath() {
 	return path;
 }
 
-vector<uint64_t> Path::getAvailableFirstFSUsInInputLink(uint64_t requiredNumberOfFSUs) {
-	return getInputLink()->getAvailableFirstFSUs(requiredNumberOfFSUs);
-}
-
 vector<uint64_t> Path::getAvailableFirstFSUsInInternalLinks(uint64_t requiredNumberOfFSUs) {
 	vector<uint64_t> availableFirstFSUs;
 
@@ -45,8 +41,4 @@ vector<uint64_t> Path::getAvailableFirstFSUsInInternalLinks(uint64_t requiredNum
 		}
 	}
 	return availableFirstFSUs;
-}
-
-vector<uint64_t> Path::getAvailableFirstFSUsInOutputLink(uint64_t requiredNumberOfFSUs) {
-	return getOutputLink()->getAvailableFirstFSUs(requiredNumberOfFSUs);
 }
