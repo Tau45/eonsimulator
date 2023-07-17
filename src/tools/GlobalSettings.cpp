@@ -23,7 +23,6 @@ void GlobalSettings::readSettings() {
 	bool engsetTrafficClassesAreValid = setEngsetTrafficClasses(ENGSET);
 	bool pascalTrafficClassesAreValid = setPascalTrafficClasses(PASCAL);
 	bool runsIsValid = setRuns(RUNS);
-	bool serviceTimeIsValid = setServiceTime(SERVICE_TIME);
 	bool selectedAlgorithmIsValid = setSelectedAlgorithm(MODE);
 
 	settingsAreValid = aParametersAreValid
@@ -31,7 +30,6 @@ void GlobalSettings::readSettings() {
 					   && callsToGenerateIsValid
 					   && linkCapacityIsValid
 					   && runsIsValid
-					   && serviceTimeIsValid
 					   && selectedAlgorithmIsValid
 					   && (erlangTrafficClassesAreValid || engsetTrafficClassesAreValid || pascalTrafficClassesAreValid)
 					   && maxTrafficClassRequireLessFSUsThanLinkCapacity();
@@ -162,25 +160,70 @@ bool GlobalSettings::setErlangTrafficClasses(PARAMETER_PREFIX prefix) {
 		return false;
 	}
 	string value = args[parameter];
-	stringstream ss(value);
-	string token;
 
-	while (getline(ss, token, ',')) {
-		int trafficClass;
+	for (auto inputString: getTrafficClassDefinitionStrings(value)) {
+		uint64_t numberOfFSUs;
+		double serviceTime;
 
-		try {
-			trafficClass = stoi(token);
-		} catch (...) {
-			Logger::instance().log(Logger::ERROR, "Error while parsing " + parameter + " traffic class: " + token);
-			return false;
+		bool numberOfFSUsWasFound = false;
+		bool serviceTimeWasFound = false;
+
+		stringstream ss(inputString);
+		string token;
+
+		while (getline(ss, token, ',')) {
+			string prefix = token.substr(0, token.find(':'));
+			string inputValue = token.substr(token.find(':') + 1, token.length());
+
+			if (prefix == "FSUs") {
+				try {
+					numberOfFSUs = stoi(inputValue);
+					numberOfFSUsWasFound = true;
+				} catch (...) {
+					Logger::instance().log(Logger::ERROR, "Error while parsing number of FSUs required by " + parameter + " traffic class: " + inputValue);
+					return false;
+				}
+
+				if (numberOfFSUs <= 0) {
+					Logger::instance().log(Logger::ERROR, "Number of FSUs required by " + parameter + " traffic class must be greater than 0. Current value: " + to_string(numberOfFSUs));
+					return false;
+				}
+			} else if (prefix == "time") {
+				try {
+					serviceTime = stod(inputValue);
+					serviceTimeWasFound = true;
+				} catch (...) {
+					Logger::instance().log(Logger::ERROR, "Error while parsing service time of " + parameter + " traffic class. Current value: " + inputValue);
+					return false;
+				}
+
+				if (serviceTime <= 0) {
+					Logger::instance().log(Logger::ERROR, "Service time of " + parameter + " traffic class must be greater than 0. Current value: " + inputValue);
+					return false;
+				}
+			} else {
+				Logger::instance().log(Logger::ERROR, "Error while parsing " + parameter + " traffic class: unknown parameter: " + prefix);
+				return false;
+			}
 		}
 
-		if (trafficClass <= 0) {
-			Logger::instance().log(Logger::ERROR, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
+		if (numberOfFSUsWasFound && serviceTimeWasFound) {
+			ErlangTrafficClassDefinition erlangTrafficClassDefinition(numberOfFSUs, serviceTime);
+			erlangTrafficClasses.insert(erlangTrafficClassDefinition);
+		} else {
+			if (!numberOfFSUsWasFound) {
+				Logger::instance().log(Logger::ERROR, "Number of FSUs required by " + parameter + " traffic class was not found");
+			}
+			if (!serviceTimeWasFound) {
+				Logger::instance().log(Logger::ERROR, "Service time of " + parameter + " traffic class was not found");
+			}
 			return false;
 		}
+	}
 
-		erlangTrafficClasses.insert(trafficClass);
+	if (erlangTrafficClasses.empty()) {
+		Logger::instance().log(Logger::ERROR, "Error parsing " + parameter + " traffic classes");
+		return false;
 	}
 
 	return true;
@@ -193,25 +236,88 @@ bool GlobalSettings::setEngsetTrafficClasses(PARAMETER_PREFIX prefix) {
 		return false;
 	}
 	string value = args[parameter];
-	stringstream ss(value);
-	string token;
 
-	while (getline(ss, token, ',')) {
-		int trafficClass;
+	for (auto inputString: getTrafficClassDefinitionStrings(value)) {
+		uint64_t numberOfFSUs;
+		double serviceTime;
+		uint64_t numberOfTrafficClasses;
 
-		try {
-			trafficClass = stoi(token);
-		} catch (...) {
-			Logger::instance().log(Logger::ERROR, "Error while parsing " + parameter + " traffic class: " + token);
-			return false;
+		bool numberOfFSUsWasFound = false;
+		bool serviceTimeWasFound = false;
+		bool numberOfTrafficClassesWasFound = false;
+
+		stringstream ss(inputString);
+		string token;
+
+		while (getline(ss, token, ',')) {
+			string prefix = token.substr(0, token.find(':'));
+			string inputValue = token.substr(token.find(':') + 1, token.length());
+
+			if (prefix == "FSUs") {
+				try {
+					numberOfFSUs = stoi(inputValue);
+					numberOfFSUsWasFound = true;
+				} catch (...) {
+					Logger::instance().log(Logger::ERROR, "Error while parsing number of FSUs required by " + parameter + " traffic class: " + inputValue);
+					return false;
+				}
+
+				if (numberOfFSUs <= 0) {
+					Logger::instance().log(Logger::ERROR, "Number of FSUs required by " + parameter + " traffic class must be greater than 0. Current value: " + to_string(numberOfFSUs));
+					return false;
+				}
+			} else if (prefix == "time") {
+				try {
+					serviceTime = stod(inputValue);
+					serviceTimeWasFound = true;
+				} catch (...) {
+					Logger::instance().log(Logger::ERROR, "Error while parsing service time of " + parameter + " traffic class. Current value: " + inputValue);
+					return false;
+				}
+
+				if (serviceTime <= 0) {
+					Logger::instance().log(Logger::ERROR, "Service time of " + parameter + " traffic class must be greater than 0. Current value: " + inputValue);
+					return false;
+				}
+			} else if (prefix == "count") {
+				try {
+					numberOfTrafficClasses = stoi(inputValue);
+					numberOfTrafficClassesWasFound = true;
+				} catch (...) {
+					Logger::instance().log(Logger::ERROR, "Error while parsing number of " + parameter + " traffic classes: " + inputValue);
+					return false;
+				}
+
+				if (numberOfTrafficClasses <= 0) {
+					Logger::instance().log(Logger::ERROR, "Number of " + parameter + " traffic classes must be greater than 0. Current value: " + to_string(numberOfTrafficClasses));
+					return false;
+				}
+			} else {
+				Logger::instance().log(Logger::ERROR, "Error while parsing " + parameter + " traffic class: unknown parameter: " + prefix);
+				return false;
+			}
 		}
 
-		if (trafficClass <= 0) {
-			Logger::instance().log(Logger::ERROR, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
+		if (numberOfFSUsWasFound && serviceTimeWasFound && numberOfTrafficClassesWasFound) {
+			EngsetTrafficClassDefinition engsetTrafficClassDefinition(numberOfFSUs, serviceTime, numberOfTrafficClasses);
+			engsetTrafficClasses.insert(engsetTrafficClassDefinition);
+		} else {
+			if (!numberOfFSUsWasFound) {
+				Logger::instance().log(Logger::ERROR, "Number of FSUs required by " + parameter + " traffic class was not found");
+			}
+			if (!serviceTimeWasFound) {
+				Logger::instance().log(Logger::ERROR, "Service time of " + parameter + " traffic class was not found");
+			}
+			if (!numberOfTrafficClassesWasFound) {
+				Logger::instance().log(Logger::ERROR, "Number of " + parameter + " traffic classes was not found");
+			}
 			return false;
 		}
+	}
 
-		engsetTrafficClasses.insert(trafficClass);
+	if (engsetTrafficClasses.empty()) {
+		Logger::instance().log(Logger::ERROR, "Error parsing " + parameter + " traffic classes");
+		return false;
 	}
 
 	return true;
@@ -224,25 +330,88 @@ bool GlobalSettings::setPascalTrafficClasses(PARAMETER_PREFIX prefix) {
 		return false;
 	}
 	string value = args[parameter];
-	stringstream ss(value);
-	string token;
 
-	while (getline(ss, token, ',')) {
-		int trafficClass;
+	for (auto inputString: getTrafficClassDefinitionStrings(value)) {
+		uint64_t numberOfFSUs;
+		double serviceTime;
+		uint64_t numberOfTrafficClasses;
 
-		try {
-			trafficClass = stoi(token);
-		} catch (...) {
-			Logger::instance().log(Logger::ERROR, "Error while parsing " + parameter + " traffic class: " + token);
-			return false;
+		bool numberOfFSUsWasFound = false;
+		bool serviceTimeWasFound = false;
+		bool numberOfTrafficClassesWasFound = false;
+
+		stringstream ss(inputString);
+		string token;
+
+		while (getline(ss, token, ',')) {
+			string prefix = token.substr(0, token.find(':'));
+			string inputValue = token.substr(token.find(':') + 1, token.length());
+
+			if (prefix == "FSUs") {
+				try {
+					numberOfFSUs = stoi(inputValue);
+					numberOfFSUsWasFound = true;
+				} catch (...) {
+					Logger::instance().log(Logger::ERROR, "Error while parsing number of FSUs required by " + parameter + " traffic class: " + inputValue);
+					return false;
+				}
+
+				if (numberOfFSUs <= 0) {
+					Logger::instance().log(Logger::ERROR, "Number of FSUs required by " + parameter + " traffic class must be greater than 0. Current value: " + to_string(numberOfFSUs));
+					return false;
+				}
+			} else if (prefix == "time") {
+				try {
+					serviceTime = stod(inputValue);
+					serviceTimeWasFound = true;
+				} catch (...) {
+					Logger::instance().log(Logger::ERROR, "Error while parsing service time of " + parameter + " traffic class. Current value: " + inputValue);
+					return false;
+				}
+
+				if (serviceTime <= 0) {
+					Logger::instance().log(Logger::ERROR, "Service time of " + parameter + " traffic class must be greater than 0. Current value: " + inputValue);
+					return false;
+				}
+			} else if (prefix == "count") {
+				try {
+					numberOfTrafficClasses = stoi(inputValue);
+					numberOfTrafficClassesWasFound = true;
+				} catch (...) {
+					Logger::instance().log(Logger::ERROR, "Error while parsing number of " + parameter + " traffic classes: " + inputValue);
+					return false;
+				}
+
+				if (numberOfTrafficClasses <= 0) {
+					Logger::instance().log(Logger::ERROR, "Number of " + parameter + " traffic classes must be greater than 0. Current value: " + to_string(numberOfTrafficClasses));
+					return false;
+				}
+			} else {
+				Logger::instance().log(Logger::ERROR, "Error while parsing " + parameter + " traffic class: unknown parameter: " + prefix);
+				return false;
+			}
 		}
 
-		if (trafficClass <= 0) {
-			Logger::instance().log(Logger::ERROR, parameter + " traffic class must be greater than 0. Current value: " + to_string(trafficClass));
+		if (numberOfFSUsWasFound && serviceTimeWasFound && numberOfTrafficClassesWasFound) {
+			PascalTrafficClassDefinition pascalTrafficClassDefinition(numberOfFSUs, serviceTime, numberOfTrafficClasses);
+			pascalTrafficClasses.insert(pascalTrafficClassDefinition);
+		} else {
+			if (!numberOfFSUsWasFound) {
+				Logger::instance().log(Logger::ERROR, "Number of FSUs required by " + parameter + " traffic class was not found");
+			}
+			if (!serviceTimeWasFound) {
+				Logger::instance().log(Logger::ERROR, "Service time of " + parameter + " traffic class was not found");
+			}
+			if (!numberOfTrafficClassesWasFound) {
+				Logger::instance().log(Logger::ERROR, "Number of " + parameter + " traffic classes was not found");
+			}
 			return false;
 		}
+	}
 
-		pascalTrafficClasses.insert(trafficClass);
+	if (pascalTrafficClasses.empty()) {
+		Logger::instance().log(Logger::ERROR, "Error parsing " + parameter + " traffic classes");
+		return false;
 	}
 
 	return true;
@@ -263,28 +432,6 @@ bool GlobalSettings::setRuns(GlobalSettings::PARAMETER_PREFIX prefix) {
 	}
 
 	if (runs <= 0) {
-		Logger::instance().log(Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
-		return false;
-	}
-
-	return true;
-}
-
-bool GlobalSettings::setServiceTime(GlobalSettings::PARAMETER_PREFIX prefix) {
-	string parameter = parameterMap[prefix];
-	if (!args.count(parameter)) {
-		Logger::instance().log(Logger::ERROR, "Parameter " + parameter + " was not found");
-		return false;
-	}
-	string value = args[parameter];
-	try {
-		serviceTime = stod(value);
-	} catch (...) {
-		Logger::instance().log(Logger::ERROR, "Error while parsing value " + parameter + ". Current value: " + value);
-		return false;
-	}
-
-	if (serviceTime <= 0) {
 		Logger::instance().log(Logger::ERROR, parameter + " must be greater than 0. Current value: " + value);
 		return false;
 	}
@@ -335,15 +482,15 @@ uint64_t GlobalSettings::getNumberOfTrafficClasses() {
 	return erlangTrafficClasses.size() + engsetTrafficClasses.size() + pascalTrafficClasses.size();
 }
 
-set<uint64_t> GlobalSettings::getErlangTrafficClasses() {
+set<ErlangTrafficClassDefinition> GlobalSettings::getErlangTrafficClasses() {
 	return erlangTrafficClasses;
 }
 
-set<uint64_t> GlobalSettings::getEngsetTrafficClasses() {
+set<EngsetTrafficClassDefinition> GlobalSettings::getEngsetTrafficClasses() {
 	return engsetTrafficClasses;
 }
 
-set<uint64_t> GlobalSettings::getPascalTrafficClasses() {
+set<PascalTrafficClassDefinition> GlobalSettings::getPascalTrafficClasses() {
 	return pascalTrafficClasses;
 }
 
@@ -351,30 +498,62 @@ uint64_t GlobalSettings::getRuns() {
 	return runs;
 }
 
-double GlobalSettings::getServiceTime() {
-	return serviceTime;
-}
-
 GlobalSettings::PATH_SELECTION_ALGORITHM GlobalSettings::getSelectedAlgorithm() {
 	return selectedAlgorithm;
 }
 
 bool GlobalSettings::maxTrafficClassRequireLessFSUsThanLinkCapacity() {
-	uint64_t erlangMaxTrafficClass = *max_element(erlangTrafficClasses.begin(), erlangTrafficClasses.end());
-	uint64_t engsetMaxTrafficClass = *max_element(engsetTrafficClasses.begin(), engsetTrafficClasses.end());
-	uint64_t pascalMaxTrafficClass = *max_element(pascalTrafficClasses.begin(), pascalTrafficClasses.end());
+	uint64_t erlangMaxTrafficClassFSURequirement = 0;
+	uint64_t engsetMaxTrafficClassFSURequirement = 0;
+	uint64_t pascalMaxTrafficClassFSURequirement = 0;
 
-	if (erlangMaxTrafficClass > linkCapacity) {
-		Logger::instance().log(Logger::ERROR, "Error: Erlang traffic class requires " + to_string(erlangMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
+	for (auto trafficClass: erlangTrafficClasses) {
+		if (trafficClass.getRequiredNumberOfFSUs() > erlangMaxTrafficClassFSURequirement) {
+			erlangMaxTrafficClassFSURequirement = trafficClass.getRequiredNumberOfFSUs();
+		}
+	}
+
+	for (auto trafficClass: engsetTrafficClasses) {
+		if (trafficClass.getRequiredNumberOfFSUs() > engsetMaxTrafficClassFSURequirement) {
+			engsetMaxTrafficClassFSURequirement = trafficClass.getRequiredNumberOfFSUs();
+		}
+	}
+
+	for (auto trafficClass: pascalTrafficClasses) {
+		if (trafficClass.getRequiredNumberOfFSUs() > pascalMaxTrafficClassFSURequirement) {
+			pascalMaxTrafficClassFSURequirement = trafficClass.getRequiredNumberOfFSUs();
+		}
+	}
+
+	if (erlangMaxTrafficClassFSURequirement > linkCapacity) {
+		Logger::instance().log(Logger::ERROR, "Error: Erlang traffic class requires " + to_string(erlangMaxTrafficClassFSURequirement) + " FSUs while link capacity is " + to_string(linkCapacity));
 		return false;
 	}
-	if (engsetMaxTrafficClass > linkCapacity) {
-		Logger::instance().log(Logger::ERROR, "Error: Engset traffic class requires " + to_string(engsetMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
+	if (engsetMaxTrafficClassFSURequirement > linkCapacity) {
+		Logger::instance().log(Logger::ERROR, "Error: Engset traffic class requires " + to_string(engsetMaxTrafficClassFSURequirement) + " FSUs while link capacity is " + to_string(linkCapacity));
 		return false;
 	}
-	if (pascalMaxTrafficClass > linkCapacity) {
-		Logger::instance().log(Logger::ERROR, "Error: Pascal traffic class requires " + to_string(pascalMaxTrafficClass) + " FSUs while link capacity is " + to_string(linkCapacity));
+	if (pascalMaxTrafficClassFSURequirement > linkCapacity) {
+		Logger::instance().log(Logger::ERROR, "Error: Pascal traffic class requires " + to_string(pascalMaxTrafficClassFSURequirement) + " FSUs while link capacity is " + to_string(linkCapacity));
 		return false;
 	}
 	return true;
+}
+
+vector<string> GlobalSettings::getTrafficClassDefinitionStrings(string input) {
+	vector<string> results;
+	stack<uint64_t> delimiterPositions;
+
+	for (uint64_t i = 0; i < input.size(); i++) {
+		if (input[i] == '{') {
+			delimiterPositions.push(i);
+		} else if (input[i] == '}' && !delimiterPositions.empty()) {
+			uint64_t openingDelimiterPosition = delimiterPositions.top();
+			delimiterPositions.pop();
+
+			string result = input.substr(openingDelimiterPosition + 1, i - 1 - openingDelimiterPosition);
+			results.push_back(result);
+		}
+	}
+	return results;
 }

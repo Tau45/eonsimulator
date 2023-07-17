@@ -5,9 +5,11 @@
 #include "EventCallServiceTermination.h"
 
 class EventNewCallArrivalEngsetClass : public Event {
+	double gamma;
+	double serviceTime;
 	TrafficClassStatistics &trafficClassStatistics;
 public:
-	EventNewCallArrivalEngsetClass(double occurrenceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
+	EventNewCallArrivalEngsetClass(double occurrenceTime, double gamma, double serviceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
 
 	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator, SimulationId &simulationId) override;
 };

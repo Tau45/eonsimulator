@@ -5,9 +5,11 @@
 #include "EventCallServiceTermination.h"
 
 class EventNewCallArrivalPascalClass : public Event {
+	double beta;
+	double serviceTime;
 	TrafficClassStatistics &trafficClassStatistics;
 public:
-	EventNewCallArrivalPascalClass(double occurrenceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
+	EventNewCallArrivalPascalClass(double occurrenceTime, double beta, double serviceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics);
 
 	void execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator, SimulationId &simulationId) override;
 };

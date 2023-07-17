@@ -12,9 +12,24 @@ SimulationSetResults::SimulationSetResults(double a, const vector<SingleSimulati
 		pascalTrafficResultRatiosVector.push_back(simulationResult.pascalTrafficResultRatios);
 	}
 
-	setTrafficSourceResults(erlangTrafficResults, erlangTrafficResultRatiosVector, GlobalSettings::instance().getErlangTrafficClasses());
-	setTrafficSourceResults(engsetTrafficResults, engsetTrafficResultRatiosVector, GlobalSettings::instance().getEngsetTrafficClasses());
-	setTrafficSourceResults(pascalTrafficResults, pascalTrafficResultRatiosVector, GlobalSettings::instance().getPascalTrafficClasses());
+	set<uint64_t> erlangTrafficClasses;
+	for (auto trafficClass: GlobalSettings::instance().getErlangTrafficClasses()) {
+		erlangTrafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
+	}
+
+	set<uint64_t> engsetTrafficClasses;
+	for (auto trafficClass: GlobalSettings::instance().getEngsetTrafficClasses()) {
+		engsetTrafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
+	}
+
+	set<uint64_t> pascalTrafficClasses;
+	for (auto trafficClass: GlobalSettings::instance().getPascalTrafficClasses()) {
+		pascalTrafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
+	}
+
+	setTrafficSourceResults(erlangTrafficResults, erlangTrafficResultRatiosVector, erlangTrafficClasses);
+	setTrafficSourceResults(engsetTrafficResults, engsetTrafficResultRatiosVector, engsetTrafficClasses);
+	setTrafficSourceResults(pascalTrafficResults, pascalTrafficResultRatiosVector, pascalTrafficClasses);
 }
 
 void SimulationSetResults::setTrafficSourceResults(map<uint64_t, TrafficClassResults> &trafficResults, const vector<map<uint64_t, TrafficClassResultRatios>> &trafficResultRatiosVector, const set<uint64_t> &trafficClasses) {

@@ -6,6 +6,9 @@
 #include <regex>
 #include <fstream>
 #include "Logger.h"
+#include "definition/EngsetTrafficClassDefinition.h"
+#include "definition/ErlangTrafficClassDefinition.h"
+#include "definition/PascalTrafficClassDefinition.h"
 
 class GlobalSettings {
 public:
@@ -23,7 +26,6 @@ private:
 		ENGSET,
 		PASCAL,
 		RUNS,
-		SERVICE_TIME,
 		MODE
 	};
 
@@ -36,7 +38,6 @@ private:
 			{ENGSET,            "-engset"},
 			{PASCAL,            "-pascal"},
 			{RUNS,              "-runs"},
-			{SERVICE_TIME,      "-serviceTime"},
 			{MODE,              "-mode"}
 	};
 
@@ -46,11 +47,10 @@ private:
 	string structureFileName;
 	uint64_t callsToGenerate;
 	uint64_t linkCapacity;
-	set<uint64_t> erlangTrafficClasses;
-	set<uint64_t> engsetTrafficClasses;
-	set<uint64_t> pascalTrafficClasses;
+	set<ErlangTrafficClassDefinition> erlangTrafficClasses;
+	set<EngsetTrafficClassDefinition> engsetTrafficClasses;
+	set<PascalTrafficClassDefinition> pascalTrafficClasses;
 	uint64_t runs;
-	double serviceTime;
 	PATH_SELECTION_ALGORITHM selectedAlgorithm;
 
 	GlobalSettings(map<string, string> args);
@@ -77,11 +77,11 @@ private:
 
 	bool setRuns(PARAMETER_PREFIX prefix);
 
-	bool setServiceTime(PARAMETER_PREFIX prefix);
-
 	bool setSelectedAlgorithm(PARAMETER_PREFIX prefix);
 
 	bool maxTrafficClassRequireLessFSUsThanLinkCapacity();
+
+	vector<string> getTrafficClassDefinitionStrings(string input);
 
 public:
 	static GlobalSettings &instance(function<GlobalSettings()> *init = nullptr);
@@ -100,15 +100,13 @@ public:
 
 	uint64_t getNumberOfTrafficClasses();
 
-	set<uint64_t> getErlangTrafficClasses();
+	set<ErlangTrafficClassDefinition> getErlangTrafficClasses();
 
-	set<uint64_t> getEngsetTrafficClasses();
+	set<EngsetTrafficClassDefinition> getEngsetTrafficClasses();
 
-	set<uint64_t> getPascalTrafficClasses();
+	set<PascalTrafficClassDefinition> getPascalTrafficClasses();
 
 	uint64_t getRuns();
-
-	double getServiceTime();
 
 	PATH_SELECTION_ALGORITHM getSelectedAlgorithm();
 };

@@ -1,8 +1,9 @@
 #include "../../include/event/EventNewCallArrivalErlangClass.h"
 
-EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double occurrenceTime, double lambda, Connection *connection, TrafficClassStatistics &trafficClassStatistics) :
+EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double occurrenceTime, double lambda, double serviceTime, Connection *connection, TrafficClassStatistics &trafficClassStatistics) :
 		Event(occurrenceTime, connection),
 		lambda(lambda),
+		serviceTime(serviceTime),
 		trafficClassStatistics(trafficClassStatistics) {}
 
 void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator, SimulationId &simulationId) {
@@ -11,6 +12,7 @@ void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Ev
 
 	eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime + generator.getRandomOccurrenceTime(lambda),
 													   lambda,
+													   serviceTime,
 													   new Connection(generator.getRandomOutputDirectionIndex(network.getNumberOfOutputDirections()), connection->getRequiredNumberOfFSUs()),
 													   trafficClassStatistics));
 
@@ -18,7 +20,7 @@ void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Ev
 		case Network::CONNECTION_CAN_BE_ESTABLISHED:
 			trafficClassStatistics.establishedConnections++;
 			connection->reserveResources();
-			eventQueue.push(new EventCallServiceTermination(occurrenceTime + generator.getRandomServiceTime(), connection));
+			eventQueue.push(new EventCallServiceTermination(occurrenceTime + generator.getRandomServiceTime(serviceTime), connection));
 
 			if (connection->getPathSize() == 1) {
 				Logger::instance().log(occurrenceTime, simulationId.getA(), simulationId.getSimulationIndex(), Logger::CONNECTION_ESTABLISHED, "Connection has been successfully set up using FSUs: " + to_string(connection->getFirstFSUOfInputLink()) + "-" + to_string(connection->getFirstFSUOfInputLink() + connection->getRequiredNumberOfFSUs() - 1) + " (" + to_string(connection->getRequiredNumberOfFSUs()) + " FSUs)");

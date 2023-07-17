@@ -22,9 +22,9 @@ class Generator {
 public:
 	Generator(int32_t x1, int32_t x2, int32_t x3);
 
-	double getRandomServiceTime();
+	double getRandomServiceTime(double serviceTime);
 
-	double getRandomOccurrenceTime(double lambda);
+	double getRandomOccurrenceTime(double intensity);
 
 	uint64_t getRandomOutputDirectionIndex(uint64_t numberOfOutputDirections);
 

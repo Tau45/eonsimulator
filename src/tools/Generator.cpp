@@ -30,13 +30,12 @@ double Generator::rown_v3(int &x) {
 	return double(x) / 2147483647;
 }
 
-double Generator::getRandomServiceTime() {
-	double serviceTime = GlobalSettings::instance().getServiceTime();
+double Generator::getRandomServiceTime(double serviceTime) {
 	return log(rown_v2(x2)) * (-serviceTime);
 }
 
-double Generator::getRandomOccurrenceTime(double lambda) {
-	return log(rown_v1(x1)) * (-1 / lambda);
+double Generator::getRandomOccurrenceTime(double intensity) {
+	return log(rown_v1(x1)) * (-1 / intensity);
 }
 
 uint64_t Generator::getRandomNaturalNumber(uint64_t numberOfNumbers) {

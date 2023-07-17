@@ -28,14 +28,15 @@ SingleSimulationResults Simulator::run() {
 }
 
 void Simulator::addErlangTrafficClasses() {
-	for (uint64_t requiredNumberOfFSUs: GlobalSettings::instance().getErlangTrafficClasses()) {
-		network.erlangTrafficClassStatistics[requiredNumberOfFSUs] = TrafficClassStatistics();
-		double lambda = getLambda(requiredNumberOfFSUs, network.getNumberOfInputLinks());
+	for (auto erlangTrafficClass: GlobalSettings::instance().getErlangTrafficClasses()) {
+		network.erlangTrafficClassStatistics[erlangTrafficClass.getRequiredNumberOfFSUs()] = TrafficClassStatistics();
+		double lambda = getLambda(erlangTrafficClass.getRequiredNumberOfFSUs(), network.getNumberOfInputLinks(), erlangTrafficClass.getServiceTime());
 
 		eventQueue.push(new EventNewCallArrivalErlangClass(generator.getRandomOccurrenceTime(lambda),
 														   lambda,
-														   new Connection(generator.getRandomOutputDirectionIndex(network.getNumberOfOutputDirections()), requiredNumberOfFSUs),
-														   network.erlangTrafficClassStatistics[requiredNumberOfFSUs]));
+														   erlangTrafficClass.getServiceTime(),
+														   new Connection(generator.getRandomOutputDirectionIndex(network.getNumberOfOutputDirections()), erlangTrafficClass.getRequiredNumberOfFSUs()),
+														   network.erlangTrafficClassStatistics[erlangTrafficClass.getRequiredNumberOfFSUs()]));
 	}
 }
 
@@ -43,10 +44,9 @@ void Simulator::addEngsetTrafficClasses() {}
 
 void Simulator::addPascalTrafficClasses() {}
 
-double Simulator::getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks) {
+double Simulator::getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks, double serviceTime) {
 	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
 	uint64_t numberOfTrafficClasses = GlobalSettings::instance().getNumberOfTrafficClasses();
-	double serviceTime = GlobalSettings::instance().getServiceTime();
 
 	return (simulationId.getA() * numberOfInputLinks * linkCapacity) / (numberOfTrafficClasses * serviceTime * requiredNumberOfFSUs);
 }

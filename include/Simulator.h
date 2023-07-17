@@ -14,7 +14,7 @@ class Simulator {
 	priority_queue<Event *, vector<Event *>, Event::EventComparator> eventQueue;
 	Generator generator;
 
-	double getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks);
+	double getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks, double serviceTime);
 
 	void addErlangTrafficClasses();
 
