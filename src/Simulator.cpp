@@ -9,7 +9,7 @@ Simulator::Simulator(double a, uint64_t simulationIndex, vector<int32_t> &seeds)
 }
 
 SingleSimulationResults Simulator::run() {
-	Logger::instance().log(0, simulationId.getA(), simulationId.getSimulationIndex(), Logger::SIMULATION_START, "The simulation has started...");
+	Logger::instance().log(0, simulationId, Logger::SIMULATION_START, "The simulation has started...");
 	auto start = chrono::high_resolution_clock::now();
 
 	while (network.getNumberOfGeneratedCallsOfTheLeastActiveClass() < GlobalSettings::instance().getCallsToGenerate()) {
@@ -22,7 +22,7 @@ SingleSimulationResults Simulator::run() {
 
 	auto finish = chrono::high_resolution_clock::now();
 	auto duration = duration_cast<chrono::milliseconds>(finish - start);
-	Logger::instance().log(eventQueue.top()->getOccurrenceTime(), simulationId.getA(), simulationId.getSimulationIndex(), Logger::SIMULATION_END, "The simulation has finished in " + to_string((double) duration.count() / 1000) + "s");
+	Logger::instance().log(eventQueue.top()->getOccurrenceTime(), simulationId, Logger::SIMULATION_END, "The simulation has finished in " + to_string((double) duration.count() / 1000) + "s");
 
 	return SingleSimulationResults(network.erlangTrafficClassStatistics, network.engsetTrafficClassStatistics, network.pascalTrafficClassStatistics);
 }

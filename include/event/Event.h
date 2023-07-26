@@ -3,7 +3,6 @@
 #define EONSIMULATOR_EVENT_H
 
 #include "../network/Network.h"
-#include "../tools/SimulationId.h"
 
 class Event {
 protected:

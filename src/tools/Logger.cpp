@@ -22,10 +22,10 @@ void Logger::log(LOG_MESSAGE_TYPE prefix, const string &message) {
 	}
 }
 
-void Logger::log(double clock, double a, uint64_t simulationIndex, LOG_MESSAGE_TYPE prefix, const string &message) {
+void Logger::log(double clock, SimulationId simulationId, LOG_MESSAGE_TYPE prefix, const string &message) {
 	if (logsEnabled) {
 		stringstream ss;
-		ss << getTimestamp(clock) << logA(a) << logSimulationIndex(simulationIndex) << logMessageTypeMap.at(prefix) << message << endl;
+		ss << getTimestamp(clock) << logA(simulationId.getA()) << logSimulationIndex(simulationId.getSimulationIndex()) << logMessageTypeMap.at(prefix) << message << endl;
 		cout << ss.str();
 	}
 }

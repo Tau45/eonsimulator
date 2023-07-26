@@ -7,6 +7,7 @@
 #include <iomanip>
 #include <map>
 #include <functional>
+#include "SimulationId.h"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ public:
 
 	void log(LOG_MESSAGE_TYPE prefix, const string &message);
 
-	void log(double clock, double a, uint64_t simulationIndex, LOG_MESSAGE_TYPE prefix, const string &message);
+	void log(double clock, SimulationId simulationId, LOG_MESSAGE_TYPE prefix, const string &message);
 
 private:
 	bool logsEnabled;
