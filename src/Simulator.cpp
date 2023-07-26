@@ -40,7 +40,20 @@ void Simulator::addErlangTrafficClasses() {
 	}
 }
 
-void Simulator::addEngsetTrafficClasses() {}
+void Simulator::addEngsetTrafficClasses() {
+	for (auto engsetTrafficClass: GlobalSettings::instance().getEngsetTrafficClasses()) {
+		network.engsetTrafficClassStatistics[engsetTrafficClass.getRequiredNumberOfFSUs()] = TrafficClassStatistics();
+		double gamma = getLambda(engsetTrafficClass.getRequiredNumberOfFSUs(), network.getNumberOfInputLinks(), engsetTrafficClass.getServiceTime());
+
+		for (uint64_t i = 0; i < engsetTrafficClass.getNumberOfTrafficClasses(); i++) {
+			eventQueue.push(new EventNewCallArrivalEngsetClass(generator.getRandomOccurrenceTime(gamma),
+															   gamma,
+															   engsetTrafficClass.getServiceTime(),
+															   new Connection(generator.getRandomOutputDirectionIndex(network.getNumberOfOutputDirections()), engsetTrafficClass.getRequiredNumberOfFSUs()),
+															   network.engsetTrafficClassStatistics[engsetTrafficClass.getRequiredNumberOfFSUs()]));
+		}
+	}
+}
 
 void Simulator::addPascalTrafficClasses() {}
 

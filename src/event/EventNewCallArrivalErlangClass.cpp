@@ -7,7 +7,7 @@ EventNewCallArrivalErlangClass::EventNewCallArrivalErlangClass(double occurrence
 		trafficClassStatistics(trafficClassStatistics) {}
 
 void EventNewCallArrivalErlangClass::execute(Network &network, priority_queue<Event *, vector<Event *>, Event::EventComparator> &eventQueue, Generator &generator, SimulationId &simulationId) {
-	Logger::instance().log(occurrenceTime, simulationId, Logger::CONNECTION_SETUP, "Setting up " + to_string(connection->getRequiredNumberOfFSUs()) + " FSU connection towards direction " + to_string(connection->getOutputDirectionIndex()) + "...");
+	Logger::instance().log(occurrenceTime, simulationId, Logger::CONNECTION_SETUP, "Erlang traffic new call event execution: Setting up " + to_string(connection->getRequiredNumberOfFSUs()) + " FSU connection towards direction " + to_string(connection->getOutputDirectionIndex()) + "...");
 	trafficClassStatistics.totalNumberOfCalls++;
 
 	eventQueue.push(new EventNewCallArrivalErlangClass(occurrenceTime + generator.getRandomOccurrenceTime(lambda),
