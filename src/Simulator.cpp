@@ -24,25 +24,25 @@ SingleSimulationResults Simulator::run() {
 	auto duration = duration_cast<chrono::milliseconds>(finish - start);
 	Logger::instance().log(eventQueue.top()->getOccurrenceTime(), simulationId, Logger::SIMULATION_END, "The simulation has finished in " + to_string((double) duration.count() / 1000) + "s");
 
-	return SingleSimulationResults(network.erlangTrafficClassStatistics, network.engsetTrafficClassStatistics, network.pascalTrafficClassStatistics);
+	return SingleSimulationResults(network.trafficClassStatistics);
 }
 
 void Simulator::addErlangTrafficClasses() {
 	for (auto erlangTrafficClass: GlobalSettings::instance().getErlangTrafficClasses()) {
-		network.erlangTrafficClassStatistics[erlangTrafficClass.getRequiredNumberOfFSUs()] = TrafficClassStatistics();
+		network.trafficClassStatistics[erlangTrafficClass.getRequiredNumberOfFSUs()] = TrafficClassStatistics();
 		double lambda = getLambda(erlangTrafficClass.getRequiredNumberOfFSUs(), network.getNumberOfInputLinks(), erlangTrafficClass.getServiceTime());
 
 		eventQueue.push(new EventNewCallArrivalErlangClass(generator.getRandomOccurrenceTime(lambda),
 														   lambda,
 														   erlangTrafficClass.getServiceTime(),
 														   new Connection(generator.getRandomOutputDirectionIndex(network.getNumberOfOutputDirections()), erlangTrafficClass.getRequiredNumberOfFSUs()),
-														   network.erlangTrafficClassStatistics[erlangTrafficClass.getRequiredNumberOfFSUs()]));
+														   network.trafficClassStatistics[erlangTrafficClass.getRequiredNumberOfFSUs()]));
 	}
 }
 
 void Simulator::addEngsetTrafficClasses() {
 	for (auto engsetTrafficClass: GlobalSettings::instance().getEngsetTrafficClasses()) {
-		network.engsetTrafficClassStatistics[engsetTrafficClass.getRequiredNumberOfFSUs()] = TrafficClassStatistics();
+		network.trafficClassStatistics[engsetTrafficClass.getRequiredNumberOfFSUs()] = TrafficClassStatistics();
 		double gamma = getLambda(engsetTrafficClass.getRequiredNumberOfFSUs(), network.getNumberOfInputLinks(), engsetTrafficClass.getServiceTime());
 
 		for (uint64_t i = 0; i < engsetTrafficClass.getNumberOfTrafficClasses(); i++) {
@@ -50,7 +50,7 @@ void Simulator::addEngsetTrafficClasses() {
 															   gamma,
 															   engsetTrafficClass.getServiceTime(),
 															   new Connection(generator.getRandomOutputDirectionIndex(network.getNumberOfOutputDirections()), engsetTrafficClass.getRequiredNumberOfFSUs()),
-															   network.engsetTrafficClassStatistics[engsetTrafficClass.getRequiredNumberOfFSUs()]));
+															   network.trafficClassStatistics[engsetTrafficClass.getRequiredNumberOfFSUs()]));
 		}
 	}
 }

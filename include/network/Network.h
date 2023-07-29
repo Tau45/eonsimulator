@@ -41,9 +41,7 @@ private:
 	bool structureIsOneLink();
 
 public:
-	map<uint64_t, TrafficClassStatistics> erlangTrafficClassStatistics;
-	map<uint64_t, TrafficClassStatistics> engsetTrafficClassStatistics;
-	map<uint64_t, TrafficClassStatistics> pascalTrafficClassStatistics;
+	map<uint64_t, TrafficClassStatistics> trafficClassStatistics;
 
 	Network();
 

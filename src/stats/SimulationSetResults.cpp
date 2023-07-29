@@ -2,37 +2,25 @@
 
 SimulationSetResults::SimulationSetResults(double a, const vector<SingleSimulationResults> &simulationResults) :
 		a(a) {
-	vector<map<uint64_t, TrafficClassResultRatios>> erlangTrafficResultRatiosVector;
-	vector<map<uint64_t, TrafficClassResultRatios>> engsetTrafficResultRatiosVector;
-	vector<map<uint64_t, TrafficClassResultRatios>> pascalTrafficResultRatiosVector;
+	vector<map<uint64_t, TrafficClassResultRatios>> trafficResultRatiosVector;
 
 	for (const SingleSimulationResults &simulationResult: simulationResults) {
-		erlangTrafficResultRatiosVector.push_back(simulationResult.erlangTrafficResultRatios);
-		engsetTrafficResultRatiosVector.push_back(simulationResult.engsetTrafficResultRatios);
-		pascalTrafficResultRatiosVector.push_back(simulationResult.pascalTrafficResultRatios);
+		trafficResultRatiosVector.push_back(simulationResult.trafficResultRatios);
 	}
 
-	set<uint64_t> erlangTrafficClasses;
+	set<uint64_t> trafficClasses;
 	for (auto trafficClass: GlobalSettings::instance().getErlangTrafficClasses()) {
-		erlangTrafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
+		trafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
 	}
 
-	set<uint64_t> engsetTrafficClasses;
 	for (auto trafficClass: GlobalSettings::instance().getEngsetTrafficClasses()) {
-		engsetTrafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
+		trafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
 	}
 
-	set<uint64_t> pascalTrafficClasses;
 	for (auto trafficClass: GlobalSettings::instance().getPascalTrafficClasses()) {
-		pascalTrafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
+		trafficClasses.insert(trafficClass.getRequiredNumberOfFSUs());
 	}
 
-	setTrafficSourceResults(erlangTrafficResults, erlangTrafficResultRatiosVector, erlangTrafficClasses);
-	setTrafficSourceResults(engsetTrafficResults, engsetTrafficResultRatiosVector, engsetTrafficClasses);
-	setTrafficSourceResults(pascalTrafficResults, pascalTrafficResultRatiosVector, pascalTrafficClasses);
-}
-
-void SimulationSetResults::setTrafficSourceResults(map<uint64_t, TrafficClassResults> &trafficResults, const vector<map<uint64_t, TrafficClassResultRatios>> &trafficResultRatiosVector, const set<uint64_t> &trafficClasses) {
 	/// Calculate average ratios
 	map<uint64_t, double> avgInternalBlockRatios;
 	map<uint64_t, double> avgExternalBlockRatios;

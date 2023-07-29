@@ -207,19 +207,7 @@ bool Network::pathHasFreeResources(Path *path, Connection *connection) {
 uint64_t Network::getNumberOfGeneratedCallsOfTheLeastActiveClass() {
 	uint64_t result = UINT64_MAX;
 
-	for (auto const &trafficClass: erlangTrafficClassStatistics) {
-		if (trafficClass.second.totalNumberOfCalls < result) {
-			result = trafficClass.second.totalNumberOfCalls;
-		}
-	}
-
-	for (auto const &trafficClass: engsetTrafficClassStatistics) {
-		if (trafficClass.second.totalNumberOfCalls < result) {
-			result = trafficClass.second.totalNumberOfCalls;
-		}
-	}
-
-	for (auto const &trafficClass: pascalTrafficClassStatistics) {
+	for (auto const &trafficClass: trafficClassStatistics) {
 		if (trafficClass.second.totalNumberOfCalls < result) {
 			result = trafficClass.second.totalNumberOfCalls;
 		}

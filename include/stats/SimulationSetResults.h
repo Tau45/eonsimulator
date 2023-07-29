@@ -8,15 +8,9 @@
 #include "../tools/GlobalSettings.h"
 
 class SimulationSetResults {
-	void setTrafficSourceResults(map<uint64_t, TrafficClassResults> &trafficResults,
-								 const vector<map<uint64_t, TrafficClassResultRatios>> &trafficResultRatiosVector,
-								 const set<uint64_t> &trafficClasses);
-
 public:
 	double a;
-	map<uint64_t, TrafficClassResults> erlangTrafficResults;
-	map<uint64_t, TrafficClassResults> engsetTrafficResults;
-	map<uint64_t, TrafficClassResults> pascalTrafficResults;
+	map<uint64_t, TrafficClassResults> trafficResults;
 
 	SimulationSetResults(double a, const vector<SingleSimulationResults> &);
 };

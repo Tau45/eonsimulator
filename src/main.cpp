@@ -89,20 +89,8 @@ int main(int argc, char *argv[]) {
 	for (auto &simulationSetResult: simulationSetResults) {
 		stringstream ss;
 		ss << simulationSetResult.a << "\t";
-		ss << "Erlang[";
-		for (auto y: simulationSetResult.erlangTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "}";
-		}
-		ss << "]\t";
-
-		ss << "Engset[";
-		for (auto y: simulationSetResult.engsetTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "}";
-		}
-		ss << "]\t";
-
-		ss << "Pascal[";
-		for (auto y: simulationSetResult.pascalTrafficResults) {
+		ss << "[";
+		for (auto y: simulationSetResult.trafficResults) {
 			ss << "{" << y.first << " FSUs\t" << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "}";
 		}
 		ss << "]\n";
@@ -114,20 +102,8 @@ int main(int argc, char *argv[]) {
 	for (auto &simulationSetResult: simulationSetResults) {
 		stringstream ss;
 		ss << simulationSetResult.a << "\t";
-		ss << "Erlang[";
-		for (auto y: simulationSetResult.erlangTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
-		}
-		ss << "]\t";
-
-		ss << "Engset[";
-		for (auto y: simulationSetResult.engsetTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
-		}
-		ss << "]\t";
-
-		ss << "Pascal[";
-		for (auto y: simulationSetResult.pascalTrafficResults) {
+		ss << "[";
+		for (auto y: simulationSetResult.trafficResults) {
 			ss << "{" << y.first << " FSUs\t" << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "}";
 		}
 		ss << "]\n";
@@ -139,20 +115,8 @@ int main(int argc, char *argv[]) {
 	for (auto &simulationSetResult: simulationSetResults) {
 		stringstream ss;
 		ss << simulationSetResult.a << "\t";
-		ss << "Erlang[";
-		for (auto y: simulationSetResult.erlangTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgTotalBlockRatio << "\t" << y.second.totalBlockConfidenceInterval << "}";
-		}
-		ss << "]\t";
-
-		ss << "Engset[";
-		for (auto y: simulationSetResult.engsetTrafficResults) {
-			ss << "{" << y.first << " FSUs\t" << y.second.avgTotalBlockRatio << "\t" << y.second.totalBlockConfidenceInterval << "}";
-		}
-		ss << "]\t";
-
-		ss << "Pascal[";
-		for (auto y: simulationSetResult.pascalTrafficResults) {
+		ss << "[";
+		for (auto y: simulationSetResult.trafficResults) {
 			ss << "{" << y.first << " FSUs\t" << y.second.avgTotalBlockRatio << "\t" << y.second.totalBlockConfidenceInterval << "}";
 		}
 		ss << "]\n";
