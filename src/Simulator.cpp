@@ -55,7 +55,21 @@ void Simulator::addEngsetTrafficClasses() {
 	}
 }
 
-void Simulator::addPascalTrafficClasses() {}
+void Simulator::addPascalTrafficClasses() {
+	for (auto pascalTrafficClass: GlobalSettings::instance().getPascalTrafficClasses()) {
+		network.trafficClassStatistics[pascalTrafficClass.getRequiredNumberOfFSUs()] = TrafficClassStatistics();
+		double beta = getLambda(pascalTrafficClass.getRequiredNumberOfFSUs(), network.getNumberOfInputLinks(), pascalTrafficClass.getServiceTime());
+
+		for (uint64_t i = 0; i < pascalTrafficClass.getNumberOfTrafficClasses(); i++) {
+			eventQueue.push(new EventNewCallArrivalPascalClass(generator.getRandomOccurrenceTime(beta),
+															   beta,
+															   pascalTrafficClass.getServiceTime(),
+															   new Connection(generator.getRandomOutputDirectionIndex(network.getNumberOfOutputDirections()), pascalTrafficClass.getRequiredNumberOfFSUs()),
+															   network.trafficClassStatistics[pascalTrafficClass.getRequiredNumberOfFSUs()],
+															   false));
+		}
+	}
+}
 
 double Simulator::getLambda(uint32_t requiredNumberOfFSUs, uint64_t numberOfInputLinks, double serviceTime) {
 	uint64_t linkCapacity = GlobalSettings::instance().getLinkCapacity();
