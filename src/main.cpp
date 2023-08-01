@@ -23,6 +23,53 @@ SimulationSetResults runSimulationSet(double a, vector<vector<int32_t>> seedsFor
 	return SimulationSetResults(a, simulationResults);
 }
 
+void saveResults(vector<SimulationSetResults> &simulationSetResults) {
+	Logger::instance().log(Logger::SIMULATIONS_ENDED, "Saving simulation results...");
+
+	string structureFileName = GlobalSettings::instance().getStructureFileName();
+	string structureName = structureFileName.substr(0, structureFileName.length() - 4);
+
+	ofstream internalBlocksResultFile(structureName + "_internal.xls");
+	ofstream externalBlocksResultFile(structureName + "_external.xls");
+	ofstream totalBlocksResultFile(structureName + "_total.xls");
+
+	for (auto &simulationSetResult: simulationSetResults) {
+		stringstream ss;
+		ss << simulationSetResult.a << "\t";
+		for (auto y: simulationSetResult.trafficResults) {
+			ss << y.second.avgInternalBlocksRatio << "\t" << y.second.internalBlocksRatioConfidenceInterval << "\t";
+		}
+		ss << endl;
+		internalBlocksResultFile << ss.str();
+	}
+
+	for (auto &simulationSetResult: simulationSetResults) {
+		stringstream ss;
+		ss << simulationSetResult.a << "\t";
+		for (auto y: simulationSetResult.trafficResults) {
+			ss << y.second.avgExternalBlocksRatio << "\t" << y.second.externalBlocksRatioConfidenceInterval << "\t";
+		}
+		ss << endl;
+		externalBlocksResultFile << ss.str();
+	}
+
+	for (auto &simulationSetResult: simulationSetResults) {
+		stringstream ss;
+		ss << simulationSetResult.a << "\t";
+		for (auto y: simulationSetResult.trafficResults) {
+			ss << y.second.avgTotalBlockRatio << "\t" << y.second.totalBlockConfidenceInterval << "\t";
+		}
+		ss << endl;
+		totalBlocksResultFile << ss.str();
+	}
+
+	internalBlocksResultFile.close();
+	externalBlocksResultFile.close();
+	totalBlocksResultFile.close();
+
+	Logger::instance().log(Logger::SIMULATIONS_ENDED, "Saving simulation results has been completed");
+}
+
 int main(int argc, char *argv[]) {
 
 	/// Read input arguments
@@ -81,7 +128,7 @@ int main(int argc, char *argv[]) {
 
 	Logger::instance().log(Logger::SIMULATIONS_ENDED, "All simulations were done in " + to_string((double) duration.count() / 1000) + "s");
 
-	// TODO: Save results in a file
+	saveResults(simulationSetResults);
 
 	/// Print results
 	/// Results for internal blocks
